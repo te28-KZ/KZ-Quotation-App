@@ -220,15 +220,13 @@
 </div>
 
 <script>
-  // 【設定①】デプロイしたGASのWeb API URLに差し替えてください
+  // 【設定①】デプロイしたGASのWeb API URL
   const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec";
 
-  // 【設定②】GAS側のスクリプトプロパティ「API_SECRET」に設定した値と
-  //          まったく同じ文字列をここに入れてください（合言葉）
+  // 【設定②】GAS側スクリプトプロパティの「API_SECRET」と完全一致させる合言葉
   const API_SECRET = "open ss1 rand kz";
 
-  // 社員マスタ（表示用のみ。実際の認証・氏名確定はGAS側のSTAFF_MASTERで行うため、
-  // ここに書く氏名・役職はログイン直後の画面表示にしか使われません）
+  // 社員マスタ（表示用）
   const STAFF_MASTER = {
     "0001": { name: "Tetsuya Goto", position: "Director" },
     "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
@@ -251,7 +249,7 @@
 
   let currentUser = null;
 
-  // 自動ログインチェック（ローカルストレージ）
+  // 自動ログインチェック
   const savedEmpId = localStorage.getItem("kz_emp_id");
   if (savedEmpId && STAFF_MASTER[savedEmpId]) {
     loginAs(savedEmpId);
@@ -301,7 +299,6 @@
   btnCreate.addEventListener("click", async () => {
     if (!currentUser) return;
 
-    // UI ローディング状態
     btnCreate.disabled = true;
     btnSpinner.style.display = "inline-block";
     btnText.textContent = "見積書を作成中...";
@@ -310,10 +307,12 @@
     resultBox.style.display = "none";
 
     try {
-      // GAS Web API へPOST
-      // ※氏名(salesPerson)はもう送らない。GAS側がempIdから正式な氏名を確定する。
+      // GASへのPOST送信（Content-Type: text/plain でCORSエラーを回避）
       const response = await fetch(GAS_WEBAPP_URL, {
         method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
         body: JSON.stringify({
           action: "createQuotation",
           empId: currentUser.id,
@@ -330,7 +329,6 @@
         linkOpenSheet.href = res.fileUrl;
         resultBox.style.display = "block";
 
-        // 自動で新規シートを別タブで開く
         window.open(res.fileUrl, "_blank");
       } else {
         throw new Error(res.message || "作成に失敗しました");
