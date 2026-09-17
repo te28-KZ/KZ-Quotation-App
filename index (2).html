@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KATZDEN VIETNAM - 見積書作成システム</title>
+
+  <!-- アプリアイコン設定 -->
+  <link rel="icon" type="image/jpeg" href="Image8c.jpg">
+  <link rel="apple-touch-icon" href="Image8c.jpg">
+
+  <style>
+    :root {
+      --primary: #c9171e;
+      --primary-hover: #a81318;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-muted: #666666;
+      --border: #e0e0e0;
+      --success: #28a745;
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 32px 28px;
+      text-align: center;
+      position: relative;
+    }
+    .app-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      object-fit: cover;
+    }
+    .logo-badge {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .sub-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .user-info-box {
+      background: #fdf5f5;
+      border: 1px solid #ffd8d8;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .user-info-box .name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .user-info-box .role {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .logout-link {
+      display: inline-block;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .status-msg {
+      margin-top: 16px;
+      font-size: 13px;
+      min-height: 20px;
+    }
+    .status-msg.error { color: #d93025; }
+    .status-msg.info { color: #1a73e8; }
+    .status-msg.success { color: var(--success); font-weight: bold; }
+    .result-box {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+      background: #e6f4ea;
+      border: 1px solid #ceead6;
+      border-radius: 8px;
+      text-align: left;
+    }
+    .result-box .quote-no {
+      font-size: 16px;
+      font-weight: 800;
+      color: #137333;
+      margin-bottom: 8px;
+    }
+    .btn-open {
+      background: #1a73e8;
+      margin-top: 10px;
+    }
+    .btn-open:hover { background: #1557b0; }
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 3px solid #fff;
+      width: 18px;
+      height: 18px;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- アプリアイコン画像 -->
+  <img src="Image8c.jpg" alt="Quotation App Icon" class="app-icon">
+  <div class="logo-badge">KATZDEN VIETNAM</div>
+  <div class="sub-title">Quotation Creation System / 見積書作成</div>
+
+  <!-- STEP 1: LOGIN VIEW -->
+  <div id="loginView">
+    <div class="form-group">
+      <label for="empId">社員番号 / Employee ID</label>
+      <input type="text" id="empId" placeholder="例: 0001" autocomplete="off">
+    </div>
+    <button class="btn" id="btnLogin">ログイン / Đăng nhập</button>
+  </div>
+
+  <!-- STEP 2: DASHBOARD VIEW -->
+  <div id="dashView" style="display: none;">
+    <div class="user-info-box">
+      <div class="name" id="dispName">--</div>
+      <div class="role" id="dispRole">--</div>
+      <span class="logout-link" id="btnLogout">ログアウト (切替)</span>
+    </div>
+
+    <button class="btn" id="btnCreate">
+      <div class="spinner" id="btnSpinner"></div>
+      <span id="btnText">＋ 新規見積書を作成</span>
+    </button>
+
+    <div class="result-box" id="resultBox">
+      <div class="quote-no" id="dispQuoteNo"></div>
+      <p style="font-size: 12px; color: #555;">Googleドライブ内に新規見積ファイルが作成されました。</p>
+      <a href="#" target="_blank" class="btn btn-open" id="linkOpenSheet" style="text-decoration: none;">
+        見積スプレッドシートを開く ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="status-msg" id="statusMsg"></div>
+</div>
+
+<script>
+  // 【設定①】デプロイしたGASのWeb API URLに差し替えてください
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+
+  // 【設定②】GAS側のスクリプトプロパティ「API_SECRET」に設定した値と
+  //          まったく同じ文字列をここに入れてください（合言葉）
+  const API_SECRET = "ここにGAS側と同じ合言葉を入れる";
+
+  // 社員マスタ（表示用のみ。実際の認証・氏名確定はGAS側のSTAFF_MASTERで行うため、
+  // ここに書く氏名・役職はログイン直後の画面表示にしか使われません）
+  const STAFF_MASTER = {
+    "0001": { name: "Tetsuya Goto", position: "Director" },
+    "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+  };
+
+  const loginView = document.getElementById("loginView");
+  const dashView = document.getElementById("dashView");
+  const empIdInput = document.getElementById("empId");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnLogout = document.getElementById("btnLogout");
+  const dispName = document.getElementById("dispName");
+  const dispRole = document.getElementById("dispRole");
+  const btnCreate = document.getElementById("btnCreate");
+  const btnSpinner = document.getElementById("btnSpinner");
+  const btnText = document.getElementById("btnText");
+  const statusMsg = document.getElementById("statusMsg");
+  const resultBox = document.getElementById("resultBox");
+  const dispQuoteNo = document.getElementById("dispQuoteNo");
+  const linkOpenSheet = document.getElementById("linkOpenSheet");
+
+  let currentUser = null;
+
+  // 自動ログインチェック（ローカルストレージ）
+  const savedEmpId = localStorage.getItem("kz_emp_id");
+  if (savedEmpId && STAFF_MASTER[savedEmpId]) {
+    loginAs(savedEmpId);
+  }
+
+  // ログイン処理
+  btnLogin.addEventListener("click", () => {
+    const id = empIdInput.value.trim();
+    if (!id) {
+      showStatus("社員番号を入力してください", "error");
+      return;
+    }
+    if (STAFF_MASTER[id]) {
+      localStorage.setItem("kz_emp_id", id);
+      loginAs(id);
+    } else {
+      showStatus("該当する社員が見つかりません", "error");
+    }
+  });
+
+  empIdInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btnLogin.click();
+  });
+
+  function loginAs(id) {
+    currentUser = STAFF_MASTER[id];
+    currentUser.id = id;
+    dispName.textContent = currentUser.name;
+    dispRole.textContent = currentUser.position;
+    loginView.style.display = "none";
+    dashView.style.display = "block";
+    resultBox.style.display = "none";
+    statusMsg.textContent = "";
+  }
+
+  // ログアウト処理
+  btnLogout.addEventListener("click", () => {
+    localStorage.removeItem("kz_emp_id");
+    currentUser = null;
+    empIdInput.value = "";
+    dashView.style.display = "none";
+    loginView.style.display = "block";
+    statusMsg.textContent = "";
+  });
+
+  // 見積作成ボタン押下
+  btnCreate.addEventListener("click", async () => {
+    if (!currentUser) return;
+
+    // UI ローディング状態
+    btnCreate.disabled = true;
+    btnSpinner.style.display = "inline-block";
+    btnText.textContent = "見積書を作成中...";
+    statusMsg.className = "status-msg info";
+    statusMsg.textContent = "自動採番・フォルダ作成・複製を行っています (約10〜15秒)";
+    resultBox.style.display = "none";
+
+    try {
+      // GAS Web API へPOST
+      // ※氏名(salesPerson)はもう送らない。GAS側がempIdから正式な氏名を確定する。
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "createQuotation",
+          empId: currentUser.id,
+          apiKey: API_SECRET
+        })
+      });
+
+      const res = await response.json();
+
+      if (res.status === "success") {
+        statusMsg.className = "status-msg success";
+        statusMsg.textContent = "作成が完了しました！";
+        dispQuoteNo.textContent = "№ " + res.quoteNo;
+        linkOpenSheet.href = res.fileUrl;
+        resultBox.style.display = "block";
+
+        // 自動で新規シートを別タブで開く
+        window.open(res.fileUrl, "_blank");
+      } else {
+        throw new Error(res.message || "作成に失敗しました");
+      }
+    } catch (err) {
+      statusMsg.className = "status-msg error";
+      statusMsg.textContent = "エラー: " + err.message;
+    } finally {
+      btnCreate.disabled = false;
+      btnSpinner.style.display = "none";
+      btnText.textContent = "＋ 新規見積書を作成";
+    }
+  });
+
+  function showStatus(text, type) {
+    statusMsg.className = "status-msg " + type;
+    statusMsg.textContent = text;
+  }
+</script>
+
+</body>
+</html>
