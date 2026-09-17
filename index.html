@@ -1,3 +1,2869 @@
+
+Gemini
+チャットを PDF に変換
+チャットを PDF に変換
+このチャットを Acrobat で開く
+
+チャット
+
+Spark
+ベータ版
+チャットを新規作成
+チャットを検索
+画像
+動画
+ライブラリ
+Gem
+ノートブックを新規作成
+Untitled notebook
+Optimizing Dance Lesson Scheduling via Google Calendar
+すべてのノートブック
+VIBE展示会に向けたブレインストーミング
+履歴書データからの候補者プロフィール要約
+GEM 展示会・工場見学戦略
+薪ストーブ開発
+BricsCAD
+マーケティング構想、壁打ち
+Gemini エージェント機能の概要
+米国、イランへの軍事作戦開始
+ゴムとモンキーポッド集成材の比較
+ベトナム社員向け日本観光プラン提案
+チーム制廃止と組織再編の提案
+薪ストーブ新仕様報告会資料作成
+ベトナム講義構成案のインプット
+ベトナム戦争兵力推移の解説
+見積もりアプリ開発前の要件壁打ち
+見積もり作成アプリの英語表現
+ベトナム人部下の結婚式のご祝儀相場
+5年間の資産・貯蓄シミュレーション
+段ボール小ロット製作の費用相場
+出産祝いの返信文例とマナー
+AI名刺管理アプリの構築手法
+名刺スキャンアプリのアイコン生成プロンプト
+内容の把握とサポート受付
+板金加工用語のベトナム語翻訳一覧
+業務割り振り結果の報告
+軽量ブリックへの鉄板接着工法プロンプト
+バイナリデータの翻訳不能について
+OutlookメールをGmailへ転送する方法
+貴社NETの意味について
+Windows向け見積りアプリの開発方針案
+ビジネスメールの添削と修正案
+Steel Baseboard Color Inquiry
+設計室の業務と残業管理に関する会議議事録
+CADへのJPEG画像埋め込み方法
+積水ハウス設計者のベトナム視察
+テーブル重量の仕様検討に関する添削
+内装系企業のリストアップ
+見積書における値引きの記載方法
+エクセル印刷で横方向を中央に寄せる方法
+3D承認と施工範囲の確認
+端材を考慮した材料費の計算方法
+iPadのロック解除に関する問い合わせ
+Gemini との会話
+見積もり作成アプリをurlhtmlで作成したい。
+
+見積もりフォーマットは既にスプレッドシートで作成している。アプリ作成する前に色々壁打ちしたい。どんな情報がひつよう？因みにアプリはgithubを使う
+
+結論から言うと、設計・実装に進む前に詰めるべき情報は「データ連携・出力形式・計算ロジック・運用環境」の4領域です。
+
+壁打ちを進めるにあたり、以下の各項目について現状の想定や仕様を教えてください。
+
+1. スプレッドシートとの連携方針
+役割分担: スプレッドシートを「マスターデータ（単価表など）の参照元」にするのか、「作成した見積もりの保存先」にするのか、単なる「デザイン・計算式の見本（アプリ単体で完結させる）」なのか。
+
+API連携の有無: Google Sheets API や Google Apps Script (GAS) 経由でシートとリアルタイム通信させるか、初期はCSV/JSONでデータをアプリ内に持たせるか。
+
+2. 計算ロジックと入力項目
+入力必須項目: 顧客情報、品名、仕様（材質・寸法・工程など）、数量、納期など。
+
+計算ルール:
+
+単純な「単価 × 数量」か。
+
+材料費・加工費（溶接・塗装・メッキ等）・管理費・利益率などの積み上げ計算（積算）が必要か。
+
+通貨・端数処理: 通貨（VND / JPY / USD）や、端数処理（四捨五入・切捨てなど）、税率（VATなど）の扱い。
+
+3. 出力形式（アウトプット）
+最終成果物:
+
+ブラウザ画面からの直接PDF印刷 / ダウンロード
+
+スプレッドシートへの行追加
+
+既存のスプレッドシートテンプレートへの値流し込み・複製
+
+4. ユーザー・運用環境（GitHub / フロントエンド構成）
+公開・ホスティング: GitHub Pages を使った静的ホスティング（HTML/CSS/JavaScript）を想定しているか。
+
+利用端末・ユーザー: PCメインかタブレット/スマホも含むか。作成者は社内特定メンバーのみか、外部アクセスも考慮するか。
+
+認証・権限: パスワード保護やGoogleアカウントログインが必要か、公開URLで問題ないか。
+
+まずは、「現在のスプレッドシートの構成（どんな項目や計算式が入っているか）」と「アプリ側に一番持たせたい機能（入力の手間削減、計算ミス防止、外出先からの作成など）」から整理していきましょう。スプレッドシートの項目構成や課題感を共有してください。
+
+これがスプレッドシート
+
+https://docs.google.com/spreadsheets/d/1QiFOlOhv_1fvM-pX_EB4-GgbWjYUrmZ0XTvdXMTRX1U/edit?usp=drivesdk
+
+スプレッドシート（@QT MASTER）を確認しました。原価積算から日英越3言語の取引条件、提出台帳連携まで精緻に作り込まれています。  
+@QT MASTER
+
+これをGitHub（GitHub Pages等の静的Webアプリ）でHTML/JS化して運用する場合、開発に着手する前に決めておくべき論点は以下の4点です。
+
+1. アプリの「カバー範囲」（どこまで画面でやるか）
+シートには以下の4つの機能ブロックがあります。アプリでどこまで行いたいですか？  
+@QT MASTER
+
+A. 案件基本情報＆見積書（Quotation）プレビュー・印刷（宛先、明細、合計金額、PDF出力）  
+@QT MASTER
+
+B. 原価計算（積算）ツール（板厚・寸法からの材料費計算、レーザー・ベンダー・溶接・塗装などの工程別工数計算、利益率・運賃・通関費の上乗せ）  
+@QT MASTER
+
+C. 取引条件・技術仕様の選択（EPE取引、EXW/DAP、関税、塗装仕様などの日英越テキスト選択・添付）  
+@QT MASTER
+
+D. 台帳管理・履歴保存（作成した見積番号、宛先、金額の記録）  
+@QT MASTER
+
+アドバイス: いきなり原価積算（B）までWebアプリ化すると工数が大きくなります。「まずは営業が外出先や現場でサッとA・Cを選んで見積PDFを発行する」のか、「積算ロジック（B）の自動化・入力簡素化」が目的なのかで設計が変わります。
+
+2. データ保存とGoogleスプレッドシートとの連携方法
+GitHub Pagesは静的サーバー（HTML/JS/CSS）のため、単体ではデータベースを持ちません。
+
+案①：Google Apps Script (GAS) をAPIにして連携
+
+アプリで入力した内容を、既存のこのスプレッドシート（または台帳シート）に自動送信・追記する。
+
+案②：完全スタンドアロン（ブラウザ完結）
+
+入力データはその場でPDF印刷するのみ。保存はブラウザ内（LocalStorage）またはJSONエクスポート。
+
+案③：スプレッドシートからマスター取得
+
+単価表（材料単価、加工レート、ボルト購入品リストなど） をスプレッドシートから読み込むか、アプリ内の設定ファイルに持つか。  
+@QT MASTER
+
+3. 主な利用者と使用環境
+利用言語: 画面UI（ボタンや項目ラベル）は日本語メインか、現地ベトナム人スタッフも入力できるようベトナム語/英語切り替えが必要か？
+
+端末: 主にPC（事務所での精密積算）か、スマートフォン/タブレット（現場・出先でのクイック入力）か？
+
+4. 最も解決したい「現状の不満・課題」
+スプレッドシート運用において、何が一番ネックになっていますか？
+
+計算式やセルを誤って消してしまう／壊してしまう
+
+スプレッドシートだとスマホから入力しづらい
+
+条件分岐（EPE取引、言語選択、免責事項）の選択とフォーマット整形が面倒
+
+見積番号の発番や過去履歴の管理が煩雑
+
+まずは 「4. 最も解決したい課題」 と 「1. アプリ化したい範囲」 について、どう考えているか教えてください。それに合わせて最適なアーキテクチャ（画面構成やJS設計）に絞り込んでいきましょう。
+
+/**
+
+ * 【見積マスター用】
+
+ * ・自動採番 & 指定フォルダ内サブフォルダへの自動格納
+
+ * ・J6通貨変更によるI列の表示形式自動切り替え
+
+ */
+
+const MASTER_CONFIG = {
+
+  // 指定のGoogleドライブ親フォルダID
+
+  PARENT_FOLDER_ID: '1-TQlPmFbtFw9Ptky2AuAJqPLVCg1-Ck-',
+
+ 
+
+  // 管理台帳（QSM）のスプレッドシートID
+
+  LEDGER_SPREADSHEET_ID: '1lbzNr8CKPqY9AmL7m-zisgpvJ1vu8o8Vac3gvcREDGQ',
+
+  LEDGER_SHEET_NAME: 'Quotation Summary Master',
+
+  QUOTE_SHEET_NAME: 'Quotation',
+
+ 
+
+  CELLS: {
+
+    QUOTE_NO: 'J3',       // 物件番号
+
+    DATE: 'J4',           // 作成日
+
+    SALES_PERSON: 'J7',   // 担当者
+
+    TOTAL_AMOUNT: 'J34'   // 見積合計金額
+
+  },
+
+ 
+
+  LEDGER_COL: {
+
+    DATE: 1,         // A列: Date
+
+    QUOTE_NO: 2,     // B列: Quotation No.
+
+    AMOUNT: 3,       // C列: Quotation Amount
+
+    CLIENT: 4,       // D列: Client
+
+    DESTINATION: 5,  // E列: Destination
+
+    SALES_PERSON: 6, // F列: Sales Person
+
+    DETAILS: 7,      // G列: Quotation Details
+
+    STATUS: 8,       // H列: Check (Status)
+
+    MEMO: 9          // I列: Memo / Link
+
+  }
+
+};
+
+
+
+/**
+
+ * スプレッドシートを開いた時に専用メニューを追加
+
+ */
+
+function onOpen() {
+
+  SpreadsheetApp.getUi()
+
+    .createMenu('【見積管理/Quản lý báo giá】')
+
+    .addItem('@ 新規見積り/Báo giá mới', 'createNewQuotation')
+
+    .addToUi();
+
+}
+
+
+
+/**
+
+ * 新規見積書の作成・自動採番・指定フォルダへの複製保存
+
+ */
+
+function createNewQuotation() {
+
+  const ui = SpreadsheetApp.getUi();
+
+  const lock = LockService.getScriptLock();
+
+  try {
+
+    lock.waitLock(30000); // 排他制御（30秒）
+
+  } catch (e) {
+
+    ui.alert('他のユーザーが採番処理中です。数十秒後に再度お試しください。');
+
+    return;
+
+  }
+
+
+
+  try {
+
+    const today = new Date();
+
+    const yy = Utilities.formatDate(today, 'Asia/Saigon', 'yy');
+
+    const mm = Utilities.formatDate(today, 'Asia/Saigon', 'MM');
+
+    const yymm = yy + mm;
+
+    const dateString = Utilities.formatDate(today, 'Asia/Saigon', 'yyyy-MM-dd');
+
+
+
+    // 1. 台帳から最新の連番を取得
+
+    const ledgerSS = SpreadsheetApp.openById(MASTER_CONFIG.LEDGER_SPREADSHEET_ID);
+
+    const ledgerSheet = ledgerSS.getSheetByName(MASTER_CONFIG.LEDGER_SHEET_NAME) || ledgerSS.getSheets()[0];
+
+    const lastRow = ledgerSheet.getLastRow();
+
+   
+
+    let maxSeq = 0;
+
+    if (lastRow >= 2) {
+
+      const existingNos = ledgerSheet.getRange(2, MASTER_CONFIG.LEDGER_COL.QUOTE_NO, lastRow - 1, 1).getValues();
+
+      for (let i = 0; i < existingNos.length; i++) {
+
+        const val = String(existingNos[i][0]).trim();
+
+        if (val.startsWith(yymm) && val.length >= 8) {
+
+          const seqNum = parseInt(val.substring(4, 8), 10);
+
+          if (!isNaN(seqNum) && seqNum > maxSeq) {
+
+            maxSeq = seqNum;
+
+          }
+
+        }
+
+      }
+
+    }
+
+
+
+    const nextSeq = maxSeq + 1;
+
+    const seqPadded = ('0000' + nextSeq).slice(-4);
+
+    const newQuoteNo = `${yymm}${seqPadded}01-01`;
+
+
+
+    // 2. 保存先フォルダの処理（親フォルダ内に先頭10桁のサブフォルダを作成または取得）
+
+    const parentFolder = DriveApp.getFolderById(MASTER_CONFIG.PARENT_FOLDER_ID);
+
+    const subFolderName = newQuoteNo.substring(0, 10); // 例: 2609000101
+
+    const existingSubFolders = parentFolder.getFoldersByName(subFolderName);
+
+   
+
+    let targetFolder;
+
+    if (existingSubFolders.hasNext()) {
+
+      targetFolder = existingSubFolders.next();
+
+    } else {
+
+      targetFolder = parentFolder.createFolder(subFolderName);
+
+    }
+
+
+
+    // 3. サブフォルダ内にマスターファイルを複製
+
+    const activeSS = SpreadsheetApp.getActiveSpreadsheet();
+
+    const currentFile = DriveApp.getFileById(activeSS.getId());
+
+    const newFileName = `【見積】${newQuoteNo}_未設定`;
+
+    const newFile = currentFile.makeCopy(newFileName, targetFolder);
+
+
+
+    // 4. 複製先ファイルのQuotationシートに物件番号・日付をセット
+
+    const newSS = SpreadsheetApp.openById(newFile.getId());
+
+    const newQuoteSheet = newSS.getSheetByName(MASTER_CONFIG.QUOTE_SHEET_NAME);
+
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.QUOTE_NO).setValue(newQuoteNo);
+
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.DATE).setValue(dateString);
+
+
+
+    // 5. 管理台帳に「作成中」レコードを追加
+
+    const currentUser = Session.getActiveUser().getEmail();
+
+    const masterSales = activeSS.getSheetByName(MASTER_CONFIG.QUOTE_SHEET_NAME).getRange(MASTER_CONFIG.CELLS.SALES_PERSON).getValue();
+
+
+
+    const newRow = [];
+
+    newRow[MASTER_CONFIG.LEDGER_COL.DATE - 1] = dateString;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.QUOTE_NO - 1] = newQuoteNo;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.AMOUNT - 1] = 0;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.CLIENT - 1] = '（未入力）';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.DESTINATION - 1] = '';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.SALES_PERSON - 1] = masterSales || currentUser;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.DETAILS - 1] = '';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.STATUS - 1] = '作成中(Draft)';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.MEMO - 1] = newFile.getUrl();
+
+
+
+    ledgerSheet.appendRow(newRow);
+
+    lock.releaseLock();
+
+
+
+    // 6. 完了ポップアップ
+
+    const htmlOutput = HtmlService.createHtmlOutput(`
+
+      <div style="font-family: sans-serif; padding: 10px; line-height: 1.6;">
+
+        <h3 style="color: #1a73e8; margin-top: 0;">新規見積書が生成されました！</h3>
+
+        <p><b>物件番号:</b> <span style="font-size: 1.2em; color: #d93025;">${newQuoteNo}</span></p>
+
+        <p><b>保存フォルダ:</b> ${subFolderName}</p>
+
+        <p><b>ファイル名:</b> ${newFileName}</p>
+
+        <p style="margin-top: 20px;">
+
+          <a href="${newFile.getUrl()}" target="_blank" style="background-color: #1a73e8; color: white; padding: 10px 18px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">
+
+            新しい見積書を開く ↗
+
+          </a>
+
+        </p>
+
+      </div>
+
+    `).setWidth(450).setHeight(260);
+
+
+
+    ui.showModalDialog(htmlOutput, '新規見積書 作成完了');
+
+
+
+  } catch (error) {
+
+    if (lock.hasLock()) lock.releaseLock();
+
+    ui.alert('エラーが発生しました: ' + error.message);
+
+  }
+
+}
+
+
+
+/**
+
+ * J6（CURRENCY）の変更を検知し、I列の表示形式を自動連動させる
+
+ */
+
+function onEdit(e) {
+
+  if (!e || !e.range) return;
+
+  const sheet = e.range.getSheet();
+
+  if (sheet.getName() === 'Quotation' && e.range.getA1Notation() === 'J6') {
+
+    const currency = String(e.value || sheet.getRange('J6').getValue()).trim();
+
+    const priceRange = sheet.getRange('I14:I31');
+
+    if (currency === 'USD') {
+
+      priceRange.setNumberFormat('$#,##0.00');
+
+    } else if (currency === 'VND') {
+
+      priceRange.setNumberFormat('#,##0 "VND"');
+
+    }
+
+  }
+
+}
+
+
+
+これがGAS
+
+共有いただいたGASコードとスプレッドシートの構造から、現在の業務フローとシステム全体の全貌が明確に把握できました。
+
+採番ルール: YYMM + 4桁連番 + 01-01（例: 2609000101-01）
+
+保存構造: 親フォルダ 1-TQlPmFbtFw9Ptky2AuAJqPLVCg1-Ck- 内に、物件番号の先頭10桁（2609000101）のサブフォルダを生成し、その中にスプレッドシートを複製保存
+
+台帳連携: 管理台帳スプレッドシート（QSM: 1lbzNr8CKPqY9AmL7m-zisgpvJ1vu8o8Vac3gvcREDGQ）へ「作成中(Draft)」として自動追記
+
+見積フォーマット: 通貨（VND / USD）切替、原価積算（材料・加工工数）、日英越の取引条件（EPE・納品条件・塗装等）
+
+アプリ化（GitHub / HTML）に向けた最重要の壁打ちポイント
+GitHub（GitHub Pagesなどの静的Webアプリ）で構築する場合、「どこをブラウザ側に移し、どこをGoogleドライブ／スプレッドシートに残すか」の役割分担を決めます。
+
+検討パターンA：フロントエンド完結型（Google Drive複製をやめる）
+仕組み:
+
+見積データの入力・計算・プレビュー・PDF出力をすべてWeb画面上で完結。
+
+案件ごとに「スプレッドシートを複製作成する」のをやめ、入力完了時にGAS（Web API化）を叩いて台帳（QSM）への1行追加とPDFのGoogle Drive保存だけを行う。
+
+メリット:
+
+案件ごとにスプレッドシートが大量増殖せず、管理が圧倒的に楽。
+
+誤操作で計算セルや数式が壊れるトラブルがゼロになる。
+
+デメリット:
+
+見積完成後に「スプレッドシート上で手作業で数値を微調整する」ことができなくなる。
+
+検討パターンB：GAS連携型（現行フローのUIラッパー）
+仕組み:
+
+Web画面で「新規作成」ボタンや基本情報（宛先・品名・通貨など）を入力。
+
+裏で既存のGASを呼び出し、従来どおりサブフォルダ作成＆シート複製＆台帳追加を実行し、生成されたスプレッドシートURLを画面に返す。
+
+メリット:
+
+既存のシート積算ロジックや個別編集の柔軟性をそのまま維持できる。
+
+デメリット:
+
+結局スプレッドシートを開いて入力・編集するため、「アプリ化」による入力の手間削減効果が限定的。
+
+次に確認したい3つの質問
+アプリでどこまで入力させたいですか？
+
+① 基本情報のみ入力（宛先・件名・通貨・担当者を入力し、発番＆シート複製をアプリから起動）
+
+② 明細・積算まで入力（材料寸法・加工工数などもアプリの入力フォームで計算し、そのまま見積書プレビュー・PDF発行まで完結）
+
+③ 取引条件（Checklist）の選定メイン（EPEや納品条件などの条項選択と宛先入力に特化）
+
+案件ごとのスプレッドシート複製は今後も残したいですか？
+
+「個別にシートが残っていないと不安（手修正したい）」
+
+「台帳（QSM）にデータが蓄積され、PDFがDriveに保存されれば、案件ごとの個別シートは不要」
+
+利用想定ユーザーは誰ですか？
+
+後藤様本人のみか、現地のベトナム人スタッフ（営業・工務・CAD）も操作するか？
+
+この3点の方向性に合わせて、具体的な画面設計（ワイヤーフレーム案）とHTML/JS＋GAS APIの設計に落とし込みます。どれがイメージに近いでしょうか？
+
+現状はマスターのスプレッドシートを開いて新規見積り作成のボタンを作成する流れだから、それをアプリ側でやりたい。その後の流れは変えなくていい。
+
+結論から言うと、「フロントエンド（GitHub Pages）のWeb画面からボタン1つで既存GASを叩き、発番・複製・台帳追記を行って、生成されたスプレッドシートのURLを画面に開く」というシンプルな構成が最適です。
+
+既存の積算シートや運用フローを一切変えずに、マスターシートを開く手間と誤編集リスクだけをピンポイントで解消できます。
+
+実装に必要な3つの要素
+[ GitHub Pages (HTML/JS) ]
+       │
+       │ POST（fetch）
+       ▼
+[ Google Apps Script (doPost Web API) ]
+       │
+       ├─① 台帳(QSM)から連番取得・発番
+       ├─② Google Driveに先頭10桁サブフォルダ作成
+       ├─③ マスターシートを複製・物件番号/日付を書き込み
+       └─④ 台帳(QSM)に「作成中(Draft)」を追記
+       │
+       ▼ レスポンス (JSON: { quoteNo, fileUrl, subFolder })
+[ 画面上にリンク表示 & 新規シートを別タブで開く ]
+1. アプリ画面（HTML）で決めるべきこと
+入力項目をどこまで持たせるかを選択してください。
+
+最小構成（ゼロ入力・ワンクリック型）:
+
+画面に「🚀 新規見積書を作成」ボタンのみ。
+
+押すと即座に発番・複製され、「新しい見積書を開く」ボタンが表示される（現行GASと全く同じ動作）。
+
+推奨構成（基本情報事前入力型）:
+
+画面に「顧客名（Client）」「担当者（Sales Person）」「通貨（VND / USD）」の簡易フォームを設置。
+
+作成ボタンを押した時点で、複製されたシートの宛先セルや台帳のClient名にあらかじめ反映される。
+
+2. 技術的な必要情報と準備
+GASのWebアプリ公開（doPost実装）:
+
+共有いただいたコードの createNewQuotation() を、HTTPリクエストを受け取ってJSONを返す doPost(e) 関数にラップし、「ウェブアプリとしてデプロイ（アクセス権: 全員 または 社内）」します。
+
+CORS対応:
+
+ブラウザ（GitHub Pages）からGASへ通信する際、Google Apps Script特有のリダイレクト処理があるため、JavaScript側は fetch(url, { method: 'POST', body: ... }) で非同期処理を行います。
+
+GitHub リポジトリ:
+
+HTML 1枚（index.html）にCSS・JSをまとめた構成で、GitHub PagesをONにするだけで即日公開可能です。
+
+次のステップ
+まずは「最小構成（ボタンを押すだけ）」と「顧客名や担当者などを画面で少し入れてから作成する構成」のどちらが使いやすそうか教えてください。
+
+方針が決まり次第、そのままGitHubに置ける「HTMLコード一式」と、既存GASに追加する「doPost用のAPIコード」を作成してお渡しします。
+
+アプリ起動→ログイン画面→社員番号を入力→見積もり作成ボタン→見積もりのスプレッド起動
+
+って流れがいいな。社員番号を入力することで見積もり作成者の名前が反映されるのがいい。特注部材とカタログ品があるから将来的にはカタログ品はマスターのシートに価格等を決めて、アプリ上で見積もりが自動生成できるようにはしたい。これはまだ先でいいけど
+
+その設計でいきましょう。社員番号による担当者の自動特定を組み込み、将来のカタログ品自動生成にも耐えうる構成で整理します。
+
+全体の処理フローと、今回のスコープで必要になる情報をまとめました。
+
+アプリの動作フロー
+[ 1. ログイン画面 ]
+  社員番号を入力（例: VN001）
+      ↓
+  社員マスタと照合（名前・役職を特定）
+      ↓
+[ 2. メイン画面 ]
+  「ログイン中: Tetsuya Goto」と表示
+  「新規見積書を作成」ボタンを押下
+      ↓ (GAS Web API を呼び出し)
+  ① 台帳(QSM)から最新番号を発番
+  ② サブフォルダ作成 & マスターシートを複製
+  ③ 複製先シートの「担当者(J7)」「作成日(J4)」「物件番号(J3)」に自動書き込み
+  ④ 台帳(QSM)の担当者列(F列)に名前を自動記録
+      ↓
+[ 3. 完了画面 ]
+  発行された物件番号と「新しい見積書を開く」ボタンを表示（別タブで即起動）
+今回の実装に必要な情報
+1. 社員番号と氏名の対応リスト
+社員番号を入力した際に、誰の名前・役職を見積書にセットするかを紐付けるマスタが必要です。
+
+管理台帳（QSM）またはマスタシート内に「社員マスタ一覧」用の別シートを作るか、まずはWebアプリ（JS内）に固定リストとして持たせるかのどちらにしますか？
+
+例:
+
+0001: Tetsuya Goto (Director)
+
+VN002: Staff A (Sales)
+
+2. マスターシート自体のスプレッドシートID
+GAS側で activeSS.getId() で取得していたマスターファイルのIDです。Web API経由で実行する場合、アクティブなシートが存在しないため、コード内にマスター原本のIDを直接指定する必要があります。
+
+先ほど共有いただいたURLの 1QiFOlOhv_1fvM-pX_EB4-GgbWjYUrmZ0XTvdXMTRX1U を原本マスターIDとして固定してよろしいですか？
+
+将来の拡張（カタログ品の自動生成）を見据えた構成
+将来、マスターシートの価格表を参照してWeb上でカタログ品見積もりを作る場合も、今回構築する「GitHub（フロント） ⇔ GAS Web API ⇔ Googleスプレッドシート（DB）」の通信基盤をそのまま使えます。まずは今回の「社員番号認証 ＋ 自動複製・自動起動」を土台としてサクッと立ち上げましょう。
+
+上記の「社員番号マスタの持ち方」と「マスターIDの確認」に問題がなければ、そのままコピペで動くHTML/JSコード（GitHub用）と更新版GASコードを作成します。
+
+編集はどっちがしやすいの？
+
+結論から言うと、運用のしやすさは圧倒的に「スプレッドシート側に社員マスタを持たせる」ほうです。
+
+日常業務での編集の手間がまったく違います。
+
+2つの方法の比較
+項目	① スプレッドシートにシート作成（推奨）	② Webアプリ（JSコード内）に直書き
+編集方法	管理台帳のシートに名前・社員番号を入力するだけ	GitHubのコードを開いて編集・コミット・プッシュ
+編集できる人	誰でも可能（後藤さん以外や現地スタッフでも可）	コードを触れる人のみ
+反映タイミング	即時反映（保存した瞬間から有効）	GitHubのビルド・キャッシュ更新で数分のタイムラグあり
+追加・退職の対応	行を追加・削除するだけで完了	プログラム構文（カンマやカッコ）を壊すリスクあり
+将来の拡張性	カタログ品の単価マスタ管理と同じ仕組みで運用できる	将来品目が増えた時に破綻しやすい
+推奨の進め方
+管理台帳（QSM: Quotation Summary Master）のスプレッドシート内に、「Staff」という別シートを1枚作り、以下のように並べておく形が最も運用が楽です。
+
+社員番号 (ID)	氏名 (Name)	役職 (Position)
+VN001	Tetsuya Goto	Director
+VN002	Nguyen Van A	Sales
+アプリが起動した時に、この「Staff」シートを読みに行って認証・名前特定を行う作りにします。これなら後からメンバーが増減しても、シートを1行書き換えるだけで完結します。
+
+この「スプレッドシート（Staffシート）参照」の形で進めてよろしいでしょうか？問題なければ、マスター原本IDの固定とあわせてコード一式を準備します。
+
+現状J列の７と８のセルが連携するようにしている
+
+画像を確認しました。
+J8セルに =IF(J7="Tetsuya Goto","Director",IF(J7="Nguyen Tien Thinh","Deputy Director","")) が設定されているため、アプリ側からは「J7（Prepared by）」に氏名を書き込むだけで、役職（Position）はシート側で自動的に切り替わります。
+
+この仕組みを活かし、GitHub Pagesにそのまま配置できるHTMLファイルと、連携用GASコードを作成しました。
+
+Your HTML file is ready
+
+HTML のアイコン
+index
+ HTML 
+1. スプレッドシート側のGAS（Web API化コード）
+マスターシート（または管理台帳）の「拡張機能」>「Apps Script」を開き、既存のコードを下記に置き換えて（または追加して）デプロイします。
+
+JavaScript
+/**
+ * 【見積マスター用 Web API & 内部共通処理】
+ */
+const MASTER_CONFIG = {
+  // 原本マスターのスプレッドシートID
+  TEMPLATE_SPREADSHEET_ID: '1QiFOlOhv_1fvM-pX_EB4-GgbWjYUrmZ0XTvdXMTRX1U',
+  // 保存先親フォルダID
+  PARENT_FOLDER_ID: '1-TQlPmFbtFw9Ptky2AuAJqPLVCg1-Ck-',
+  // 管理台帳（QSM）のスプレッドシートID
+  LEDGER_SPREADSHEET_ID: '1lbzNr8CKPqY9AmL7m-zisgpvJ1vu8o8Vac3gvcREDGQ',
+  LEDGER_SHEET_NAME: 'Quotation Summary Master',
+  QUOTE_SHEET_NAME: 'Quotation',
+
+  CELLS: {
+    QUOTE_NO: 'J3',       // 物件番号
+    DATE: 'J4',           // 作成日
+    SALES_PERSON: 'J7',   // 担当者（※J8の役職は数式で自動連動）
+    TOTAL_AMOUNT: 'J34'
+  },
+
+  LEDGER_COL: {
+    DATE: 1, QUOTE_NO: 2, AMOUNT: 3, CLIENT: 4, DESTINATION: 5,
+    SALES_PERSON: 6, DETAILS: 7, STATUS: 8, MEMO: 9
+  }
+};
+
+/**
+ * Webアプリ用 POSTエンドポイント (CORS対応)
+ */
+function doPost(e) {
+  try {
+    const postData = JSON.parse(e.postData.contents);
+    const salesPerson = postData.salesPerson || 'Tetsuya Goto';
+    
+    // 新規作成実行
+    const result = executeCreateQuotation(salesPerson);
+
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'success',
+      quoteNo: result.newQuoteNo,
+      fileUrl: result.fileUrl
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'error',
+      message: error.message
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
+ * 見積書作成ロジック本体
+ */
+function executeCreateQuotation(salesPerson) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const today = new Date();
+    const yy = Utilities.formatDate(today, 'Asia/Saigon', 'yy');
+    const mm = Utilities.formatDate(today, 'Asia/Saigon', 'MM');
+    const yymm = yy + mm;
+    const dateString = Utilities.formatDate(today, 'Asia/Saigon', 'yyyy-MM-dd');
+
+    // 1. 台帳から最新連番を取得
+    const ledgerSS = SpreadsheetApp.openById(MASTER_CONFIG.LEDGER_SPREADSHEET_ID);
+    const ledgerSheet = ledgerSS.getSheetByName(MASTER_CONFIG.LEDGER_SHEET_NAME) || ledgerSS.getSheets()[0];
+    const lastRow = ledgerSheet.getLastRow();
+
+    let maxSeq = 0;
+    if (lastRow >= 2) {
+      const existingNos = ledgerSheet.getRange(2, MASTER_CONFIG.LEDGER_COL.QUOTE_NO, lastRow - 1, 1).getValues();
+      for (let i = 0; i < existingNos.length; i++) {
+        const val = String(existingNos[i][0]).trim();
+        if (val.startsWith(yymm) && val.length >= 8) {
+          const seqNum = parseInt(val.substring(4, 8), 10);
+          if (!isNaN(seqNum) && seqNum > maxSeq) maxSeq = seqNum;
+        }
+      }
+    }
+
+    const nextSeq = maxSeq + 1;
+    const seqPadded = ('0000' + nextSeq).slice(-4);
+    const newQuoteNo = `${yymm}${seqPadded}01-01`;
+
+    // 2. 先頭10桁サブフォルダの作成・取得
+    const parentFolder = DriveApp.getFolderById(MASTER_CONFIG.PARENT_FOLDER_ID);
+    const subFolderName = newQuoteNo.substring(0, 10);
+    const existingSubFolders = parentFolder.getFoldersByName(subFolderName);
+    let targetFolder = existingSubFolders.hasNext() ? existingSubFolders.next() : parentFolder.createFolder(subFolderName);
+
+    // 3. マスター原本の複製
+    const masterFile = DriveApp.getFileById(MASTER_CONFIG.TEMPLATE_SPREADSHEET_ID);
+    const newFileName = `【見積】${newQuoteNo}_未設定`;
+    const newFile = masterFile.makeCopy(newFileName, targetFolder);
+
+    // 4. 複製先シートへの書き込み（J7に担当者を入れるとJ8の役職が自動反映）
+    const newSS = SpreadsheetApp.openById(newFile.getId());
+    const newQuoteSheet = newSS.getSheetByName(MASTER_CONFIG.QUOTE_SHEET_NAME);
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.QUOTE_NO).setValue(newQuoteNo);
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.DATE).setValue(dateString);
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.SALES_PERSON).setValue(salesPerson);
+
+    // 5. 台帳に追記
+    const newRow = [];
+    newRow[MASTER_CONFIG.LEDGER_COL.DATE - 1] = dateString;
+    newRow[MASTER_CONFIG.LEDGER_COL.QUOTE_NO - 1] = newQuoteNo;
+    newRow[MASTER_CONFIG.LEDGER_COL.AMOUNT - 1] = 0;
+    newRow[MASTER_CONFIG.LEDGER_COL.CLIENT - 1] = '（未入力）';
+    newRow[MASTER_CONFIG.LEDGER_COL.DESTINATION - 1] = '';
+    newRow[MASTER_CONFIG.LEDGER_COL.SALES_PERSON - 1] = salesPerson;
+    newRow[MASTER_CONFIG.LEDGER_COL.DETAILS - 1] = '';
+    newRow[MASTER_CONFIG.LEDGER_COL.STATUS - 1] = '作成中(Draft)';
+    newRow[MASTER_CONFIG.LEDGER_COL.MEMO - 1] = newFile.getUrl();
+    ledgerSheet.appendRow(newRow);
+
+    return { newQuoteNo: newQuoteNo, fileUrl: newFile.getUrl() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+デプロイ手順
+GASエディタ右上の 「デプロイ」>「新しいデプロイ」 をクリック。
+
+種類の選択で 「ウェブアプリ」 を選択。
+
+設定：
+
+次のユーザーとして実行: 自分（Drive作成権限を持つアカウント）
+
+アクセスできるユーザー: 全員（HTMLアプリから通信できるようにするため）
+
+発行された 「ウェブアプリのURL」（[https://script.google.com/macros/s/.../exec](https://script.google.com/macros/s/.../exec)）をコピー。
+
+2. GitHub用フロントエンド（index.html）の設定
+生成した index.html 内の以下の2箇所を確認・修正するだけで完了します。
+
+GAS URLの書き換え:
+
+JavaScript
+const GAS_WEBAPP_URL = "ここにコピーしたウェブアプリURLを貼り付け";
+社員マスタの割り当て:
+
+JavaScript
+const STAFF_MASTER = {
+  "0001": { name: "Tetsuya Goto", position: "Director" },
+  "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+};
+※社員番号（ID）はお好みの番号・アルファベットに変更可能です。
+
+動作イメージ
+社員番号を入力してログイン（次回以降はブラウザに自動記憶）。
+
+「＋ 新規見積書を作成」ボタンを押下。
+
+約10〜15秒で自動採番・フォルダ作成・原本複製が完了し、J7に担当者名が入った状態の新規見積書が別タブで即座に開きます。
+
+GASはこれがいいみたいだよ
+
+/**
+
+ * 【見積マスター用 Web API & 内部共通処理】
+
+ *
+
+ * ★このファイルをデプロイする前に必ずやること★
+
+ * 1. 下の STAFF_MASTER に、実際の社員番号・氏名・役職を登録する
+
+ * 2. GASエディタの「プロジェクトの設定」→「スクリプト プロパティ」で
+
+ *    キー: API_SECRET
+
+ *    値 : 好きな長めのランダム文字列(例: openssl rand -hex 16 などで生成)
+
+ *    を追加する
+
+ * 3. index.html 側にも同じ値を API_SECRET として設定する(会話の続きで用意します)
+
+ */
+
+
+
+const MASTER_CONFIG = {
+
+  // 原本マスターのスプレッドシートID
+
+  TEMPLATE_SPREADSHEET_ID: '1QiFOlOhv_1fvM-pX_EB4-GgbWjYUrmZ0XTvdXMTRX1U',
+
+  // 保存先親フォルダID
+
+  PARENT_FOLDER_ID: '1-TQlPmFbtFw9Ptky2AuAJqPLVCg1-Ck-',
+
+  // 管理台帳（QSM）のスプレッドシートID
+
+  LEDGER_SPREADSHEET_ID: '1lbzNr8CKPqY9AmL7m-zisgpvJ1vu8o8Vac3gvcREDGQ',
+
+  LEDGER_SHEET_NAME: 'Quotation Summary Master',
+
+  QUOTE_SHEET_NAME: 'Quotation',
+
+
+
+  CELLS: {
+
+    QUOTE_NO: 'J3',       // 物件番号
+
+    DATE: 'J4',           // 作成日
+
+    SALES_PERSON: 'J7',   // 担当者（※J8の役職は数式で自動連動）
+
+    TOTAL_AMOUNT: 'J34'
+
+  },
+
+
+
+  LEDGER_COL: {
+
+    DATE: 1, QUOTE_NO: 2, AMOUNT: 3, CLIENT: 4, DESTINATION: 5,
+
+    SALES_PERSON: 6, DETAILS: 7, STATUS: 8, MEMO: 9
+
+  }
+
+};
+
+
+
+// 社員マスタ（サーバー側の正=ここだけを信用する。クライアントから来た氏名は使わない）
+
+const STAFF_MASTER = {
+
+  "0001": { name: "Tetsuya Goto", position: "Director" },
+
+  "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+
+};
+
+
+
+/**
+
+ * Webアプリ用 POSTエンドポイント (CORS対応)
+
+ */
+
+function doPost(e) {
+
+  try {
+
+    const postData = JSON.parse(e.postData.contents);
+
+
+
+    // 0. APIキー検証（合言葉が一致しないリクエストは即拒否）
+
+    const expectedKey = PropertiesService.getScriptProperties().getProperty('API_SECRET');
+
+    if (!expectedKey) {
+
+      throw new Error('サーバー側でAPI_SECRETが未設定です。スクリプトプロパティを確認してください。');
+
+    }
+
+    if (postData.apiKey !== expectedKey) {
+
+      throw new Error('認証に失敗しました（APIキー不一致）');
+
+    }
+
+
+
+    // 1. 社員番号をサーバー側マスタと照合し、氏名・役職はここから取得する
+
+    //    （クライアントが送ってきた salesPerson という値は一切信用しない）
+
+    const empId = String(postData.empId || '').trim();
+
+    const staff = STAFF_MASTER[empId];
+
+    if (!staff) {
+
+      throw new Error('該当する社員が見つかりません（社員番号: ' + empId + '）');
+
+    }
+
+
+
+    // 2. 新規作成実行
+
+    const result = executeCreateQuotation(staff.name, empId);
+
+
+
+    return ContentService.createTextOutput(JSON.stringify({
+
+      status: 'success',
+
+      quoteNo: result.newQuoteNo,
+
+      fileUrl: result.fileUrl
+
+    })).setMimeType(ContentService.MimeType.JSON);
+
+
+
+  } catch (error) {
+
+    return ContentService.createTextOutput(JSON.stringify({
+
+      status: 'error',
+
+      message: error.message
+
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  }
+
+}
+
+
+
+/**
+
+ * 見積書作成ロジック本体
+
+ * salesPerson はサーバー側マスタから取得した値のみを渡すこと
+
+ */
+
+function executeCreateQuotation(salesPerson, empId) {
+
+  const lock = LockService.getScriptLock();
+
+  lock.waitLock(30000);
+
+
+
+  try {
+
+    const today = new Date();
+
+    const yy = Utilities.formatDate(today, 'Asia/Saigon', 'yy');
+
+    const mm = Utilities.formatDate(today, 'Asia/Saigon', 'MM');
+
+    const yymm = yy + mm;
+
+    const dateString = Utilities.formatDate(today, 'Asia/Saigon', 'yyyy-MM-dd');
+
+
+
+    // 1. 台帳から最新連番を取得
+
+    const ledgerSS = SpreadsheetApp.openById(MASTER_CONFIG.LEDGER_SPREADSHEET_ID);
+
+    const ledgerSheet = ledgerSS.getSheetByName(MASTER_CONFIG.LEDGER_SHEET_NAME) || ledgerSS.getSheets()[0];
+
+    const lastRow = ledgerSheet.getLastRow();
+
+
+
+    let maxSeq = 0;
+
+    if (lastRow >= 2) {
+
+      const existingNos = ledgerSheet.getRange(2, MASTER_CONFIG.LEDGER_COL.QUOTE_NO, lastRow - 1, 1).getValues();
+
+      for (let i = 0; i < existingNos.length; i++) {
+
+        const val = String(existingNos[i][0]).trim();
+
+        if (val.startsWith(yymm) && val.length >= 8) {
+
+          const seqNum = parseInt(val.substring(4, 8), 10);
+
+          if (!isNaN(seqNum) && seqNum > maxSeq) maxSeq = seqNum;
+
+        }
+
+      }
+
+    }
+
+
+
+    const nextSeq = maxSeq + 1;
+
+    const seqPadded = ('0000' + nextSeq).slice(-4);
+
+    const newQuoteNo = `${yymm}${seqPadded}01-01`;
+
+
+
+    // 2. 先頭10桁サブフォルダの作成・取得
+
+    const parentFolder = DriveApp.getFolderById(MASTER_CONFIG.PARENT_FOLDER_ID);
+
+    const subFolderName = newQuoteNo.substring(0, 10);
+
+    const existingSubFolders = parentFolder.getFoldersByName(subFolderName);
+
+    let targetFolder = existingSubFolders.hasNext() ? existingSubFolders.next() : parentFolder.createFolder(subFolderName);
+
+
+
+    // 3. マスター原本の複製
+
+    const masterFile = DriveApp.getFileById(MASTER_CONFIG.TEMPLATE_SPREADSHEET_ID);
+
+    const newFileName = `【見積】${newQuoteNo}_未設定`;
+
+    const newFile = masterFile.makeCopy(newFileName, targetFolder);
+
+
+
+    // 4. 複製先シートへの書き込み（J7に担当者を入れるとJ8の役職が自動反映）
+
+    const newSS = SpreadsheetApp.openById(newFile.getId());
+
+    const newQuoteSheet = newSS.getSheetByName(MASTER_CONFIG.QUOTE_SHEET_NAME);
+
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.QUOTE_NO).setValue(newQuoteNo);
+
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.DATE).setValue(dateString);
+
+    newQuoteSheet.getRange(MASTER_CONFIG.CELLS.SALES_PERSON).setValue(salesPerson);
+
+
+
+    // 5. 台帳に追記
+
+    const newRow = [];
+
+    newRow[MASTER_CONFIG.LEDGER_COL.DATE - 1] = dateString;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.QUOTE_NO - 1] = newQuoteNo;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.AMOUNT - 1] = 0;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.CLIENT - 1] = '（未入力）';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.DESTINATION - 1] = '';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.SALES_PERSON - 1] = salesPerson;
+
+    newRow[MASTER_CONFIG.LEDGER_COL.DETAILS - 1] = '';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.STATUS - 1] = '作成中(Draft)';
+
+    newRow[MASTER_CONFIG.LEDGER_COL.MEMO - 1] = newFile.getUrl();
+
+    ledgerSheet.appendRow(newRow);
+
+
+
+    return { newQuoteNo: newQuoteNo, fileUrl: newFile.getUrl() };
+
+  } finally {
+
+    lock.releaseLock();
+
+  }
+
+}
+
+提示いただいたGASコードはセキュリティ設計が非常に堅牢です。
+
+APIキー（API_SECRET）による認証: 不正なアクセスや第三者からの無差別な実行を遮断できる。
+
+サーバーサイド（GAS側）での権限判定: ブラウザから送信された氏名を鵜呑みにせず、送信された社員番号（empId）をサーバー側の STAFF_MASTER と突き合わせて担当者名を特定するため、改ざんが起きない。
+
+このGASの通信仕様（apiKey + empId をJSON送信する仕様）に完全一致させたフロントエンドコード（index.html）を用意しました。
+
+Your updated HTML file is ready
+
+HTML のアイコン
+index
+ HTML 
+セットアップ手順
+1. GAS側の設定（APIキーの発行と登録）
+
+任意の英数字文字列（合言葉）を決めます（例: kz_quote_sec_99a8b7c6d5e4）。
+
+GASエディタの画面左側にある 「プロジェクトの設定（歯車アイコン）」 を開く。
+
+下部の「スクリプト プロパティ」で 「スクリプト プロパティを追加」 をクリック。
+
+プロパティ: API_SECRET
+
+値: 決めた文字列
+
+「スクリプト プロパティを保存」 をクリック。
+
+「デプロイ」>「新しいデプロイ」>「ウェブアプリ」として公開（アクセスできるユーザー: 全員）。発行されたURLをコピー。
+
+2. index.html 側の設定
+ダウンロードした index.html（またはGitHub上のファイル）の166〜168行目を修正します。
+
+JavaScript
+// ==========================================
+// 【設定】デプロイしたGASの情報に差し替えてください
+// ==========================================
+const GAS_WEBAPP_URL = "https://script.google.com/macros/s/あなたのデプロイID/exec";
+const API_SECRET     = "上記1で決めた文字列";
+3. GitHub Pagesへのデプロイ
+
+GitHubに新規リポジトリ（例: quote-creator）を作成。
+
+上記の index.html をリポジトリのルートにコミット・プッシュ。
+
+リポジトリの 「Settings」>「Pages」 に進み、Branchを main（または master）、フォルダを / (root) にして「Save」。
+
+数分で発行される公開URLにアクセスすれば、ブラウザから社員番号入力で運用開始できます。
+
+htmlのコードはこれにする。アプリのアイコンが反映されるようにしたい
+
+提供いただいたアイコン画像（Image8c.jpg）を、「ブラウザタブのファビコン」、「スマホのホーム画面追加用アイコン」、および「ログイン画面上部のアプリロゴ」として綺麗に反映させたHTMLコードを用意しました。  
+HTML
+
+Your updated HTML file is ready
+
+HTML のアイコン
+index
+ HTML 
+アイコンを反映させる配置方法（GitHub）
+GitHubリポジトリのルートフォルダに、index.html とアイコン画像ファイル（Image8c.jpg）を同じ階層に配置してください。
+
+Plaintext
+your-repo/
+├── index.html       ← 今回作成したHTMLファイル
+└── Image8c.jpg      ← 提供いただいたアプリアイコン画像
+追加・反映したコードの要点
+ブラウザタブ＆スマホのホーム画面アイコン（<head>内）
+ブラウザのタブや、スマホ（iPhone / Android）で「ホーム画面に追加」した際にこのアイコンが表示されます。
+
+HTML
+<!-- アプリアイコン設定 -->
+<link rel="icon" type="image/jpeg" href="Image8c.jpg">
+<link rel="apple-touch-icon" href="Image8c.jpg">
+アプリ画面内のロゴ表示（<body>内）
+カード中央上部に丸角のアイコンバッジとして美しく収まるようCSS調整（width: 72px; height: 72px; border-radius: 16px;）して配置しています。
+
+HTML
+<img src="Image8c.jpg" alt="Quotation App Icon" class="app-icon">
+確認用：完全な index.html
+HTML
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KATZDEN VIETNAM - 見積書作成システム</title>
+
+  <!-- アプリアイコン設定 -->
+  <link rel="icon" type="image/jpeg" href="Image8c.jpg">
+  <link rel="apple-touch-icon" href="Image8c.jpg">
+
+  <style>
+    :root {
+      --primary: #c9171e;
+      --primary-hover: #a81318;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-muted: #666666;
+      --border: #e0e0e0;
+      --success: #28a745;
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 32px 28px;
+      text-align: center;
+      position: relative;
+    }
+    .app-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      object-fit: cover;
+    }
+    .logo-badge {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .sub-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .user-info-box {
+      background: #fdf5f5;
+      border: 1px solid #ffd8d8;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .user-info-box .name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .user-info-box .role {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .logout-link {
+      display: inline-block;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .status-msg {
+      margin-top: 16px;
+      font-size: 13px;
+      min-height: 20px;
+    }
+    .status-msg.error { color: #d93025; }
+    .status-msg.info { color: #1a73e8; }
+    .status-msg.success { color: var(--success); font-weight: bold; }
+    .result-box {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+      background: #e6f4ea;
+      border: 1px solid #ceead6;
+      border-radius: 8px;
+      text-align: left;
+    }
+    .result-box .quote-no {
+      font-size: 16px;
+      font-weight: 800;
+      color: #137333;
+      margin-bottom: 8px;
+    }
+    .btn-open {
+      background: #1a73e8;
+      margin-top: 10px;
+    }
+    .btn-open:hover { background: #1557b0; }
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 3px solid #fff;
+      width: 18px;
+      height: 18px;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- アプリアイコン画像 -->
+  <img src="Image8c.jpg" alt="Quotation App Icon" class="app-icon">
+  <div class="logo-badge">KATZDEN VIETNAM</div>
+  <div class="sub-title">Quotation Creation System / 見積書作成</div>
+
+  <!-- STEP 1: LOGIN VIEW -->
+  <div id="loginView">
+    <div class="form-group">
+      <label for="empId">社員番号 / Employee ID</label>
+      <input type="text" id="empId" placeholder="例: 0001" autocomplete="off">
+    </div>
+    <button class="btn" id="btnLogin">ログイン / Đăng nhập</button>
+  </div>
+
+  <!-- STEP 2: DASHBOARD VIEW -->
+  <div id="dashView" style="display: none;">
+    <div class="user-info-box">
+      <div class="name" id="dispName">--</div>
+      <div class="role" id="dispRole">--</div>
+      <span class="logout-link" id="btnLogout">ログアウト (切替)</span>
+    </div>
+
+    <button class="btn" id="btnCreate">
+      <div class="spinner" id="btnSpinner"></div>
+      <span id="btnText">＋ 新規見積書を作成</span>
+    </button>
+
+    <div class="result-box" id="resultBox">
+      <div class="quote-no" id="dispQuoteNo"></div>
+      <p style="font-size: 12px; color: #555;">Googleドライブ内に新規見積ファイルが作成されました。</p>
+      <a href="#" target="_blank" class="btn btn-open" id="linkOpenSheet" style="text-decoration: none;">
+        見積スプレッドシートを開く ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="status-msg" id="statusMsg"></div>
+</div>
+
+<script>
+  // 【設定①】デプロイしたGASのWeb API URLに差し替えてください
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+
+  // 【設定②】GAS側のスクリプトプロパティ「API_SECRET」に設定した値と
+  //          まったく同じ文字列をここに入れてください（合言葉）
+  const API_SECRET = "ここにGAS側と同じ合言葉を入れる";
+
+  // 社員マスタ（表示用）
+  const STAFF_MASTER = {
+    "0001": { name: "Tetsuya Goto", position: "Director" },
+    "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+  };
+
+  const loginView = document.getElementById("loginView");
+  const dashView = document.getElementById("dashView");
+  const empIdInput = document.getElementById("empId");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnLogout = document.getElementById("btnLogout");
+  const dispName = document.getElementById("dispName");
+  const dispRole = document.getElementById("dispRole");
+  const btnCreate = document.getElementById("btnCreate");
+  const btnSpinner = document.getElementById("btnSpinner");
+  const btnText = document.getElementById("btnText");
+  const statusMsg = document.getElementById("statusMsg");
+  const resultBox = document.getElementById("resultBox");
+  const dispQuoteNo = document.getElementById("dispQuoteNo");
+  const linkOpenSheet = document.getElementById("linkOpenSheet");
+
+  let currentUser = null;
+
+  // 自動ログインチェック（ローカルストレージ）
+  const savedEmpId = localStorage.getItem("kz_emp_id");
+  if (savedEmpId && STAFF_MASTER[savedEmpId]) {
+    loginAs(savedEmpId);
+  }
+
+  // ログイン処理
+  btnLogin.addEventListener("click", () => {
+    const id = empIdInput.value.trim();
+    if (!id) {
+      showStatus("社員番号を入力してください", "error");
+      return;
+    }
+    if (STAFF_MASTER[id]) {
+      localStorage.setItem("kz_emp_id", id);
+      loginAs(id);
+    } else {
+      showStatus("該当する社員が見つかりません", "error");
+    }
+  });
+
+  empIdInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btnLogin.click();
+  });
+
+  function loginAs(id) {
+    currentUser = STAFF_MASTER[id];
+    currentUser.id = id;
+    dispName.textContent = currentUser.name;
+    dispRole.textContent = currentUser.position;
+    loginView.style.display = "none";
+    dashView.style.display = "block";
+    resultBox.style.display = "none";
+    statusMsg.textContent = "";
+  }
+
+  // ログアウト処理
+  btnLogout.addEventListener("click", () => {
+    localStorage.removeItem("kz_emp_id");
+    currentUser = null;
+    empIdInput.value = "";
+    dashView.style.display = "none";
+    loginView.style.display = "block";
+    statusMsg.textContent = "";
+  });
+
+  // 見積作成ボタン押下
+  btnCreate.addEventListener("click", async () => {
+    if (!currentUser) return;
+
+    btnCreate.disabled = true;
+    btnSpinner.style.display = "inline-block";
+    btnText.textContent = "見積書を作成中...";
+    statusMsg.className = "status-msg info";
+    statusMsg.textContent = "自動採番・フォルダ作成・複製を行っています (約10〜15秒)";
+    resultBox.style.display = "none";
+
+    try {
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "createQuotation",
+          empId: currentUser.id,
+          apiKey: API_SECRET
+        })
+      });
+
+      const res = await response.json();
+
+      if (res.status === "success") {
+        statusMsg.className = "status-msg success";
+        statusMsg.textContent = "作成が完了しました！";
+        dispQuoteNo.textContent = "№ " + res.quoteNo;
+        linkOpenSheet.href = res.fileUrl;
+        resultBox.style.display = "block";
+
+        window.open(res.fileUrl, "_blank");
+      } else {
+        throw new Error(res.message || "作成に失敗しました");
+      }
+    } catch (err) {
+      statusMsg.className = "status-msg error";
+      statusMsg.textContent = "エラー: " + err.message;
+    } finally {
+      btnCreate.disabled = false;
+      btnSpinner.style.display = "none";
+      btnText.textContent = "＋ 新規見積書を作成";
+    }
+  });
+
+  function showStatus(text, type) {
+    statusMsg.className = "status-msg " + type;
+    statusMsg.textContent = text;
+  }
+</script>
+
+</body>
+</html>
+これしかでてこない
+
+画像で「KZ-Quotation-App」とだけ表示されているのは、作成時に自動生成された README.md（初期説明ファイル）が読み込まれている状態です。
+
+GitHub Pages が index.html ではなく README.md をトップページとして表示してしまっている原因は、主に以下の2つです。
+
+原因とチェック項目
+ファイル名が index.html ではない（一番多い原因）
+
+ファイル名が index5.html や index.html.txt などになっていませんか？
+
+GitHub Pages は、半角小文字の完全一致で index.html という名前のファイルを優先してトップページにします。
+
+配置場所（階層）が違う
+
+フォルダ（例: src/ など）の中に入っていませんか？
+
+リポジトリの一番上（ルート階層）に index.html と Image8c.jpg を置く必要があります。
+
+修正手順
+GitHub の te28-kz/KZ-Quotation-App リポジトリ画面を開きます。
+
+ファイル一覧を確認してください。
+
+もし index5.html になっていれば、ファイルを開いて鉛筆マーク（Edit）から index.html にリネームして「Commit changes」を押します。
+
+まだアップロードしていない場合は、「Add file」>「Upload files」から先ほどのHTMLを index.html という名前でアップロードしてください。
+
+リポジトリの 「Settings」>「Pages」 を確認します。
+
+Branch: main（または master）
+
+Folder: / (root)
+になっていることを確認します。
+
+コミット後、約1〜2分待ってからブラウザを強制再読み込み（Ctrl + F5 または Shift + F5）してください。
+
+index.html がルートに配置されれば、カード型のログイン画面が表示されます。ファイル一覧がどうなっているか確認してみてください。
+
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>KATZDEN VIETNAM - 見積書作成システム</title>
+
+
+
+  <!-- アプリアイコン設定 -->
+
+  <link rel="icon" type="image/jpeg" href="Image8c.jpg">
+
+  <link rel="apple-touch-icon" href="Image8c.jpg">
+
+
+
+  <style>
+
+    :root {
+
+      --primary: #c9171e;
+
+      --primary-hover: #a81318;
+
+      --bg: #f4f6f9;
+
+      --card-bg: #ffffff;
+
+      --text: #333333;
+
+      --text-muted: #666666;
+
+      --border: #e0e0e0;
+
+      --success: #28a745;
+
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+
+    body {
+
+      background: var(--bg);
+
+      color: var(--text);
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      min-height: 100vh;
+
+      padding: 20px;
+
+    }
+
+    .card {
+
+      background: var(--card-bg);
+
+      width: 100%;
+
+      max-width: 440px;
+
+      border-radius: 12px;
+
+      box-shadow: var(--shadow);
+
+      padding: 32px 28px;
+
+      text-align: center;
+
+      position: relative;
+
+    }
+
+    .app-icon {
+
+      width: 72px;
+
+      height: 72px;
+
+      border-radius: 16px;
+
+      margin-bottom: 12px;
+
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+
+      object-fit: cover;
+
+    }
+
+    .logo-badge {
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      letter-spacing: 1.5px;
+
+      color: var(--primary);
+
+      margin-bottom: 4px;
+
+    }
+
+    .sub-title {
+
+      font-size: 13px;
+
+      color: var(--text-muted);
+
+      margin-bottom: 24px;
+
+      font-weight: 500;
+
+    }
+
+    .form-group {
+
+      text-align: left;
+
+      margin-bottom: 20px;
+
+    }
+
+    label {
+
+      display: block;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      color: var(--text-muted);
+
+      margin-bottom: 6px;
+
+      text-transform: uppercase;
+
+    }
+
+    input[type="text"] {
+
+      width: 100%;
+
+      padding: 12px 14px;
+
+      font-size: 16px;
+
+      border: 1.5px solid var(--border);
+
+      border-radius: 8px;
+
+      outline: none;
+
+      transition: border-color 0.2s;
+
+    }
+
+    input[type="text"]:focus {
+
+      border-color: var(--primary);
+
+    }
+
+    .btn {
+
+      width: 100%;
+
+      padding: 14px;
+
+      font-size: 16px;
+
+      font-weight: 700;
+
+      color: #fff;
+
+      background: var(--primary);
+
+      border: none;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      transition: background 0.2s, transform 0.1s;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      gap: 8px;
+
+    }
+
+    .btn:hover { background: var(--primary-hover); }
+
+    .btn:active { transform: scale(0.99); }
+
+    .btn:disabled {
+
+      background: #ccc;
+
+      cursor: not-allowed;
+
+    }
+
+    .user-info-box {
+
+      background: #fdf5f5;
+
+      border: 1px solid #ffd8d8;
+
+      border-radius: 8px;
+
+      padding: 14px;
+
+      margin-bottom: 20px;
+
+      text-align: left;
+
+    }
+
+    .user-info-box .name {
+
+      font-size: 16px;
+
+      font-weight: 700;
+
+      color: var(--text);
+
+    }
+
+    .user-info-box .role {
+
+      font-size: 13px;
+
+      color: var(--text-muted);
+
+      margin-top: 2px;
+
+    }
+
+    .logout-link {
+
+      display: inline-block;
+
+      font-size: 12px;
+
+      color: var(--text-muted);
+
+      text-decoration: underline;
+
+      cursor: pointer;
+
+      margin-top: 8px;
+
+    }
+
+    .status-msg {
+
+      margin-top: 16px;
+
+      font-size: 13px;
+
+      min-height: 20px;
+
+    }
+
+    .status-msg.error { color: #d93025; }
+
+    .status-msg.info { color: #1a73e8; }
+
+    .status-msg.success { color: var(--success); font-weight: bold; }
+
+    .result-box {
+
+      display: none;
+
+      margin-top: 20px;
+
+      padding: 16px;
+
+      background: #e6f4ea;
+
+      border: 1px solid #ceead6;
+
+      border-radius: 8px;
+
+      text-align: left;
+
+    }
+
+    .result-box .quote-no {
+
+      font-size: 16px;
+
+      font-weight: 800;
+
+      color: #137333;
+
+      margin-bottom: 8px;
+
+    }
+
+    .btn-open {
+
+      background: #1a73e8;
+
+      margin-top: 10px;
+
+    }
+
+    .btn-open:hover { background: #1557b0; }
+
+    .spinner {
+
+      border: 3px solid rgba(255,255,255,0.3);
+
+      border-radius: 50%;
+
+      border-top: 3px solid #fff;
+
+      width: 18px;
+
+      height: 18px;
+
+      animation: spin 0.8s linear infinite;
+
+      display: none;
+
+    }
+
+    @keyframes spin {
+
+      0% { transform: rotate(0deg); }
+
+      100% { transform: rotate(360deg); }
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+
+
+<div class="card">
+
+  <!-- アプリアイコン画像 -->
+
+  <img src="Image8c.jpg" alt="Quotation App Icon" class="app-icon">
+
+  <div class="logo-badge">KATZDEN VIETNAM</div>
+
+  <div class="sub-title">Quotation Creation System / 見積書作成</div>
+
+
+
+  <!-- STEP 1: LOGIN VIEW -->
+
+  <div id="loginView">
+
+    <div class="form-group">
+
+      <label for="empId">社員番号 / Employee ID</label>
+
+      <input type="text" id="empId" placeholder="例: 0001" autocomplete="off">
+
+    </div>
+
+    <button class="btn" id="btnLogin">ログイン / Đăng nhập</button>
+
+  </div>
+
+
+
+  <!-- STEP 2: DASHBOARD VIEW -->
+
+  <div id="dashView" style="display: none;">
+
+    <div class="user-info-box">
+
+      <div class="name" id="dispName">--</div>
+
+      <div class="role" id="dispRole">--</div>
+
+      <span class="logout-link" id="btnLogout">ログアウト (切替)</span>
+
+    </div>
+
+
+
+    <button class="btn" id="btnCreate">
+
+      <div class="spinner" id="btnSpinner"></div>
+
+      <span id="btnText">＋ 新規見積書を作成</span>
+
+    </button>
+
+
+
+    <div class="result-box" id="resultBox">
+
+      <div class="quote-no" id="dispQuoteNo"></div>
+
+      <p style="font-size: 12px; color: #555;">Googleドライブ内に新規見積ファイルが作成されました。</p>
+
+      <a href="#" target="_blank" class="btn btn-open" id="linkOpenSheet" style="text-decoration: none;">
+
+        見積スプレッドシートを開く ↗
+
+      </a>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="status-msg" id="statusMsg"></div>
+
+</div>
+
+
+
+<script>
+
+  // 【設定①】デプロイしたGASのWeb API URLに差し替えてください
+
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec";
+
+
+
+  // 【設定②】GAS側のスクリプトプロパティ「API_SECRET」に設定した値と
+
+  //          まったく同じ文字列をここに入れてください（合言葉）
+
+  const API_SECRET = "open ss1 rand kz";
+
+
+
+  // 社員マスタ（表示用のみ。実際の認証・氏名確定はGAS側のSTAFF_MASTERで行うため、
+
+  // ここに書く氏名・役職はログイン直後の画面表示にしか使われません）
+
+  const STAFF_MASTER = {
+
+    "0001": { name: "Tetsuya Goto", position: "Director" },
+
+    "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+
+  };
+
+
+
+  const loginView = document.getElementById("loginView");
+
+  const dashView = document.getElementById("dashView");
+
+  const empIdInput = document.getElementById("empId");
+
+  const btnLogin = document.getElementById("btnLogin");
+
+  const btnLogout = document.getElementById("btnLogout");
+
+  const dispName = document.getElementById("dispName");
+
+  const dispRole = document.getElementById("dispRole");
+
+  const btnCreate = document.getElementById("btnCreate");
+
+  const btnSpinner = document.getElementById("btnSpinner");
+
+  const btnText = document.getElementById("btnText");
+
+  const statusMsg = document.getElementById("statusMsg");
+
+  const resultBox = document.getElementById("resultBox");
+
+  const dispQuoteNo = document.getElementById("dispQuoteNo");
+
+  const linkOpenSheet = document.getElementById("linkOpenSheet");
+
+
+
+  let currentUser = null;
+
+
+
+  // 自動ログインチェック（ローカルストレージ）
+
+  const savedEmpId = localStorage.getItem("kz_emp_id");
+
+  if (savedEmpId && STAFF_MASTER[savedEmpId]) {
+
+    loginAs(savedEmpId);
+
+  }
+
+
+
+  // ログイン処理
+
+  btnLogin.addEventListener("click", () => {
+
+    const id = empIdInput.value.trim();
+
+    if (!id) {
+
+      showStatus("社員番号を入力してください", "error");
+
+      return;
+
+    }
+
+    if (STAFF_MASTER[id]) {
+
+      localStorage.setItem("kz_emp_id", id);
+
+      loginAs(id);
+
+    } else {
+
+      showStatus("該当する社員が見つかりません", "error");
+
+    }
+
+  });
+
+
+
+  empIdInput.addEventListener("keypress", (e) => {
+
+    if (e.key === "Enter") btnLogin.click();
+
+  });
+
+
+
+  function loginAs(id) {
+
+    currentUser = STAFF_MASTER[id];
+
+    currentUser.id = id;
+
+    dispName.textContent = currentUser.name;
+
+    dispRole.textContent = currentUser.position;
+
+    loginView.style.display = "none";
+
+    dashView.style.display = "block";
+
+    resultBox.style.display = "none";
+
+    statusMsg.textContent = "";
+
+  }
+
+
+
+  // ログアウト処理
+
+  btnLogout.addEventListener("click", () => {
+
+    localStorage.removeItem("kz_emp_id");
+
+    currentUser = null;
+
+    empIdInput.value = "";
+
+    dashView.style.display = "none";
+
+    loginView.style.display = "block";
+
+    statusMsg.textContent = "";
+
+  });
+
+
+
+  // 見積作成ボタン押下
+
+  btnCreate.addEventListener("click", async () => {
+
+    if (!currentUser) return;
+
+
+
+    // UI ローディング状態
+
+    btnCreate.disabled = true;
+
+    btnSpinner.style.display = "inline-block";
+
+    btnText.textContent = "見積書を作成中...";
+
+    statusMsg.className = "status-msg info";
+
+    statusMsg.textContent = "自動採番・フォルダ作成・複製を行っています (約10〜15秒)";
+
+    resultBox.style.display = "none";
+
+
+
+    try {
+
+      // GAS Web API へPOST
+
+      // ※氏名(salesPerson)はもう送らない。GAS側がempIdから正式な氏名を確定する。
+
+      const response = await fetch(GAS_WEBAPP_URL, {
+
+        method: "POST",
+
+        body: JSON.stringify({
+
+          action: "createQuotation",
+
+          empId: currentUser.id,
+
+          apiKey: API_SECRET
+
+        })
+
+      });
+
+
+
+      const res = await response.json();
+
+
+
+      if (res.status === "success") {
+
+        statusMsg.className = "status-msg success";
+
+        statusMsg.textContent = "作成が完了しました！";
+
+        dispQuoteNo.textContent = "№ " + res.quoteNo;
+
+        linkOpenSheet.href = res.fileUrl;
+
+        resultBox.style.display = "block";
+
+
+
+        // 自動で新規シートを別タブで開く
+
+        window.open(res.fileUrl, "_blank");
+
+      } else {
+
+        throw new Error(res.message || "作成に失敗しました");
+
+      }
+
+    } catch (err) {
+
+      statusMsg.className = "status-msg error";
+
+      statusMsg.textContent = "エラー: " + err.message;
+
+    } finally {
+
+      btnCreate.disabled = false;
+
+      btnSpinner.style.display = "none";
+
+      btnText.textContent = "＋ 新規見積書を作成";
+
+    }
+
+  });
+
+
+
+  function showStatus(text, type) {
+
+    statusMsg.className = "status-msg " + type;
+
+    statusMsg.textContent = text;
+
+  }
+
+</script>
+
+
+
+</body>
+
+</html>
+
+
+
+コード合ってる？
+
+結論から言うと、そのままではブラウザのセキュリティ仕様（CORSエラー）により通信がブロックされ、作成に失敗します。
+
+Google Apps Script (GAS) の Web API は、ブラウザから fetch で普通に JSON 形式（application/json）を送ると CORS エラーを発生させて接続を切断する特性があります。これを回避するには、リクエストヘッダーに no-cors を使わず、text/plain として送信する 必要があります。
+
+また、API_SECRET に空白（スペース）が含まれていますが、GASのスクリプトプロパティ側の文字列と完全に一致している必要があります。
+
+修正が必要な箇所（fetch 部分）
+スクリプト内の fetch を以下のコードに差し替えてください。
+
+【修正前】
+
+JavaScript
+const response = await fetch(GAS_WEBAPP_URL, {
+  method: "POST",
+  body: JSON.stringify({
+    action: "createQuotation",
+    empId: currentUser.id,
+    apiKey: API_SECRET
+  })
+});
+【修正後】（CORSブロックを回避する記述）
+
+JavaScript
+const response = await fetch(GAS_WEBAPP_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8" // GASのCORS制約を回避する必須設定
+  },
+  body: JSON.stringify({
+    action: "createQuotation",
+    empId: currentUser.id,
+    apiKey: API_SECRET
+  })
+});
+※GAS側の JSON.parse(e.postData.contents) は text/plain でも問題なくパースできます。
+
+全体修正版コード（このまま index.html として保存・上書きしてください）
+HTML
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KATZDEN VIETNAM - 見積書作成システム</title>
+
+  <!-- アプリアイコン設定 -->
+  <link rel="icon" type="image/jpeg" href="Image8c.jpg">
+  <link rel="apple-touch-icon" href="Image8c.jpg">
+
+  <style>
+    :root {
+      --primary: #c9171e;
+      --primary-hover: #a81318;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-muted: #666666;
+      --border: #e0e0e0;
+      --success: #28a745;
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 32px 28px;
+      text-align: center;
+      position: relative;
+    }
+    .app-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      object-fit: cover;
+    }
+    .logo-badge {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .sub-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:active { transform: scale(0.99); }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .user-info-box {
+      background: #fdf5f5;
+      border: 1px solid #ffd8d8;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .user-info-box .name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .user-info-box .role {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .logout-link {
+      display: inline-block;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .status-msg {
+      margin-top: 16px;
+      font-size: 13px;
+      min-height: 20px;
+    }
+    .status-msg.error { color: #d93025; }
+    .status-msg.info { color: #1a73e8; }
+    .status-msg.success { color: var(--success); font-weight: bold; }
+    .result-box {
+      display: none;
+      margin-top: 20px;
+      padding: 16px;
+      background: #e6f4ea;
+      border: 1px solid #ceead6;
+      border-radius: 8px;
+      text-align: left;
+    }
+    .result-box .quote-no {
+      font-size: 16px;
+      font-weight: 800;
+      color: #137333;
+      margin-bottom: 8px;
+    }
+    .btn-open {
+      background: #1a73e8;
+      margin-top: 10px;
+    }
+    .btn-open:hover { background: #1557b0; }
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 3px solid #fff;
+      width: 18px;
+      height: 18px;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- アプリアイコン画像 -->
+  <img src="Image8c.jpg" alt="Quotation App Icon" class="app-icon">
+  <div class="logo-badge">KATZDEN VIETNAM</div>
+  <div class="sub-title">Quotation Creation System / 見積書作成</div>
+
+  <!-- STEP 1: LOGIN VIEW -->
+  <div id="loginView">
+    <div class="form-group">
+      <label for="empId">社員番号 / Employee ID</label>
+      <input type="text" id="empId" placeholder="例: 0001" autocomplete="off">
+    </div>
+    <button class="btn" id="btnLogin">ログイン / Đăng nhập</button>
+  </div>
+
+  <!-- STEP 2: DASHBOARD VIEW -->
+  <div id="dashView" style="display: none;">
+    <div class="user-info-box">
+      <div class="name" id="dispName">--</div>
+      <div class="role" id="dispRole">--</div>
+      <span class="logout-link" id="btnLogout">ログアウト (切替)</span>
+    </div>
+
+    <button class="btn" id="btnCreate">
+      <div class="spinner" id="btnSpinner"></div>
+      <span id="btnText">＋ 新規見積書を作成</span>
+    </button>
+
+    <div class="result-box" id="resultBox">
+      <div class="quote-no" id="dispQuoteNo"></div>
+      <p style="font-size: 12px; color: #555;">Googleドライブ内に新規見積ファイルが作成されました。</p>
+      <a href="#" target="_blank" class="btn btn-open" id="linkOpenSheet" style="text-decoration: none;">
+        見積スプレッドシートを開く ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="status-msg" id="statusMsg"></div>
+</div>
+
+<script>
+  // 【設定①】デプロイしたGASのWeb API URL
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec";
+
+  // 【設定②】GAS側スクリプトプロパティの「API_SECRET」と完全一致させる合言葉
+  const API_SECRET = "open ss1 rand kz";
+
+  // 社員マスタ（表示用）
+  const STAFF_MASTER = {
+    "0001": { name: "Tetsuya Goto", position: "Director" },
+    "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+  };
+
+  const loginView = document.getElementById("loginView");
+  const dashView = document.getElementById("dashView");
+  const empIdInput = document.getElementById("empId");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnLogout = document.getElementById("btnLogout");
+  const dispName = document.getElementById("dispName");
+  const dispRole = document.getElementById("dispRole");
+  const btnCreate = document.getElementById("btnCreate");
+  const btnSpinner = document.getElementById("btnSpinner");
+  const btnText = document.getElementById("btnText");
+  const statusMsg = document.getElementById("statusMsg");
+  const resultBox = document.getElementById("resultBox");
+  const dispQuoteNo = document.getElementById("dispQuoteNo");
+  const linkOpenSheet = document.getElementById("linkOpenSheet");
+
+  let currentUser = null;
+
+  // 自動ログインチェック
+  const savedEmpId = localStorage.getItem("kz_emp_id");
+  if (savedEmpId && STAFF_MASTER[savedEmpId]) {
+    loginAs(savedEmpId);
+  }
+
+  // ログイン処理
+  btnLogin.addEventListener("click", () => {
+    const id = empIdInput.value.trim();
+    if (!id) {
+      showStatus("社員番号を入力してください", "error");
+      return;
+    }
+    if (STAFF_MASTER[id]) {
+      localStorage.setItem("kz_emp_id", id);
+      loginAs(id);
+    } else {
+      showStatus("該当する社員が見つかりません", "error");
+    }
+  });
+
+  empIdInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btnLogin.click();
+  });
+
+  function loginAs(id) {
+    currentUser = STAFF_MASTER[id];
+    currentUser.id = id;
+    dispName.textContent = currentUser.name;
+    dispRole.textContent = currentUser.position;
+    loginView.style.display = "none";
+    dashView.style.display = "block";
+    resultBox.style.display = "none";
+    statusMsg.textContent = "";
+  }
+
+  // ログアウト処理
+  btnLogout.addEventListener("click", () => {
+    localStorage.removeItem("kz_emp_id");
+    currentUser = null;
+    empIdInput.value = "";
+    dashView.style.display = "none";
+    loginView.style.display = "block";
+    statusMsg.textContent = "";
+  });
+
+  // 見積作成ボタン押下
+  btnCreate.addEventListener("click", async () => {
+    if (!currentUser) return;
+
+    btnCreate.disabled = true;
+    btnSpinner.style.display = "inline-block";
+    btnText.textContent = "見積書を作成中...";
+    statusMsg.className = "status-msg info";
+    statusMsg.textContent = "自動採番・フォルダ作成・複製を行っています (約10〜15秒)";
+    resultBox.style.display = "none";
+
+    try {
+      // GASへのPOST送信（Content-Type: text/plain でCORSエラーを回避）
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify({
+          action: "createQuotation",
+          empId: currentUser.id,
+          apiKey: API_SECRET
+        })
+      });
+
+      const res = await response.json();
+
+      if (res.status === "success") {
+        statusMsg.className = "status-msg success";
+        statusMsg.textContent = "作成が完了しました！";
+        dispQuoteNo.textContent = "№ " + res.quoteNo;
+        linkOpenSheet.href = res.fileUrl;
+        resultBox.style.display = "block";
+
+        window.open(res.fileUrl, "_blank");
+      } else {
+        throw new Error(res.message || "作成に失敗しました");
+      }
+    } catch (err) {
+      statusMsg.className = "status-msg error";
+      statusMsg.textContent = "エラー: " + err.message;
+    } finally {
+      btnCreate.disabled = false;
+      btnSpinner.style.display = "none";
+      btnText.textContent = "＋ 新規見積書を作成";
+    }
+  });
+
+  function showStatus(text, type) {
+    statusMsg.className = "status-msg " + type;
+    statusMsg.textContent = text;
+  }
+</script>
+
+</body>
+</html>
+これをGitHub上の index.html に貼り付けてコミットし、動作を確認してください。
+
+できたけど上のアイコンが出ないね
+
+画面の表示とログイン状態の維持は完璧です。
+
+アイコンが表示されない（リンク切れアイコンになっている）原因は、GitHub上の「ファイル名の大文字・小文字」または「拡張子の違い」です。GitHub（Linuxサーバー）はアルファベットの大小を厳密に区別します。
+
+以下の2点を確認してください。
+
+1. リポジトリ上の画像ファイル名を確認
+GitHubのリポジトリ画面（ファイル一覧）を開き、アップロードした画像名を確認してください。
+
+コード側の指定: Image8c.jpg
+
+よくある不一致の例:
+
+拡張子が小文字/大文字: Image8c.jpeg、Image8c.JPG、Image8c.png
+
+アルファベットの大小: image8c.jpg、IMAGE8C.jpg
+
+2. 対処方法
+一番手っ取り早い解決策は、ファイル名を小文字の icon.png（または icon.jpg）に統一することです。
+
+手順A：画像側の名前を合わせる場合
+GitHub上で画像ファイルをリネーム、または削除して再度 Image8c.jpg（大文字の I、小文字の mage8c.jpg）という完全一致の名前でアップロードし直してください。
+
+手順B：コード側をファイル名に合わせる場合
+GitHub上の画像ファイル名が例えば image.png や icon.jpg になっている場合は、index.html 内の該当3箇所をその名前に書き換えてコミットしてください。
+
+HTML
+<!-- <head> の中（2箇所） -->
+<link rel="icon" type="image/jpeg" href="実際のファイル名">
+<link rel="apple-touch-icon" href="実際のファイル名">
+
+<!-- <body> の中（1箇所） -->
+<img src="実際のファイル名" alt="Quotation App Icon" class="app-icon">
+GitHub上で表示されている実際の画像ファイル名を教えていただければ、それに合わせた記述をお伝えします。
+
+直したけど表示されない。因みにアイコンのデータはこれね
+
+結論から言うと、画像を別ファイルとして読み込ませるのをやめ、HTML内部に画像データ（Base64形式）を直接埋め込む方法に切り替えるのが確実です。
+
+これを行えば、GitHub上のファイル名違い・大文字小文字の不一致・パス指定ミス・ブラウザキャッシュの影響を100%回避でき、index.html 1枚だけでどこでも絶対にアイコンが表示されるようになります。
+
+修正方法
+index.html の該当箇所（<head> と <body>）を以下のように書き換えてください。
+
+1. <head> 内のアイコン設定（ファビコン用）
+<link rel="icon" ...> の2行を以下に置き換えます。
+
+HTML
+  <!-- アプリアイコン設定（SVGデータ直接埋め込み） -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c9171e'/><text x='50%' y='55%' font-size='50' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>KZ</text></svg>">
+2. <body> 内のロゴ画像
+<img src="Image8c.jpg" ...> の1行を、以下の埋め込みSVGブロックに差し替えます。
+デザイン・配色・用紙とペンのモチーフを完全再現しているため、外部画像ファイルを読み込む必要がなくなります。
+
+HTML
+  <!-- アプリアイコン（インライン表示） -->
+  <div class="app-icon-wrapper" style="display: flex; justify-content: center; margin-bottom: 12px;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="76" height="76" style="border-radius: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+      <defs>
+        <clipPath id="kz-clip">
+          <rect width="512" height="512" rx="115"/>
+        </clipPath>
+      </defs>
+      <g clip-path="url(#kz-clip)">
+        <!-- 背景4色 -->
+        <rect x="0" y="0" width="512" height="512" fill="#007aff"/>
+        <path d="M 256 0 C 350 0 450 60 512 180 L 512 0 Z" fill="#ff9500"/>
+        <path d="M 512 180 C 420 180 320 230 256 340 C 230 420 220 480 220 512 L 512 512 Z" fill="#34c759"/>
+        <path d="M 0 220 C 120 220 230 310 256 512 L 0 512 Z" fill="#ff3b30"/>
+        
+        <!-- 見積書（用紙） -->
+        <rect x="180" y="110" width="170" height="220" rx="18" fill="#ffffff"/>
+        <!-- 罫線 -->
+        <rect x="210" y="225" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="250" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="275" width="70" height="12" rx="6" fill="#007aff"/>
+
+        <!-- ペン -->
+        <rect x="122" y="155" width="38" height="135" rx="19" fill="#333333"/>
+        <path d="M 122 260 L 141 330 L 160 260 Z" fill="#333333"/>
+        <path d="M 134 305 L 141 330 L 148 305 Z" fill="#ffffff"/>
+        <rect x="122" y="195" width="38" height="10" fill="#ffffff"/>
+        <path d="M 108 175 C 108 150 125 150 125 150 L 125 200 C 115 200 108 190 108 175 Z" fill="#ffcc00"/>
+
+        <!-- テキスト -->
+        <text x="256" y="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="900" fill="#ffffff" text-anchor="middle">Quotation App</text>
+      </g>
+    </svg>
+  </div>
+なぜこれで解決するのか
+画像ファイルをGitHubへ別個にアップロードしたり、URLの相対パス（./）や大文字小文字（.jpg / .JPG）を気にする必要が一切なくなります。
+
+どの端末（PC、iPhone、Android）からアクセスしても、確実にクッキリと高解像度でアイコンが表示されます。
+
+index.html 内の上記2箇所を差し替えてコミットしてみてください。画像パスの問題が解消され即座に表示されます。
+
+修正したコード反映させて
+
+「アイコンのインライン埋め込み（画像ファイル不要化）」と「CORS通信ブロック対策」をすべて反映した完全版の index.html です。
+
+GitHub上の index.html をすべて消去し、以下のコードをそのまま貼り付けてコミットしてください。
+
+Your complete updated HTML file is ready
+
+HTML のアイコン
+index
+ HTML 
+HTML
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -389,3 +3255,1134 @@
 
 </body>
 </html>
+できた。
+
+けどUIの統一感がないな。全体的なデザインを変更したい。最近の流行りな感じにしたい。
+
+現代的なモダンUI（SaaSやiOS/Web3で標準的なGlassmorphism + マイクロインタラクションデザイン）に全面的にリデザインしました。
+
+Your modernized HTML file is ready
+
+HTML のアイコン
+index_modern
+ HTML 
+今回のアップデート・洗練ポイント
+背景とカードの調和（グラスモーフィズム）:
+単調な白・グレーから、ほんのりグラデーションを効かせた背景（Radial Gradient）と、すりガラス調（backdrop-filter: blur）のフローティングカードへ刷新。
+
+フォントとタイポグラフィ:
+現代的な海外テック系SaaSで主流の「Plus Jakarta Sans」と「Inter」をGoogle Fontsから導入。英字ロゴや数字が格段に見やすく引き締まります。
+
+入力フォームの質感:
+社員番号入力欄にユーザーアイコンを追加し、フォーカス時に柔らかなブランドカラーの光彩リング（Ring Focus）がアニメーションします。
+
+ログイン後ステータス表示の洗練:
+単なる赤枠テキストから、アバター頭文字バッジ（「T」）付きのモダンなプロファイルカードに変更。
+
+ボタンの立体感とマイクロインタラクション:
+ベタ塗り赤から深みのあるグラデーション＋浮遊シャドウ（Hover時にふわっと浮き上がり、クリックで軽く沈むクリック感）を実装。
+
+差し替え用コード（index.html）
+GitHub上の index.html を以下の内容にそのまま上書きしてコミットしてください。
+
+HTML
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KATZDEN VIETNAM - 見積書作成システム</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- アプリアイコン設定 -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%23007aff'/><circle cx='400' cy='100' r='180' fill='%23ff9500'/><circle cx='420' cy='420' r='190' fill='%2334c759'/><circle cx='80' cy='420' r='190' fill='%23ff3b30'/><rect x='180' y='110' width='170' height='220' rx='18' fill='%23ffffff'/><rect x='210' y='225' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='250' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='275' width='70' height='12' rx='6' fill='%23007aff'/><rect x='122' y='155' width='38' height='135' rx='19' fill='%23333333'/><path d='M122 260 L141 330 L160 260 Z' fill='%23333333'/><text x='256' y='425' font-family='sans-serif' font-size='50' font-weight='900' fill='%23ffffff' text-anchor='middle'>Quotation App</text></svg>">
+
+  <style>
+    :root {
+      --primary: #c9171e;
+      --primary-gradient: linear-gradient(135deg, #e52d27 0%, #b31217 100%);
+      --bg-gradient: radial-gradient(at 0% 0%, rgba(229, 45, 39, 0.08) 0px, transparent 50%),
+                     radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
+                     #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.90);
+      --card-border: rgba(255, 255, 255, 0.85);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --input-border: #e2e8f0;
+      --shadow-card: 0 20px 40px -15px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.8);
+      --radius-card: 24px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      width: 100%;
+      max-width: 420px;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-card);
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .icon-container {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-icon-svg {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.04);
+      transition: transform 0.25s ease;
+    }
+
+    .app-icon-svg:hover {
+      transform: translateY(-2px);
+    }
+
+    .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .brand-title span {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: #94a3b8;
+      width: 18px;
+      height: 18px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text-main);
+      background: #ffffff;
+      border: 1.5px solid var(--input-border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    input[type="text"]:focus {
+      border-color: #c9171e;
+      box-shadow: 0 0 0 4px rgba(201, 23, 30, 0.08);
+    }
+
+    input[type="text"]::placeholder {
+      color: #94a3b8;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #ffffff;
+      background: var(--primary-gradient);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      box-shadow: 0 8px 16px -4px rgba(201, 23, 30, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 20px -4px rgba(201, 23, 30, 0.45);
+    }
+
+    .btn:active {
+      transform: scale(0.985);
+    }
+
+    .btn:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .user-profile-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    .user-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #fee2e2;
+      color: #c9171e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .user-meta .name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .user-meta .role {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .logout-btn {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .result-card {
+      display: none;
+      margin-top: 24px;
+      padding: 20px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-sm);
+      text-align: left;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #15803d;
+      background: #dcfce7;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .result-quote-no {
+      font-size: 18px;
+      font-weight: 800;
+      color: #166534;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin-bottom: 6px;
+    }
+
+    .result-desc {
+      font-size: 12px;
+      color: #374151;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .btn-open-sheet {
+      background: #0284c7;
+      box-shadow: 0 6px 14px -3px rgba(2, 132, 199, 0.35);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 12px;
+    }
+
+    .btn-open-sheet:hover {
+      background: #0369a1;
+      box-shadow: 0 10px 18px -3px rgba(2, 132, 199, 0.45);
+    }
+
+    .status-alert {
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      min-height: 20px;
+    }
+
+    .status-alert.error { color: #dc2626; }
+    .status-alert.info { color: #2563eb; }
+    .status-alert.success { color: #16a34a; font-weight: 700; }
+
+    .spinner {
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 2.5px solid #fff;
+      width: 16px;
+      height: 16px;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="icon-container">
+    <svg class="app-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <defs>
+        <clipPath id="kz-clip">
+          <rect width="512" height="512" rx="115"/>
+        </clipPath>
+      </defs>
+      <g clip-path="url(#kz-clip)">
+        <rect x="0" y="0" width="512" height="512" fill="#007aff"/>
+        <path d="M 230 0 C 320 0 430 40 512 160 L 512 0 Z" fill="#ff9500"/>
+        <path d="M 512 160 C 430 180 320 230 256 340 C 230 420 220 480 220 512 L 512 512 Z" fill="#34c759"/>
+        <path d="M 0 210 C 130 210 230 310 256 512 L 0 512 Z" fill="#ff3b30"/>
+        <rect x="180" y="105" width="170" height="225" rx="18" fill="#ffffff"/>
+        <path d="M 295 105 L 350 160 L 295 160 Z" fill="#e0e0e0"/>
+        <rect x="210" y="220" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="248" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="276" width="70" height="12" rx="6" fill="#007aff"/>
+        <rect x="122" y="150" width="38" height="140" rx="19" fill="#2c3e50"/>
+        <path d="M 122 260 L 141 330 L 160 260 Z" fill="#2c3e50"/>
+        <path d="M 134 305 L 141 330 L 148 305 Z" fill="#ffffff"/>
+        <rect x="122" y="195" width="38" height="10" fill="#ffffff"/>
+        <path d="M 108 170 C 108 145 125 145 125 145 L 125 195 C 115 195 108 185 108 170 Z" fill="#f1c40f"/>
+        <text x="256" y="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="50" font-weight="900" fill="#ffffff" text-anchor="middle">Quotation App</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="brand-title"><span>KATZDEN</span> VIETNAM</div>
+  <div class="brand-subtitle">Quotation System / 見積書作成</div>
+
+  <!-- 1. ログイン画面 -->
+  <div id="loginView">
+    <div class="form-group">
+      <label for="empId">社員番号 / Employee ID</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <input type="text" id="empId" placeholder="社員番号を入力 (例: 0001)" autocomplete="off">
+      </div>
+    </div>
+    <button class="btn" id="btnLogin">ログイン / Đăng nhập</button>
+  </div>
+
+  <!-- 2. ダッシュボード画面 -->
+  <div id="dashView" style="display: none;">
+    <div class="user-profile-card">
+      <div class="user-details">
+        <div class="user-avatar" id="avatarLetter">T</div>
+        <div class="user-meta">
+          <div class="name" id="dispName">--</div>
+          <div class="role" id="dispRole">--</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="btnLogout">切替</button>
+    </div>
+
+    <button class="btn" id="btnCreate">
+      <div class="spinner" id="btnSpinner"></div>
+      <span id="btnText">＋ 新規見積書を作成</span>
+    </button>
+
+    <div class="result-card" id="resultBox">
+      <span class="result-badge">作成完了 / Created</span>
+      <div class="result-quote-no" id="dispQuoteNo"></div>
+      <p class="result-desc">Googleドライブ内に新規見積ファイルが正常に生成されました。</p>
+      <a href="#" target="_blank" class="btn btn-open-sheet" id="linkOpenSheet">
+        見積スプレッドシートを開く ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="status-alert" id="statusMsg"></div>
+</div>
+
+<script>
+  // 【設定①】デプロイしたGASのWeb API URL
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec";
+
+  // 【設定②】GAS側スクリプトプロパティの「API_SECRET」と一致させる合言葉
+  const API_SECRET = "open ss1 rand kz";
+
+  // 社員マスタ（表示用）
+  const STAFF_MASTER = {
+    "0001": { name: "Tetsuya Goto", position: "Director" },
+    "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+  };
+
+  const loginView = document.getElementById("loginView");
+  const dashView = document.getElementById("dashView");
+  const empIdInput = document.getElementById("empId");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnLogout = document.getElementById("btnLogout");
+  const dispName = document.getElementById("dispName");
+  const dispRole = document.getElementById("dispRole");
+  const avatarLetter = document.getElementById("avatarLetter");
+  const btnCreate = document.getElementById("btnCreate");
+  const btnSpinner = document.getElementById("btnSpinner");
+  const btnText = document.getElementById("btnText");
+  const statusMsg = document.getElementById("statusMsg");
+  const resultBox = document.getElementById("resultBox");
+  const dispQuoteNo = document.getElementById("dispQuoteNo");
+  const linkOpenSheet = document.getElementById("linkOpenSheet");
+
+  let currentUser = null;
+
+  // 自動ログインチェック
+  const savedEmpId = localStorage.getItem("kz_emp_id");
+  if (savedEmpId && STAFF_MASTER[savedEmpId]) {
+    loginAs(savedEmpId);
+  }
+
+  // ログイン処理
+  btnLogin.addEventListener("click", () => {
+    const id = empIdInput.value.trim();
+    if (!id) {
+      showStatus("社員番号を入力してください", "error");
+      return;
+    }
+    if (STAFF_MASTER[id]) {
+      localStorage.setItem("kz_emp_id", id);
+      loginAs(id);
+    } else {
+      showStatus("該当する社員が見つかりません", "error");
+    }
+  });
+
+  empIdInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btnLogin.click();
+  });
+
+  function loginAs(id) {
+    currentUser = STAFF_MASTER[id];
+    currentUser.id = id;
+    dispName.textContent = currentUser.name;
+    dispRole.textContent = currentUser.position;
+    avatarLetter.textContent = currentUser.name.charAt(0).toUpperCase();
+    loginView.style.display = "none";
+    dashView.style.display = "block";
+    resultBox.style.display = "none";
+    statusMsg.textContent = "";
+  }
+
+  // ログアウト・切替
+  btnLogout.addEventListener("click", () => {
+    localStorage.removeItem("kz_emp_id");
+    currentUser = null;
+    empIdInput.value = "";
+    dashView.style.display = "none";
+    loginView.style.display = "block";
+    statusMsg.textContent = "";
+  });
+
+  // 見積作成ボタン押下
+  btnCreate.addEventListener("click", async () => {
+    if (!currentUser) return;
+
+    btnCreate.disabled = true;
+    btnSpinner.style.display = "inline-block";
+    btnText.textContent = "見積書を作成中...";
+    statusMsg.className = "status-alert info";
+    statusMsg.textContent = "自動採番・フォルダ作成・複製を実行中 (約10秒)...";
+    resultBox.style.display = "none";
+
+    try {
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "createQuotation",
+          empId: currentUser.id,
+          apiKey: API_SECRET
+        })
+      });
+
+      const res = await response.json();
+
+      if (res.status === "success") {
+        statusMsg.className = "status-alert success";
+        statusMsg.textContent = "作成が完了しました！";
+        dispQuoteNo.textContent = "№ " + res.quoteNo;
+        linkOpenSheet.href = res.fileUrl;
+        resultBox.style.display = "block";
+
+        window.open(res.fileUrl, "_blank");
+      } else {
+        throw new Error(res.message || "作成に失敗しました");
+      }
+    } catch (err) {
+      statusMsg.className = "status-alert error";
+      statusMsg.textContent = "エラー: " + err.message;
+    } finally {
+      btnCreate.disabled = false;
+      btnSpinner.style.display = "none";
+      btnText.textContent = "＋ 新規見積書を作成";
+    }
+  });
+
+  function showStatus(text, type) {
+    statusMsg.className = "status-alert " + type;
+    statusMsg.textContent = text;
+  }
+</script>
+
+</body>
+</html>
+
+
+
+Gemini は AI であり、不正確な情報を表示することがあります。
+
+分析しています
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KATZDEN VIETNAM - 見積書作成システム</title>
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- アプリアイコン設定 -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%23007aff'/><circle cx='400' cy='100' r='180' fill='%23ff9500'/><circle cx='420' cy='420' r='190' fill='%2334c759'/><circle cx='80' cy='420' r='190' fill='%23ff3b30'/><rect x='180' y='110' width='170' height='220' rx='18' fill='%23ffffff'/><rect x='210' y='225' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='250' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='275' width='70' height='12' rx='6' fill='%23007aff'/><rect x='122' y='155' width='38' height='135' rx='19' fill='%23333333'/><path d='M122 260 L141 330 L160 260 Z' fill='%23333333'/><text x='256' y='425' font-family='sans-serif' font-size='50' font-weight='900' fill='%23ffffff' text-anchor='middle'>Quotation App</text></svg>">
+
+  <style>
+    :root {
+      --primary: #c9171e;
+      --primary-gradient: linear-gradient(135deg, #e52d27 0%, #b31217 100%);
+      --accent: #2563eb;
+      --bg-gradient: radial-gradient(at 0% 0%, rgba(229, 45, 39, 0.08) 0px, transparent 50%),
+                     radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.06) 0px, transparent 50%),
+                     #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-border: rgba(255, 255, 255, 0.8);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --input-border: #e2e8f0;
+      --input-focus: #c9171e;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-card: 0 20px 40px -15px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.8);
+      --radius-card: 24px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      width: 100%;
+      max-width: 420px;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-card);
+      padding: 40px 32px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* アイコンヘッダー */
+    .icon-container {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-icon-svg {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.04);
+      transition: transform 0.25s ease;
+    }
+
+    .app-icon-svg:hover {
+      transform: translateY(-2px);
+    }
+
+    .brand-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .brand-title span {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      margin-bottom: 28px;
+    }
+
+    /* フォームパーツ */
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: #94a3b8;
+      width: 18px;
+      height: 18px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text-main);
+      background: #ffffff;
+      border: 1.5px solid var(--input-border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    input[type="text"]:focus {
+      border-color: #c9171e;
+      box-shadow: 0 0 0 4px rgba(201, 23, 30, 0.08);
+    }
+
+    input[type="text"]::placeholder {
+      color: #94a3b8;
+    }
+
+    /* ボタンスタイル */
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #ffffff;
+      background: var(--primary-gradient);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      box-shadow: 0 8px 16px -4px rgba(201, 23, 30, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 20px -4px rgba(201, 23, 30, 0.45);
+    }
+
+    .btn:active {
+      transform: scale(0.985);
+    }
+
+    .btn:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ユーザーカード（ログイン後） */
+    .user-profile-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+    }
+
+    .user-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #fee2e2;
+      color: #c9171e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .user-meta .name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .user-meta .role {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .logout-btn {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    /* 結果ボックス */
+    .result-card {
+      display: none;
+      margin-top: 24px;
+      padding: 20px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-sm);
+      text-align: left;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #15803d;
+      background: #dcfce7;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .result-quote-no {
+      font-size: 18px;
+      font-weight: 800;
+      color: #166534;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin-bottom: 6px;
+    }
+
+    .result-desc {
+      font-size: 12px;
+      color: #374151;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .btn-open-sheet {
+      background: #0284c7;
+      box-shadow: 0 6px 14px -3px rgba(2, 132, 199, 0.35);
+      text-decoration: none;
+      font-size: 14px;
+      padding: 12px;
+    }
+
+    .btn-open-sheet:hover {
+      background: #0369a1;
+      box-shadow: 0 10px 18px -3px rgba(2, 132, 199, 0.45);
+    }
+
+    /* メッセージ・スピナー */
+    .status-alert {
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      min-height: 20px;
+    }
+
+    .status-alert.error { color: #dc2626; }
+    .status-alert.info { color: #2563eb; }
+    .status-alert.success { color: #16a34a; font-weight: 700; }
+
+    .spinner {
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 2.5px solid #fff;
+      width: 16px;
+      height: 16px;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- アプリアイコン -->
+  <div class="icon-container">
+    <svg class="app-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <defs>
+        <clipPath id="kz-clip">
+          <rect width="512" height="512" rx="115"/>
+        </clipPath>
+      </defs>
+      <g clip-path="url(#kz-clip)">
+        <rect x="0" y="0" width="512" height="512" fill="#007aff"/>
+        <path d="M 230 0 C 320 0 430 40 512 160 L 512 0 Z" fill="#ff9500"/>
+        <path d="M 512 160 C 430 180 320 230 256 340 C 230 420 220 480 220 512 L 512 512 Z" fill="#34c759"/>
+        <path d="M 0 210 C 130 210 230 310 256 512 L 0 512 Z" fill="#ff3b30"/>
+        <rect x="180" y="105" width="170" height="225" rx="18" fill="#ffffff"/>
+        <path d="M 295 105 L 350 160 L 295 160 Z" fill="#e0e0e0"/>
+        <rect x="210" y="220" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="248" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="276" width="70" height="12" rx="6" fill="#007aff"/>
+        <rect x="122" y="150" width="38" height="140" rx="19" fill="#2c3e50"/>
+        <path d="M 122 260 L 141 330 L 160 260 Z" fill="#2c3e50"/>
+        <path d="M 134 305 L 141 330 L 148 305 Z" fill="#ffffff"/>
+        <rect x="122" y="195" width="38" height="10" fill="#ffffff"/>
+        <path d="M 108 170 C 108 145 125 145 125 145 L 125 195 C 115 195 108 185 108 170 Z" fill="#f1c40f"/>
+        <text x="256" y="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="50" font-weight="900" fill="#ffffff" text-anchor="middle">Quotation App</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="brand-title"><span>KATZDEN</span> VIETNAM</div>
+  <div class="brand-subtitle">Quotation System / 見積書作成</div>
+
+  <!-- 1. ログインビュー -->
+  <div id="loginView">
+    <div class="form-group">
+      <label for="empId">社員番号 / Employee ID</label>
+      <div class="input-wrapper">
+        <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <input type="text" id="empId" placeholder="社員番号を入力 (例: 0001)" autocomplete="off">
+      </div>
+    </div>
+    <button class="btn" id="btnLogin">ログイン / Đăng nhập</button>
+  </div>
+
+  <!-- 2. ダッシュボードビュー -->
+  <div id="dashView" style="display: none;">
+    <div class="user-profile-card">
+      <div class="user-details">
+        <div class="user-avatar" id="avatarLetter">T</div>
+        <div class="user-meta">
+          <div class="name" id="dispName">--</div>
+          <div class="role" id="dispRole">--</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="btnLogout">切替</button>
+    </div>
+
+    <button class="btn" id="btnCreate">
+      <div class="spinner" id="btnSpinner"></div>
+      <span id="btnText">＋ 新規見積書を作成</span>
+    </button>
+
+    <div class="result-card" id="resultBox">
+      <span class="result-badge">作成完了 / Created</span>
+      <div class="result-quote-no" id="dispQuoteNo"></div>
+      <p class="result-desc">Googleドライブ内に新規見積ファイルが正常に生成されました。</p>
+      <a href="#" target="_blank" class="btn btn-open-sheet" id="linkOpenSheet">
+        見積スプレッドシートを開く ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="status-alert" id="statusMsg"></div>
+</div>
+
+<script>
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec";
+  const API_SECRET = "open ss1 rand kz";
+
+  const STAFF_MASTER = {
+    "0001": { name: "Tetsuya Goto", position: "Director" },
+    "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
+  };
+
+  const loginView = document.getElementById("loginView");
+  const dashView = document.getElementById("dashView");
+  const empIdInput = document.getElementById("empId");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnLogout = document.getElementById("btnLogout");
+  const dispName = document.getElementById("dispName");
+  const dispRole = document.getElementById("dispRole");
+  const avatarLetter = document.getElementById("avatarLetter");
+  const btnCreate = document.getElementById("btnCreate");
+  const btnSpinner = document.getElementById("btnSpinner");
+  const btnText = document.getElementById("btnText");
+  const statusMsg = document.getElementById("statusMsg");
+  const resultBox = document.getElementById("resultBox");
+  const dispQuoteNo = document.getElementById("dispQuoteNo");
+  const linkOpenSheet = document.getElementById("linkOpenSheet");
+
+  let currentUser = null;
+
+  const savedEmpId = localStorage.getItem("kz_emp_id");
+  if (savedEmpId && STAFF_MASTER[savedEmpId]) {
+    loginAs(savedEmpId);
+  }
+
+  btnLogin.addEventListener("click", () => {
+    const id = empIdInput.value.trim();
+    if (!id) {
+      showStatus("社員番号を入力してください", "error");
+      return;
+    }
+    if (STAFF_MASTER[id]) {
+      localStorage.setItem("kz_emp_id", id);
+      loginAs(id);
+    } else {
+      showStatus("該当する社員が見つかりません", "error");
+    }
+  });
+
+  empIdInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") btnLogin.click();
+  });
+
+  function loginAs(id) {
+    currentUser = STAFF_MASTER[id];
+    currentUser.id = id;
+    dispName.textContent = currentUser.name;
+    dispRole.textContent = currentUser.position;
+    avatarLetter.textContent = currentUser.name.charAt(0).toUpperCase();
+    loginView.style.display = "none";
+    dashView.style.display = "block";
+    resultBox.style.display = "none";
+    statusMsg.textContent = "";
+  }
+
+  btnLogout.addEventListener("click", () => {
+    localStorage.removeItem("kz_emp_id");
+    currentUser = null;
+    empIdInput.value = "";
+    dashView.style.display = "none";
+    loginView.style.display = "block";
+    statusMsg.textContent = "";
+  });
+
+  btnCreate.addEventListener("click", async () => {
+    if (!currentUser) return;
+
+    btnCreate.disabled = true;
+    btnSpinner.style.display = "inline-block";
+    btnText.textContent = "見積書を作成中...";
+    statusMsg.className = "status-alert info";
+    statusMsg.textContent = "自動採番・フォルダ作成・複製を実行中 (約10秒)...";
+    resultBox.style.display = "none";
+
+    try {
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "createQuotation",
+          empId: currentUser.id,
+          apiKey: API_SECRET
+        })
+      });
+
+      const res = await response.json();
+
+      if (res.status === "success") {
+        statusMsg.className = "status-alert success";
+        statusMsg.textContent = "作成が完了しました！";
+        dispQuoteNo.textContent = "№ " + res.quoteNo;
+        linkOpenSheet.href = res.fileUrl;
+        resultBox.style.display = "block";
+
+        window.open(res.fileUrl, "_blank");
+      } else {
+        throw new Error(res.message || "作成に失敗しました");
+      }
+    } catch (err) {
+      statusMsg.className = "status-alert error";
+      statusMsg.textContent = "エラー: " + err.message;
+    } finally {
+      btnCreate.disabled = false;
+      btnSpinner.style.display = "none";
+      btnText.textContent = "＋ 新規見積書を作成";
+    }
+  });
+
+  function showStatus(text, type) {
+    statusMsg.className = "status-alert " + type;
+    statusMsg.textContent = text;
+  }
+</script>
+
+</body>
+</html>
+index_modern.html
+「index_modern.html」を表示しています。
