@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KATZDEN VIETNAM - 見積書作成システム</title>
 
-  <!-- アプリアイコン設定 -->
-  <link rel="icon" type="image/jpeg" href="Image8c.png">
-  <link rel="apple-touch-icon" href="Image8c.png">
+  <!-- アプリアイコン設定（SVGデータ直接埋め込み：タブ・ホーム画面用） -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%23007aff'/><circle cx='400' cy='100' r='180' fill='%23ff9500'/><circle cx='420' cy='420' r='190' fill='%2334c759'/><circle cx='80' cy='420' r='190' fill='%23ff3b30'/><rect x='180' y='110' width='170' height='220' rx='18' fill='%23ffffff'/><rect x='210' y='225' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='250' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='275' width='70' height='12' rx='6' fill='%23007aff'/><rect x='122' y='155' width='38' height='135' rx='19' fill='%23333333'/><path d='M122 260 L141 330 L160 260 Z' fill='%23333333'/><text x='256' y='425' font-family='sans-serif' font-size='50' font-weight='900' fill='%23ffffff' text-anchor='middle'>Quotation App</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%23007aff'/><circle cx='400' cy='100' r='180' fill='%23ff9500'/><circle cx='420' cy='420' r='190' fill='%2334c759'/><circle cx='80' cy='420' r='190' fill='%23ff3b30'/><rect x='180' y='110' width='170' height='220' rx='18' fill='%23ffffff'/><rect x='210' y='225' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='250' width='110' height='12' rx='6' fill='%23007aff'/><rect x='210' y='275' width='70' height='12' rx='6' fill='%23007aff'/><rect x='122' y='155' width='38' height='135' rx='19' fill='%23333333'/><path d='M122 260 L141 330 L160 260 Z' fill='%23333333'/><text x='256' y='425' font-family='sans-serif' font-size='50' font-weight='900' fill='%23ffffff' text-anchor='middle'>Quotation App</text></svg>">
 
   <style>
     :root {
@@ -41,13 +41,16 @@
       text-align: center;
       position: relative;
     }
-    .app-icon {
-      width: 72px;
-      height: 72px;
-      border-radius: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      object-fit: cover;
+    .app-icon-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .app-icon-svg {
+      width: 76px;
+      height: 76px;
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     }
     .logo-badge {
       font-size: 22px;
@@ -151,7 +154,7 @@
       border-radius: 8px;
       text-align: left;
     }
-    .result-box .quote-no {
+    .quote-no {
       font-size: 16px;
       font-weight: 800;
       color: #137333;
@@ -180,8 +183,43 @@
 <body>
 
 <div class="card">
-  <!-- アプリアイコン画像 -->
-  <img src="Image8c.png" alt="Quotation App Icon" class="app-icon">
+  <!-- アプリアイコン（完全埋め込み型：画像ファイル不要で確実に表示） -->
+  <div class="app-icon-wrapper">
+    <svg class="app-icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <defs>
+        <clipPath id="kz-clip">
+          <rect width="512" height="512" rx="115"/>
+        </clipPath>
+      </defs>
+      <g clip-path="url(#kz-clip)">
+        <!-- 4色背景 -->
+        <rect x="0" y="0" width="512" height="512" fill="#007aff"/>
+        <path d="M 230 0 C 320 0 430 40 512 160 L 512 0 Z" fill="#ff9500"/>
+        <path d="M 512 160 C 430 180 320 230 256 340 C 230 420 220 480 220 512 L 512 512 Z" fill="#34c759"/>
+        <path d="M 0 210 C 130 210 230 310 256 512 L 0 512 Z" fill="#ff3b30"/>
+        
+        <!-- 見積書用紙 -->
+        <rect x="180" y="105" width="170" height="225" rx="18" fill="#ffffff"/>
+        <path d="M 295 105 L 350 160 L 295 160 Z" fill="#e0e0e0"/>
+        
+        <!-- 書類罫線 -->
+        <rect x="210" y="220" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="248" width="110" height="12" rx="6" fill="#007aff"/>
+        <rect x="210" y="276" width="70" height="12" rx="6" fill="#007aff"/>
+
+        <!-- ペン -->
+        <rect x="122" y="150" width="38" height="140" rx="19" fill="#2c3e50"/>
+        <path d="M 122 260 L 141 330 L 160 260 Z" fill="#2c3e50"/>
+        <path d="M 134 305 L 141 330 L 148 305 Z" fill="#ffffff"/>
+        <rect x="122" y="195" width="38" height="10" fill="#ffffff"/>
+        <path d="M 108 170 C 108 145 125 145 125 145 L 125 195 C 115 195 108 185 108 170 Z" fill="#f1c40f"/>
+
+        <!-- タイトルテキスト -->
+        <text x="256" y="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="50" font-weight="900" fill="#ffffff" text-anchor="middle">Quotation App</text>
+      </g>
+    </svg>
+  </div>
+
   <div class="logo-badge">KATZDEN VIETNAM</div>
   <div class="sub-title">Quotation Creation System / 見積書作成</div>
 
