@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quotation Workspace — KATZDEN VIETNAM</title>
 
-  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -26,323 +25,83 @@
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    body {
-      background-color: var(--bg-canvas);
-      color: var(--text-main);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .notion-cover {
-      width: 100%;
-      height: 140px;
-      background: linear-gradient(180deg, #f1f1ef 0%, #e8e7e4 100%);
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .notion-page {
-      width: 100%;
-      max-width: 680px;
-      padding: 0 40px 80px 40px;
-      position: relative;
-    }
-
-    .notion-icon-wrap {
-      width: 72px;
-      height: 72px;
-      margin-top: -36px;
-      margin-bottom: 20px;
-      background: #ffffff;
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(15, 15, 15, 0.05);
-      font-size: 34px;
-    }
-
-    .notion-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent-red);
-    }
-
-    .notion-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-main);
-      letter-spacing: -0.02em;
-      margin-bottom: 24px;
-      line-height: 1.25;
-    }
-
-    .notion-properties {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 28px;
-    }
-
-    .prop-row {
-      display: flex;
-      align-items: center;
-      min-height: 32px;
-      font-size: 14px;
-    }
-
-    .prop-name {
-      width: 150px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      flex-shrink: 0;
-    }
-
-    .prop-value {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .notion-input {
-      width: 100%;
-      max-width: 260px;
-      padding: 6px 10px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text-main);
-      background: #fafaf9;
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
-      outline: none;
-      transition: all 0.15s ease;
-    }
-
-    .notion-input:focus {
-      background: #ffffff;
-      border-color: #2383e2;
-      box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.15);
-    }
-
-    .radio-group {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 14px;
-    }
-    .radio-group label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+    body { background-color: var(--bg-canvas); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+    .notion-cover { width: 100%; height: 140px; background: linear-gradient(180deg, #f1f1ef 0%, #e8e7e4 100%); border-bottom: 1px solid var(--border-subtle); }
+    .notion-page { width: 100%; max-width: 680px; padding: 0 40px 80px 40px; position: relative; }
+    .notion-icon-wrap { width: 72px; height: 72px; margin-top: -36px; margin-bottom: 20px; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(15, 15, 15, 0.05); font-size: 34px; }
+    .notion-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; font-weight: 500; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-red); }
+    .notion-title { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; margin-bottom: 24px; line-height: 1.25; }
+    .notion-properties { display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 28px; }
+    .prop-row { display: flex; align-items: center; min-height: 32px; font-size: 14px; }
+    .prop-name { width: 150px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-size: 13px; flex-shrink: 0; }
+    .prop-value { flex: 1; display: flex; align-items: center; gap: 12px; }
     
-    .calc-value {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--text-muted);
-      background: var(--hover-bg);
-      padding: 4px 8px;
-      border-radius: 4px;
-    }
+    .notion-input { width: 100%; max-width: 260px; padding: 6px 10px; font-size: 14px; font-family: inherit; color: var(--text-main); background: #fafaf9; border: 1px solid var(--border-subtle); border-radius: 4px; outline: none; transition: all 0.15s ease; }
+    .notion-input:focus { background: #ffffff; border-color: #2383e2; box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.15); }
+    select.notion-input { cursor: pointer; }
 
-    .notion-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #ffffff;
-      background: var(--btn-dark);
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      box-shadow: 0 1px 2px rgba(15, 15, 15, 0.1);
-    }
+    .radio-group { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+    .radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .calc-value { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); background: var(--hover-bg); padding: 4px 8px; border-radius: 4px; }
+
+    .notion-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background: var(--btn-dark); border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(15, 15, 15, 0.1); }
     .notion-btn:hover { background: var(--btn-dark-hover); }
     .notion-btn:disabled { background: #e9e9e7; color: var(--text-placeholder); cursor: not-allowed; box-shadow: none; }
 
-    .notion-user-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--hover-bg);
-      padding: 4px 10px 4px 6px;
-      border-radius: 14px;
-      font-size: 13px;
-      font-weight: 500;
-    }
+    .notion-user-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--hover-bg); padding: 4px 10px 4px 6px; border-radius: 14px; font-size: 13px; font-weight: 500; }
+    .user-avatar { width: 20px; height: 20px; border-radius: 50%; background: var(--accent-red); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+    .btn-switch-user { font-size: 12px; color: var(--text-muted); text-decoration: underline; cursor: pointer; background: none; border: none; }
 
-    .user-avatar {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--accent-red);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .btn-switch-user {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-decoration: underline;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-
-    .notion-callout {
-      display: none;
-      background: var(--callout-bg);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 16px 18px;
-      margin-top: 24px;
-      text-align: left;
-    }
+    .notion-callout { display: none; background: var(--callout-bg); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 16px 18px; margin-top: 24px; text-align: left; }
     .callout-header { font-size: 13px; font-weight: 600; color: #287a4d; margin-bottom: 6px; }
     .callout-body { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
     .callout-deadline { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
     .deadline-date { font-weight: 600; color: var(--accent-red); }
 
-    .link-notion-style {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: #2383e2;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 6px 10px;
-      background: #ffffff;
-      border: 1px solid #d3e5f7;
-      border-radius: 4px;
-      transition: background 0.15s;
-    }
+    .link-notion-style { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2383e2; text-decoration: none; font-weight: 500; padding: 6px 10px; background: #ffffff; border: 1px solid #d3e5f7; border-radius: 4px; transition: background 0.15s; }
     .link-notion-style:hover { background: #f0f7fe; }
 
     .status-msg { margin-top: 14px; font-size: 13px; color: var(--text-muted); min-height: 20px; }
     .status-msg.error { color: #eb5757; }
     .status-msg.success { color: #287a4d; font-weight: 500; }
 
-    .spin {
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    .spin.dark {
-      border-color: rgba(0,0,0,0.1);
-      border-top-color: #37352f;
-    }
-
+    .spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spin.dark { border-color: rgba(0,0,0,0.1); border-top-color: #37352f; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .notion-divider {
-      height: 1px;
-      background: var(--border-subtle);
-      margin: 40px 0 24px 0;
-    }
-
-    .search-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: var(--text-main);
-    }
-
-    .search-box-wrap {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+    .notion-divider { height: 1px; background: var(--border-subtle); margin: 40px 0 24px 0; }
+    .search-header { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-main); }
+    .search-box-wrap { display: flex; gap: 8px; margin-bottom: 16px; }
     .search-box-wrap .notion-input { max-width: 100%; }
-
-    .btn-secondary {
-      background: #ffffff;
-      color: var(--text-main);
-      border: 1px solid var(--border-subtle);
-      padding: 6px 14px;
-    }
+    .btn-secondary { background: #ffffff; color: var(--text-main); border: 1px solid var(--border-subtle); padding: 6px 14px; }
     .btn-secondary:hover { background: var(--hover-bg); }
 
     .result-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .result-card {
-      padding: 14px;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      background: #ffffff;
-      transition: background 0.15s;
-    }
+    .result-card { padding: 14px; border: 1px solid var(--border-subtle); border-radius: 6px; background: #ffffff; transition: background 0.15s; }
     .result-card:hover { background: #fafaf9; }
-
-    .rc-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
+    .rc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .rc-quote-no { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: #1a5734; text-decoration: none; }
     .rc-quote-no:hover { text-decoration: underline; }
-
-    .rc-status {
-      font-size: 11px;
-      padding: 2px 6px;
-      background: var(--hover-bg);
-      border-radius: 4px;
-      font-weight: 500;
-      color: var(--text-main);
-    }
-    .rc-status.submitted { background: #d3e5f7; color: #1d73c9; }
-    .rc-status.negotiating { background: #fdf3c6; color: #b26b00; }
-    .rc-status.in-production { background: #dcfce7; color: #166534; }
-
+    
+    .rc-status { font-size: 11px; padding: 2px 6px; background: var(--hover-bg); border-radius: 4px; font-weight: 500; color: var(--text-main); }
     .rc-client { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .rc-details { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
-
-    .rc-footer { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); }
+    .rc-footer { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); align-items: center; }
     .rc-deadline { color: var(--accent-red); font-weight: 500; }
+    .rc-badge { font-size: 11px; padding: 2px 6px; border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-muted); }
+    
+    .btn-edit-sm { font-size: 11px; padding: 2px 8px; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; color: var(--text-muted); }
+    .btn-edit-sm:hover { background: var(--hover-bg); color: var(--text-main); }
 
+    /* モーダル */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-content { background: #ffffff; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+    .modal-form-row { margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-muted); }
+    .modal-form-row input, .modal-form-row select, .modal-form-row textarea { width: 100%; padding: 6px 10px; font-size: 14px; border: 1px solid var(--border-subtle); border-radius: 4px; font-family: inherit; outline: none; }
+    .modal-form-row textarea { resize: vertical; height: 70px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -351,14 +110,7 @@
 
   <div class="notion-page">
     <div class="notion-icon-wrap">📋</div>
-
-    <div class="notion-breadcrumb">
-      <span class="status-dot"></span>
-      <span>KATZDEN VIETNAM</span>
-      <span>/</span>
-      <span>Sales & Operations</span>
-    </div>
-
+    <div class="notion-breadcrumb"><span class="status-dot"></span><span>KATZDEN VIETNAM</span><span>/</span><span>Sales & Operations</span></div>
     <h1 class="notion-title">Quotation Workspace</h1>
 
     <!-- 1. ログイン -->
@@ -383,6 +135,7 @@
 
     <!-- 2. ダッシュボード -->
     <div id="dashView" style="display: none;">
+      
       <!-- 作成エリア -->
       <div class="notion-properties">
         <div class="prop-row">
@@ -391,10 +144,7 @@
             <span>Created by</span>
           </div>
           <div class="prop-value">
-            <div class="notion-user-badge">
-              <span class="user-avatar" id="avatarLetter">T</span>
-              <span id="dispName">--</span>
-            </div>
+            <div class="notion-user-badge"><span class="user-avatar" id="avatarLetter">T</span><span id="dispName">--</span></div>
             <button class="btn-switch-user" id="btnLogout">切替</button>
           </div>
         </div>
@@ -406,9 +156,22 @@
           </div>
           <div class="prop-value">
             <div class="radio-group">
-              <label><input type="radio" name="isDomestic" value="true" checked> 国内案件</label>
-              <label><input type="radio" name="isDomestic" value="false"> 輸出</label>
+              <label><input type="radio" name="isDomestic" value="true" checked> 国内 (Domestic)</label>
+              <label><input type="radio" name="isDomestic" value="false"> 輸出 (Overseas)</label>
             </div>
+          </div>
+        </div>
+
+        <div class="prop-row">
+          <div class="prop-name">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>
+            <span>Trade Type</span>
+          </div>
+          <div class="prop-value">
+            <select id="tradeType" class="notion-input">
+              <option value="Direct">直接取引 (Direct)</option>
+              <option value="Via Forwarder">通関業者経由 (Via Forwarder)</option>
+            </select>
           </div>
         </div>
 
@@ -432,15 +195,12 @@
       <div class="notion-callout" id="resultBox">
         <div class="callout-header">✓ 生成完了</div>
         <div class="callout-body" id="dispQuoteNo"></div>
-        <div class="callout-deadline" id="dispDeadlineWrap" style="display:none;">
-          ⚠️ 手配期限: <span class="deadline-date" id="dispDeadlineDate"></span>
-        </div>
+        <div class="callout-deadline" id="dispDeadlineWrap" style="display:none;">⚠️ 手配期限: <span class="deadline-date" id="dispDeadlineDate"></span></div>
         <a href="#" target="_blank" class="link-notion-style" id="linkOpenSheet">
           <span>スプレッドシートを開く</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
         </a>
       </div>
-
       <div class="status-msg" id="statusMsg"></div>
 
       <!-- 検索・進捗ビュー -->
@@ -463,13 +223,63 @@
     </div>
   </div>
 
+  <!-- 編集モーダル -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalQuoteTitle">案件編集</div>
+      <input type="hidden" id="editQuoteNo">
+      
+      <div class="modal-form-row">
+        <label>ステータス (Status)</label>
+        <select id="editStatus">
+          <option value="1. Draft">1. Draft (作成中)</option>
+          <option value="2. Submitted">2. Submitted (見積提出済)</option>
+          <option value="3. Negotiating">3. Negotiating (交渉中)</option>
+          <option value="4. Accepted">4. Accepted (受注確定)</option>
+          <option value="5. CAD / Drawing">5. CAD / Drawing (作図中)</option>
+          <option value="6. Production">6. Production (工場生産中)</option>
+          <option value="7. Delivered">7. Delivered (納入・出荷完了)</option>
+          <option value="8. Paid">8. Paid (入金完了)</option>
+          <option value="9. Lost / Cancelled">9. Lost / Cancelled (失注・キャンセル)</option>
+        </select>
+      </div>
+
+      <div class="modal-form-row">
+        <label>取引形態 (Trade Type)</label>
+        <select id="editTradeType">
+          <option value="直接取引(Direct)">直接取引 (Direct)</option>
+          <option value="通関業者経由(Via Forwarder)">通関業者経由 (Via Forwarder)</option>
+        </select>
+      </div>
+
+      <div class="modal-form-row">
+        <label>納入予定日 (Delivery Date)</label>
+        <input type="date" id="editDeliveryDate">
+      </div>
+
+      <div class="modal-form-row">
+        <label>見積もり内容 (Details)</label>
+        <input type="text" id="editDetails" placeholder="製品名や仕様のメモ...">
+      </div>
+
+      <div class="modal-form-row">
+        <label>追加メモ・変更理由 (Memo)</label>
+        <textarea id="editMemo" placeholder="変更の理由などを入力すると履歴に残ります..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="notion-btn btn-secondary" id="btnCancelEdit">キャンセル</button>
+        <button class="notion-btn" id="btnSaveEdit">変更を保存</button>
+      </div>
+    </div>
+  </div>
+
 <script>
-  // 【設定①】デプロイしたGASのWeb API URL
-  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzlzuj_8xAACqthJVYtLjq2wNLwdhUxmuf5yhgP0aQkpofW9LZ4naRDqypZa_MVtRhA/exec";
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec";
   const API_SECRET = "open ss1 rand kz";
 
-  // 動的取得用変数
   let STAFF_MASTER = {};
+  let currentSearchResults = [];
 
   const loginView = document.getElementById("loginView");
   const dashView = document.getElementById("dashView");
@@ -481,29 +291,40 @@
   const statusMsg = document.getElementById("statusMsg");
   const initStatusMsg = document.getElementById("initStatusMsg");
 
-  // 作成用
   const btnCreate = document.getElementById("btnCreate");
   const btnSpinner = document.getElementById("btnSpinner");
   const btnText = document.getElementById("btnText");
   const resultBox = document.getElementById("resultBox");
   const dispQuoteNo = document.getElementById("dispQuoteNo");
   const linkOpenSheet = document.getElementById("linkOpenSheet");
-  const deliveryDateInput = document.getElementById("deliveryDate");
+  
   const radioDomestic = document.querySelectorAll('input[name="isDomestic"]');
+  const tradeTypeInput = document.getElementById("tradeType");
+  const deliveryDateInput = document.getElementById("deliveryDate");
   const deliveryRow = document.getElementById("deliveryRow");
   const dispDeadlineWrap = document.getElementById("dispDeadlineWrap");
   const dispDeadlineDate = document.getElementById("dispDeadlineDate");
 
-  // 検索用
   const btnSearch = document.getElementById("btnSearch");
   const searchInput = document.getElementById("searchInput");
   const searchSpinner = document.getElementById("searchSpinner");
   const searchText = document.getElementById("searchText");
   const searchResultList = document.getElementById("searchResultList");
 
+  // モーダル要素
+  const editModal = document.getElementById("editModal");
+  const modalQuoteTitle = document.getElementById("modalQuoteTitle");
+  const editQuoteNo = document.getElementById("editQuoteNo");
+  const editStatus = document.getElementById("editStatus");
+  const editTradeType = document.getElementById("editTradeType");
+  const editDeliveryDate = document.getElementById("editDeliveryDate");
+  const editDetails = document.getElementById("editDetails");
+  const editMemo = document.getElementById("editMemo");
+  const btnCancelEdit = document.getElementById("btnCancelEdit");
+  const btnSaveEdit = document.getElementById("btnSaveEdit");
+
   let currentUser = null;
 
-  // ラジオボタンの切り替え
   radioDomestic.forEach(radio => {
     radio.addEventListener('change', (e) => {
       if(e.target.value === "true") deliveryRow.style.display = "flex";
@@ -511,7 +332,6 @@
     });
   });
 
-  // ★ 起動時にスプレッドシートから社員マスタを読み込む
   async function loadStaffMaster() {
     try {
       const response = await fetch(GAS_WEBAPP_URL, {
@@ -526,20 +346,15 @@
         document.getElementById("loginSpinner").style.display = "none";
         document.getElementById("loginText").textContent = "ログイン";
         btnLogin.disabled = false;
-
-        // 過去のログイン情報があれば自動ログイン
         const savedEmpId = localStorage.getItem("kz_emp_id");
         if (savedEmpId && STAFF_MASTER[savedEmpId]) loginAs(savedEmpId);
-      } else {
-        throw new Error(res.message);
-      }
+      } else throw new Error(res.message);
     } catch (err) {
       initStatusMsg.className = "status-msg error";
       initStatusMsg.textContent = "社員リストの取得に失敗しました。再読み込みしてください。";
     }
   }
 
-  // 初回ロード実行
   window.addEventListener('DOMContentLoaded', loadStaffMaster);
 
   btnLogin.addEventListener("click", () => {
@@ -548,9 +363,7 @@
     if (STAFF_MASTER[id]) {
       localStorage.setItem("kz_emp_id", id);
       loginAs(id);
-    } else {
-      showStatus("登録されていない社員番号です", "error");
-    }
+    } else showStatus("登録されていない社員番号です", "error");
   });
 
   empIdInput.addEventListener("keypress", (e) => { if (e.key === "Enter") btnLogin.click(); });
@@ -565,8 +378,6 @@
     dashView.style.display = "block";
     resultBox.style.display = "none";
     statusMsg.textContent = "";
-    
-    // ログイン時に自動で最新一覧を取得
     executeSearch("");
   }
 
@@ -579,13 +390,11 @@
     statusMsg.textContent = "";
   });
 
-  // --- 見積書作成処理 ---
   btnCreate.addEventListener("click", async () => {
     if (!currentUser) return;
     const isDomestic = document.querySelector('input[name="isDomestic"]:checked').value === "true";
+    const tradeType = tradeTypeInput.value;
     const deliveryDate = deliveryDateInput.value;
-
-    if(isDomestic && !deliveryDate) { showStatus("国内案件は納入予定日を入力してください", "error"); return; }
 
     btnCreate.disabled = true;
     btnSpinner.style.display = "inline-block";
@@ -599,7 +408,14 @@
       const response = await fetch(GAS_WEBAPP_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "createQuotation", empId: currentUser.id, apiKey: API_SECRET, isDomestic: isDomestic, deliveryDate: deliveryDate })
+        body: JSON.stringify({ 
+          action: "createQuotation", 
+          empId: currentUser.id, 
+          apiKey: API_SECRET, 
+          isDomestic: isDomestic, 
+          tradeType: tradeType,
+          deliveryDate: deliveryDate 
+        })
       });
       const res = await response.json();
 
@@ -614,8 +430,6 @@
         linkOpenSheet.href = res.fileUrl;
         resultBox.style.display = "block";
         window.open(res.fileUrl, "_blank");
-        
-        // 作成後、一覧をリロード
         executeSearch("");
       } else throw new Error(res.message || "失敗しました");
     } catch (err) {
@@ -633,10 +447,7 @@
     initStatusMsg.textContent = text;
   }
 
-  // --- 進捗検索処理 ---
-  btnSearch.addEventListener("click", () => {
-    executeSearch(searchInput.value.trim());
-  });
+  btnSearch.addEventListener("click", () => { executeSearch(searchInput.value.trim()); });
 
   async function executeSearch(query) {
     btnSearch.disabled = true;
@@ -653,6 +464,7 @@
       const res = await response.json();
 
       if (res.status === "success") {
+        currentSearchResults = res.data;
         renderResults(res.data);
       } else {
         searchResultList.innerHTML = `<div style="color:red; font-size:13px;">エラー: ${res.message}</div>`;
@@ -672,16 +484,8 @@
       return;
     }
 
-    searchResultList.innerHTML = data.map(item => {
-      // ステータスに応じた色付け
-      let statusClass = '';
-      const s = item.status.toLowerCase();
-      if(s.includes('submitted')) statusClass = 'submitted';
-      else if(s.includes('negotiating')) statusClass = 'negotiating';
-      else if(s.includes('production') || s.includes('ordered')) statusClass = 'in-production';
-
+    searchResultList.innerHTML = data.map((item, index) => {
       const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="rc-quote-no">${item.quoteNo} ↗</a>` : `<span class="rc-quote-no">${item.quoteNo}</span>`;
-      
       const deadlineHtml = item.orderDeadline ? `<span class="rc-deadline">手配期限: ${item.orderDeadline}</span>` : '';
       const deliveryHtml = item.deliveryDate ? `<span>納入: ${item.deliveryDate}</span>` : '';
 
@@ -689,10 +493,17 @@
       <div class="result-card">
         <div class="rc-header">
           ${fileLink}
-          <span class="rc-status ${statusClass}">${item.status}</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="rc-status">${item.status}</span>
+            <button class="btn-edit-sm" onclick="openEditModal(${index})">編集</button>
+          </div>
         </div>
         <div class="rc-client">${item.client || '(顧客未入力)'}</div>
-        ${item.details ? `<div class="rc-details">${item.details}</div>` : ''}
+        ${item.details ? `<div style="font-size:13px; color:var(--text-main); margin-bottom:6px;">内容: ${item.details}</div>` : ''}
+        <div class="rc-footer" style="margin-bottom: 6px;">
+          <span class="rc-badge">${item.category}</span>
+          <span class="rc-badge">${item.tradeType}</span>
+        </div>
         <div class="rc-footer">
           ${deliveryHtml}
           ${deadlineHtml}
@@ -701,6 +512,67 @@
       `;
     }).join('');
   }
+
+  // --- 編集モーダル操作 ---
+  window.openEditModal = function(index) {
+    const item = currentSearchResults[index];
+    if(!item) return;
+
+    editQuoteNo.value = item.quoteNo;
+    modalQuoteTitle.textContent = `案件編集: ${item.quoteNo}`;
+    editStatus.value = item.status;
+    editTradeType.value = item.tradeType;
+    editDeliveryDate.value = item.deliveryDate || '';
+    editDetails.value = item.details || '';
+    editMemo.value = '';
+
+    editModal.style.display = "flex";
+  };
+
+  btnCancelEdit.addEventListener("click", () => {
+    editModal.style.display = "none";
+  });
+
+  btnSaveEdit.addEventListener("click", async () => {
+    const qNo = editQuoteNo.value;
+    const newStatus = editStatus.value;
+    const newTradeType = editTradeType.value;
+    const newDeliveryDate = editDeliveryDate.value;
+    const newDetails = editDetails.value;
+    const newMemo = editMemo.value;
+
+    btnSaveEdit.disabled = true;
+    btnSaveEdit.textContent = "保存中...";
+
+    try {
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "updateProject",
+          empId: currentUser.id,
+          apiKey: API_SECRET,
+          quoteNo: qNo,
+          status: newStatus,
+          tradeType: newTradeType,
+          deliveryDate: newDeliveryDate,
+          details: newDetails,
+          memo: newMemo
+        })
+      });
+      const res = await response.json();
+
+      if (res.status === "success") {
+        editModal.style.display = "none";
+        executeSearch(searchInput.value.trim()); // 再検索して画面更新
+      } else throw new Error(res.message);
+    } catch (err) {
+      alert("更新に失敗しました: " + err.message);
+    } finally {
+      btnSaveEdit.disabled = false;
+      btnSaveEdit.textContent = "変更を保存";
+    }
+  });
 
 </script>
 </body>
