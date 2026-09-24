@@ -16,7 +16,6 @@
       --text-muted: #787774;
       --text-placeholder: #9b9a97;
       --border-subtle: #edece9;
-      --border-focus: #2eaadc;
       --hover-bg: #efefed;
       --btn-dark: #232323;
       --btn-dark-hover: #000000;
@@ -44,11 +43,10 @@
 
     .radio-group { display: flex; align-items: center; gap: 16px; font-size: 14px; }
     .radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-    .calc-value { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); background: var(--hover-bg); padding: 4px 8px; border-radius: 4px; }
 
-    .notion-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background: var(--btn-dark); border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(15, 15, 15, 0.1); }
+    .notion-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background: var(--btn-dark); border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
     .notion-btn:hover { background: var(--btn-dark-hover); }
-    .notion-btn:disabled { background: #e9e9e7; color: var(--text-placeholder); cursor: not-allowed; box-shadow: none; }
+    .notion-btn:disabled { background: #e9e9e7; color: var(--text-placeholder); cursor: not-allowed; }
 
     .notion-user-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--hover-bg); padding: 4px 10px 4px 6px; border-radius: 14px; font-size: 13px; font-weight: 500; }
     .user-avatar { width: 20px; height: 20px; border-radius: 50%; background: var(--accent-red); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
@@ -60,7 +58,7 @@
     .callout-deadline { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
     .deadline-date { font-weight: 600; color: var(--accent-red); }
 
-    .link-notion-style { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2383e2; text-decoration: none; font-weight: 500; padding: 6px 10px; background: #ffffff; border: 1px solid #d3e5f7; border-radius: 4px; transition: background 0.15s; }
+    .link-notion-style { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2383e2; text-decoration: none; font-weight: 500; padding: 6px 10px; background: #ffffff; border: 1px solid #d3e5f7; border-radius: 4px; }
     .link-notion-style:hover { background: #f0f7fe; }
 
     .status-msg { margin-top: 14px; font-size: 13px; color: var(--text-muted); min-height: 20px; }
@@ -86,7 +84,8 @@
     .rc-quote-no:hover { text-decoration: underline; }
     
     .rc-status { font-size: 11px; padding: 2px 6px; background: var(--hover-bg); border-radius: 4px; font-weight: 500; color: var(--text-main); }
-    .rc-client { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .rc-client { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .rc-amount { font-size: 12px; color: #1a5734; font-weight: 600; padding: 2px 6px; background: #e8f5e9; border-radius: 4px; }
     .rc-footer { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); align-items: center; }
     .rc-deadline { color: var(--accent-red); font-weight: 500; }
     .rc-badge { font-size: 11px; padding: 2px 6px; border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-muted); }
@@ -97,7 +96,8 @@
     /* モーダル */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center; }
     .modal-content { background: #ffffff; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
     .modal-form-row { margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-muted); }
     .modal-form-row input, .modal-form-row select, .modal-form-row textarea { width: 100%; padding: 6px 10px; font-size: 14px; border: 1px solid var(--border-subtle); border-radius: 4px; font-family: inherit; outline: none; }
     .modal-form-row textarea { resize: vertical; height: 70px; }
@@ -105,9 +105,7 @@
   </style>
 </head>
 <body>
-
   <div class="notion-cover"></div>
-
   <div class="notion-page">
     <div class="notion-icon-wrap">📋</div>
     <div class="notion-breadcrumb"><span class="status-dot"></span><span>KATZDEN VIETNAM</span><span>/</span><span>Sales & Operations</span></div>
@@ -135,8 +133,6 @@
 
     <!-- 2. ダッシュボード -->
     <div id="dashView" style="display: none;">
-      
-      <!-- 作成エリア -->
       <div class="notion-properties">
         <div class="prop-row">
           <div class="prop-name">
@@ -148,7 +144,6 @@
             <button class="btn-switch-user" id="btnLogout">切替</button>
           </div>
         </div>
-
         <div class="prop-row">
           <div class="prop-name">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line></svg>
@@ -161,7 +156,6 @@
             </div>
           </div>
         </div>
-
         <div class="prop-row">
           <div class="prop-name">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>
@@ -174,7 +168,6 @@
             </select>
           </div>
         </div>
-
         <div class="prop-row" id="deliveryRow">
           <div class="prop-name">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -182,7 +175,6 @@
           </div>
           <div class="prop-value">
             <input type="date" id="deliveryDate" class="notion-input" style="width: 150px;">
-            <span class="calc-value" id="calcPreview">自動計算</span>
           </div>
         </div>
       </div>
@@ -227,6 +219,7 @@
   <div class="modal-overlay" id="editModal">
     <div class="modal-content">
       <div class="modal-title" id="modalQuoteTitle">案件編集</div>
+      <div class="modal-subtitle">※保存時に見積書の最新の「客先名」と「金額」が自動同期されます。</div>
       <input type="hidden" id="editQuoteNo">
       
       <div class="modal-form-row">
@@ -258,7 +251,7 @@
       </div>
 
       <div class="modal-form-row">
-        <label>見積もり内容 (Details)</label>
+        <label>見積もり内容 (Details) - 手動入力用</label>
         <input type="text" id="editDetails" placeholder="製品名や仕様のメモ...">
       </div>
 
@@ -280,6 +273,7 @@
 
   let STAFF_MASTER = {};
   let currentSearchResults = [];
+  let currentUser = null;
 
   const loginView = document.getElementById("loginView");
   const dashView = document.getElementById("dashView");
@@ -288,47 +282,18 @@
   const btnLogout = document.getElementById("btnLogout");
   const dispName = document.getElementById("dispName");
   const avatarLetter = document.getElementById("avatarLetter");
-  const statusMsg = document.getElementById("statusMsg");
   const initStatusMsg = document.getElementById("initStatusMsg");
+  const statusMsg = document.getElementById("statusMsg");
 
   const btnCreate = document.getElementById("btnCreate");
-  const btnSpinner = document.getElementById("btnSpinner");
-  const btnText = document.getElementById("btnText");
-  const resultBox = document.getElementById("resultBox");
-  const dispQuoteNo = document.getElementById("dispQuoteNo");
-  const linkOpenSheet = document.getElementById("linkOpenSheet");
-  
-  const radioDomestic = document.querySelectorAll('input[name="isDomestic"]');
-  const tradeTypeInput = document.getElementById("tradeType");
-  const deliveryDateInput = document.getElementById("deliveryDate");
-  const deliveryRow = document.getElementById("deliveryRow");
-  const dispDeadlineWrap = document.getElementById("dispDeadlineWrap");
-  const dispDeadlineDate = document.getElementById("dispDeadlineDate");
-
   const btnSearch = document.getElementById("btnSearch");
   const searchInput = document.getElementById("searchInput");
-  const searchSpinner = document.getElementById("searchSpinner");
-  const searchText = document.getElementById("searchText");
   const searchResultList = document.getElementById("searchResultList");
 
-  // モーダル要素
-  const editModal = document.getElementById("editModal");
-  const modalQuoteTitle = document.getElementById("modalQuoteTitle");
-  const editQuoteNo = document.getElementById("editQuoteNo");
-  const editStatus = document.getElementById("editStatus");
-  const editTradeType = document.getElementById("editTradeType");
-  const editDeliveryDate = document.getElementById("editDeliveryDate");
-  const editDetails = document.getElementById("editDetails");
-  const editMemo = document.getElementById("editMemo");
-  const btnCancelEdit = document.getElementById("btnCancelEdit");
-  const btnSaveEdit = document.getElementById("btnSaveEdit");
-
-  let currentUser = null;
-
-  radioDomestic.forEach(radio => {
+  document.querySelectorAll('input[name="isDomestic"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
-      if(e.target.value === "true") deliveryRow.style.display = "flex";
-      else { deliveryRow.style.display = "none"; deliveryDateInput.value = ""; }
+      document.getElementById("deliveryRow").style.display = (e.target.value === "true") ? "flex" : "none";
+      if (e.target.value === "false") document.getElementById("deliveryDate").value = "";
     });
   });
 
@@ -340,7 +305,6 @@
         body: JSON.stringify({ action: "getStaffMaster", apiKey: API_SECRET })
       });
       const res = await response.json();
-      
       if (res.status === "success") {
         STAFF_MASTER = res.data;
         document.getElementById("loginSpinner").style.display = "none";
@@ -359,25 +323,22 @@
 
   btnLogin.addEventListener("click", () => {
     const id = empIdInput.value.trim();
-    if (!id) { showStatus("社員番号を入力してください", "error"); return; }
+    if (!id) return showStatus("社員番号を入力してください", "error");
     if (STAFF_MASTER[id]) {
       localStorage.setItem("kz_emp_id", id);
       loginAs(id);
     } else showStatus("登録されていない社員番号です", "error");
   });
 
-  empIdInput.addEventListener("keypress", (e) => { if (e.key === "Enter") btnLogin.click(); });
-  searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") btnSearch.click(); });
+  empIdInput.addEventListener("keypress", e => { if (e.key === "Enter") btnLogin.click(); });
+  searchInput.addEventListener("keypress", e => { if (e.key === "Enter") btnSearch.click(); });
 
   function loginAs(id) {
-    currentUser = STAFF_MASTER[id];
-    currentUser.id = id;
+    currentUser = { id: id, ...STAFF_MASTER[id] };
     dispName.textContent = currentUser.name;
     avatarLetter.textContent = currentUser.name.charAt(0).toUpperCase();
     loginView.style.display = "none";
     dashView.style.display = "block";
-    resultBox.style.display = "none";
-    statusMsg.textContent = "";
     executeSearch("");
   }
 
@@ -387,58 +348,50 @@
     empIdInput.value = "";
     dashView.style.display = "none";
     loginView.style.display = "block";
-    statusMsg.textContent = "";
   });
 
   btnCreate.addEventListener("click", async () => {
     if (!currentUser) return;
     const isDomestic = document.querySelector('input[name="isDomestic"]:checked').value === "true";
-    const tradeType = tradeTypeInput.value;
-    const deliveryDate = deliveryDateInput.value;
-
+    
     btnCreate.disabled = true;
-    btnSpinner.style.display = "inline-block";
-    btnText.textContent = "作成中...";
+    document.getElementById("btnSpinner").style.display = "inline-block";
+    document.getElementById("btnText").textContent = "作成中...";
     statusMsg.className = "status-msg";
     statusMsg.textContent = "台帳処理中...";
-    resultBox.style.display = "none";
-    dispDeadlineWrap.style.display = "none";
 
     try {
       const response = await fetch(GAS_WEBAPP_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ 
-          action: "createQuotation", 
-          empId: currentUser.id, 
-          apiKey: API_SECRET, 
+          action: "createQuotation", empId: currentUser.id, apiKey: API_SECRET, 
           isDomestic: isDomestic, 
-          tradeType: tradeType,
-          deliveryDate: deliveryDate 
+          tradeType: document.getElementById("tradeType").value,
+          deliveryDate: document.getElementById("deliveryDate").value 
         })
       });
       const res = await response.json();
-
       if (res.status === "success") {
         statusMsg.className = "status-msg success";
         statusMsg.textContent = "作成完了";
-        dispQuoteNo.textContent = res.quoteNo;
+        document.getElementById("dispQuoteNo").textContent = res.quoteNo;
         if(isDomestic && res.orderDeadline) {
-          dispDeadlineDate.textContent = res.orderDeadline;
-          dispDeadlineWrap.style.display = "block";
+          document.getElementById("dispDeadlineDate").textContent = res.orderDeadline;
+          document.getElementById("dispDeadlineWrap").style.display = "block";
         }
-        linkOpenSheet.href = res.fileUrl;
-        resultBox.style.display = "block";
+        document.getElementById("linkOpenSheet").href = res.fileUrl;
+        document.getElementById("resultBox").style.display = "block";
         window.open(res.fileUrl, "_blank");
         executeSearch("");
-      } else throw new Error(res.message || "失敗しました");
+      } else throw new Error(res.message);
     } catch (err) {
       statusMsg.className = "status-msg error";
       statusMsg.textContent = err.message;
     } finally {
       btnCreate.disabled = false;
-      btnSpinner.style.display = "none";
-      btnText.textContent = "＋ 新規見積書を作成";
+      document.getElementById("btnSpinner").style.display = "none";
+      document.getElementById("btnText").textContent = "＋ 新規見積書を作成";
     }
   });
 
@@ -447,12 +400,12 @@
     initStatusMsg.textContent = text;
   }
 
-  btnSearch.addEventListener("click", () => { executeSearch(searchInput.value.trim()); });
+  btnSearch.addEventListener("click", () => executeSearch(searchInput.value.trim()));
 
   async function executeSearch(query) {
     btnSearch.disabled = true;
-    searchSpinner.style.display = "inline-block";
-    searchText.style.display = "none";
+    document.getElementById("searchSpinner").style.display = "inline-block";
+    document.getElementById("searchText").style.display = "none";
     searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">検索中...</div>';
 
     try {
@@ -462,87 +415,75 @@
         body: JSON.stringify({ action: "searchProjects", empId: currentUser.id, apiKey: API_SECRET, query: query })
       });
       const res = await response.json();
-
       if (res.status === "success") {
         currentSearchResults = res.data;
         renderResults(res.data);
-      } else {
-        searchResultList.innerHTML = `<div style="color:red; font-size:13px;">エラー: ${res.message}</div>`;
-      }
+      } else throw new Error(res.message);
     } catch (err) {
       searchResultList.innerHTML = '<div style="color:red; font-size:13px;">通信エラーが発生しました</div>';
     } finally {
       btnSearch.disabled = false;
-      searchSpinner.style.display = "none";
-      searchText.style.display = "inline";
+      document.getElementById("searchSpinner").style.display = "none";
+      document.getElementById("searchText").style.display = "inline";
     }
   }
 
- function renderResults(data) {
-      if(!data || data.length === 0) {
-        searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">該当する案件が見つかりません。</div>';
-        return;
-      }
+  function renderResults(data) {
+    if(!data || data.length === 0) {
+      searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">該当する案件が見つかりません。</div>';
+      return;
+    }
 
-      searchResultList.innerHTML = data.map((item, index) => {
-        const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="rc-quote-no">${item.quoteNo} ↗</a>` : `<span class="rc-quote-no">${item.quoteNo}</span>`;
-        const deadlineHtml = item.orderDeadline ? `<span class="rc-deadline">手配期限: ${item.orderDeadline}</span>` : '';
-        const deliveryHtml = item.deliveryDate ? `<span>納入: ${item.deliveryDate}</span>` : '';
+    searchResultList.innerHTML = data.map((item, index) => {
+      const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="rc-quote-no">${item.quoteNo} ↗</a>` : `<span class="rc-quote-no">${item.quoteNo}</span>`;
+      const formattedAmt = item.amount && !isNaN(item.amount) ? Number(item.amount).toLocaleString() : item.amount;
+      const amountHtml = (formattedAmt && formattedAmt !== '0') ? `<span class="rc-amount">¥/₫ ${formattedAmt}</span>` : '';
 
-        return `
-        <div class="result-card">
-          <div class="rc-header">
-            ${fileLink}
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="rc-status">${item.status}</span>
-              <button class="btn-edit-sm" onclick="openEditModal(${index})">編集</button>
-            </div>
-          </div>
-          <!-- ▼ ここでクライアント名を表示します -->
-          <div class="rc-client">${item.client || '(顧客未入力)'}</div>
-          ${item.details ? `<div style="font-size:13px; color:var(--text-main); margin-bottom:6px;">内容: ${item.details}</div>` : ''}
-          <div class="rc-footer" style="margin-bottom: 6px;">
-            <span class="rc-badge">${item.category}</span>
-            <span class="rc-badge">${item.tradeType}</span>
-          </div>
-          <div class="rc-footer">
-            ${deliveryHtml}
-            ${deadlineHtml}
+      return `
+      <div class="result-card">
+        <div class="rc-header">
+          ${fileLink}
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="rc-status">${item.status}</span>
+            <button class="btn-edit-sm" onclick="openEditModal(${index})">編集</button>
           </div>
         </div>
-        `;
-      }).join('');
-    }
+        <div class="rc-client">${item.client || '(顧客未入力)'} ${amountHtml}</div>
+        ${item.details ? `<div style="font-size:13px; color:var(--text-main); margin-bottom:6px;">内容: ${item.details}</div>` : ''}
+        <div class="rc-footer" style="margin-bottom: 6px;">
+          <span class="rc-badge">${item.category}</span>
+          <span class="rc-badge">${item.tradeType}</span>
+        </div>
+        <div class="rc-footer">
+          ${item.deliveryDate ? `<span>納入: ${item.deliveryDate}</span>` : ''}
+          ${item.orderDeadline ? `<span class="rc-deadline">手配期限: ${item.orderDeadline}</span>` : ''}
+        </div>
+      </div>
+      `;
+    }).join('');
+  }
+
   // --- 編集モーダル操作 ---
+  const editModal = document.getElementById("editModal");
   window.openEditModal = function(index) {
     const item = currentSearchResults[index];
     if(!item) return;
-
-    editQuoteNo.value = item.quoteNo;
-    modalQuoteTitle.textContent = `案件編集: ${item.quoteNo}`;
-    editStatus.value = item.status;
-    editTradeType.value = item.tradeType;
-    editDeliveryDate.value = item.deliveryDate || '';
-    editDetails.value = item.details || '';
-    editMemo.value = '';
-
+    document.getElementById("editQuoteNo").value = item.quoteNo;
+    document.getElementById("modalQuoteTitle").textContent = `案件編集: ${item.quoteNo}`;
+    document.getElementById("editStatus").value = item.status;
+    document.getElementById("editTradeType").value = item.tradeType;
+    document.getElementById("editDeliveryDate").value = item.deliveryDate || '';
+    document.getElementById("editDetails").value = item.details || '';
+    document.getElementById("editMemo").value = '';
     editModal.style.display = "flex";
   };
 
-  btnCancelEdit.addEventListener("click", () => {
-    editModal.style.display = "none";
-  });
+  document.getElementById("btnCancelEdit").addEventListener("click", () => editModal.style.display = "none");
 
-  btnSaveEdit.addEventListener("click", async () => {
-    const qNo = editQuoteNo.value;
-    const newStatus = editStatus.value;
-    const newTradeType = editTradeType.value;
-    const newDeliveryDate = editDeliveryDate.value;
-    const newDetails = editDetails.value;
-    const newMemo = editMemo.value;
-
-    btnSaveEdit.disabled = true;
-    btnSaveEdit.textContent = "保存中...";
+  document.getElementById("btnSaveEdit").addEventListener("click", async () => {
+    const btn = document.getElementById("btnSaveEdit");
+    btn.disabled = true;
+    btn.textContent = "同期＆保存中...";
 
     try {
       const response = await fetch(GAS_WEBAPP_URL, {
@@ -552,28 +493,26 @@
           action: "updateProject",
           empId: currentUser.id,
           apiKey: API_SECRET,
-          quoteNo: qNo,
-          status: newStatus,
-          tradeType: newTradeType,
-          deliveryDate: newDeliveryDate,
-          details: newDetails,
-          memo: newMemo
+          quoteNo: document.getElementById("editQuoteNo").value,
+          status: document.getElementById("editStatus").value,
+          tradeType: document.getElementById("editTradeType").value,
+          deliveryDate: document.getElementById("editDeliveryDate").value,
+          details: document.getElementById("editDetails").value,
+          memo: document.getElementById("editMemo").value
         })
       });
       const res = await response.json();
-
       if (res.status === "success") {
         editModal.style.display = "none";
-        executeSearch(searchInput.value.trim()); // 再検索して画面更新
+        executeSearch(searchInput.value.trim()); // 再検索して同期された情報を画面に反映
       } else throw new Error(res.message);
     } catch (err) {
       alert("更新に失敗しました: " + err.message);
     } finally {
-      btnSaveEdit.disabled = false;
-      btnSaveEdit.textContent = "変更を保存";
+      btn.disabled = false;
+      btn.textContent = "変更を保存";
     }
   });
-
 </script>
 </body>
 </html>
