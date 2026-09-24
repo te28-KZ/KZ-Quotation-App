@@ -478,41 +478,41 @@
     }
   }
 
-  function renderResults(data) {
-    if(!data || data.length === 0) {
-      searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">該当する案件が見つかりません。</div>';
-      return;
-    }
+ function renderResults(data) {
+      if(!data || data.length === 0) {
+        searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">該当する案件が見つかりません。</div>';
+        return;
+      }
 
-    searchResultList.innerHTML = data.map((item, index) => {
-      const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="rc-quote-no">${item.quoteNo} ↗</a>` : `<span class="rc-quote-no">${item.quoteNo}</span>`;
-      const deadlineHtml = item.orderDeadline ? `<span class="rc-deadline">手配期限: ${item.orderDeadline}</span>` : '';
-      const deliveryHtml = item.deliveryDate ? `<span>納入: ${item.deliveryDate}</span>` : '';
+      searchResultList.innerHTML = data.map((item, index) => {
+        const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="rc-quote-no">${item.quoteNo} ↗</a>` : `<span class="rc-quote-no">${item.quoteNo}</span>`;
+        const deadlineHtml = item.orderDeadline ? `<span class="rc-deadline">手配期限: ${item.orderDeadline}</span>` : '';
+        const deliveryHtml = item.deliveryDate ? `<span>納入: ${item.deliveryDate}</span>` : '';
 
-      return `
-      <div class="result-card">
-        <div class="rc-header">
-          ${fileLink}
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="rc-status">${item.status}</span>
-            <button class="btn-edit-sm" onclick="openEditModal(${index})">編集</button>
+        return `
+        <div class="result-card">
+          <div class="rc-header">
+            ${fileLink}
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="rc-status">${item.status}</span>
+              <button class="btn-edit-sm" onclick="openEditModal(${index})">編集</button>
+            </div>
+          </div>
+          <!-- ▼ ここでクライアント名を表示します -->
+          <div class="rc-client">${item.client || '(顧客未入力)'}</div>
+          ${item.details ? `<div style="font-size:13px; color:var(--text-main); margin-bottom:6px;">内容: ${item.details}</div>` : ''}
+          <div class="rc-footer" style="margin-bottom: 6px;">
+            <span class="rc-badge">${item.category}</span>
+            <span class="rc-badge">${item.tradeType}</span>
+          </div>
+          <div class="rc-footer">
+            ${deliveryHtml}
+            ${deadlineHtml}
           </div>
         </div>
-        <div class="rc-client">${item.client || '(顧客未入力)'}</div>
-        ${item.details ? `<div style="font-size:13px; color:var(--text-main); margin-bottom:6px;">内容: ${item.details}</div>` : ''}
-        <div class="rc-footer" style="margin-bottom: 6px;">
-          <span class="rc-badge">${item.category}</span>
-          <span class="rc-badge">${item.tradeType}</span>
-        </div>
-        <div class="rc-footer">
-          ${deliveryHtml}
-          ${deadlineHtml}
-        </div>
-      </div>
-      `;
-    }).join('');
-  }
-
+        `;
+      }).join('');
+    }
   // --- 編集モーダル操作 ---
   window.openEditModal = function(index) {
     const item = currentSearchResults[index];
