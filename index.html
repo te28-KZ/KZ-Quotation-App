@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quotation Workspace — KATZDEN VIETNAM</title>
 
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -17,6 +17,7 @@
       --text-muted: #787774;
       --text-placeholder: #9b9a97;
       --border-subtle: #edece9;
+      --border-focus: #2eaadc;
       --hover-bg: #efefed;
       --btn-dark: #232323;
       --btn-dark-hover: #000000;
@@ -42,7 +43,6 @@
       align-items: center;
     }
 
-    /* Notion Cover Banner */
     .notion-cover {
       width: 100%;
       height: 140px;
@@ -50,15 +50,13 @@
       border-bottom: 1px solid var(--border-subtle);
     }
 
-    /* Main Notion Page Container */
     .notion-page {
       width: 100%;
-      max-width: 640px;
+      max-width: 680px;
       padding: 0 40px 80px 40px;
       position: relative;
     }
 
-    /* Notion Page Icon */
     .notion-icon-wrap {
       width: 72px;
       height: 72px;
@@ -74,7 +72,6 @@
       font-size: 34px;
     }
 
-    /* Breadcrumbs / Top Workspace */
     .notion-breadcrumb {
       display: flex;
       align-items: center;
@@ -101,11 +98,10 @@
       line-height: 1.25;
     }
 
-    /* Notion Properties (Key-Value Block) */
     .notion-properties {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       padding-bottom: 24px;
       border-bottom: 1px solid var(--border-subtle);
       margin-bottom: 28px;
@@ -132,9 +128,9 @@
       flex: 1;
       display: flex;
       align-items: center;
+      gap: 12px;
     }
 
-    /* Inputs styled like Notion cells */
     .notion-input {
       width: 100%;
       max-width: 260px;
@@ -155,7 +151,28 @@
       box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.15);
     }
 
-    /* Notion Button */
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    
+    .calc-value {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--hover-bg);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
     .notion-btn {
       display: inline-flex;
       align-items: center;
@@ -172,19 +189,9 @@
       transition: all 0.15s ease;
       box-shadow: 0 1px 2px rgba(15, 15, 15, 0.1);
     }
+    .notion-btn:hover { background: var(--btn-dark-hover); }
+    .notion-btn:disabled { background: #e9e9e7; color: var(--text-placeholder); cursor: not-allowed; box-shadow: none; }
 
-    .notion-btn:hover {
-      background: var(--btn-dark-hover);
-    }
-
-    .notion-btn:disabled {
-      background: #e9e9e7;
-      color: var(--text-placeholder);
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    /* User Tag Badge */
     .notion-user-badge {
       display: inline-flex;
       align-items: center;
@@ -210,7 +217,6 @@
     }
 
     .btn-switch-user {
-      margin-left: 12px;
       font-size: 12px;
       color: var(--text-muted);
       text-decoration: underline;
@@ -219,7 +225,6 @@
       border: none;
     }
 
-    /* Notion Callout Block */
     .notion-callout {
       display: none;
       background: var(--callout-bg);
@@ -229,24 +234,10 @@
       margin-top: 24px;
       text-align: left;
     }
-
-    .callout-header {
-      font-size: 13px;
-      font-weight: 600;
-      color: #287a4d;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .callout-body {
-      font-family: var(--font-mono);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 12px;
-    }
+    .callout-header { font-size: 13px; font-weight: 600; color: #287a4d; margin-bottom: 6px; }
+    .callout-body { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+    .callout-deadline { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+    .deadline-date { font-weight: 600; color: var(--accent-red); }
 
     .link-notion-style {
       display: inline-flex;
@@ -262,17 +253,9 @@
       border-radius: 4px;
       transition: background 0.15s;
     }
+    .link-notion-style:hover { background: #f0f7fe; }
 
-    .link-notion-style:hover {
-      background: #f0f7fe;
-    }
-
-    .status-msg {
-      margin-top: 14px;
-      font-size: 13px;
-      color: var(--text-muted);
-      min-height: 20px;
-    }
+    .status-msg { margin-top: 14px; font-size: 13px; color: var(--text-muted); min-height: 20px; }
     .status-msg.error { color: #eb5757; }
     .status-msg.success { color: #287a4d; font-weight: 500; }
 
@@ -280,23 +263,125 @@
       width: 14px;
       height: 14px;
       border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #ffffff;
+      border-top-color: transparent;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      display: none;
+    }
+    .spin.dark {
+      border-color: rgba(0,0,0,0.1);
+      border-top-color: #37352f;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ★ 追加: 検索ビューのスタイル */
+    .notion-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 40px 0 24px 0;
     }
+
+    .search-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-main);
+    }
+
+    .search-box-wrap {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .search-box-wrap .notion-input {
+      max-width: 100%;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+    }
+    .btn-secondary:hover {
+      background: var(--hover-bg);
+    }
+
+    .result-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .result-card {
+      padding: 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      background: #ffffff;
+      transition: background 0.15s;
+    }
+    .result-card:hover {
+      background: #fafaf9;
+    }
+
+    .rc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .rc-quote-no {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a5734;
+      text-decoration: none;
+    }
+    .rc-quote-no:hover { text-decoration: underline; }
+
+    .rc-status {
+      font-size: 11px;
+      padding: 2px 6px;
+      background: var(--hover-bg);
+      border-radius: 4px;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+    
+    .rc-status.submitted { background: #d3e5f7; color: #1d73c9; }
+    .rc-status.negotiating { background: #fdf3c6; color: #b26b00; }
+    .rc-status.in-production { background: #dcfce7; color: #166534; }
+
+    .rc-client {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .rc-details {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .rc-footer {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .rc-deadline { color: var(--accent-red); font-weight: 500; }
+
   </style>
 </head>
 <body>
 
-  <!-- Top Cover -->
   <div class="notion-cover"></div>
 
-  <!-- Page Body -->
   <div class="notion-page">
     <div class="notion-icon-wrap">📋</div>
 
@@ -309,7 +394,7 @@
 
     <h1 class="notion-title">Quotation Workspace</h1>
 
-    <!-- 1. ログインビュー -->
+    <!-- 1. ログイン -->
     <div id="loginView">
       <div class="notion-properties">
         <div class="prop-row">
@@ -325,8 +410,9 @@
       <button class="notion-btn" id="btnLogin">ログイン</button>
     </div>
 
-    <!-- 2. ダッシュボードビュー -->
+    <!-- 2. ダッシュボード -->
     <div id="dashView" style="display: none;">
+      <!-- 作成エリア -->
       <div class="notion-properties">
         <div class="prop-row">
           <div class="prop-name">
@@ -337,9 +423,32 @@
             <div class="notion-user-badge">
               <span class="user-avatar" id="avatarLetter">T</span>
               <span id="dispName">--</span>
-              <span style="color: var(--text-muted); font-size: 11px;" id="dispRole">(--)</span>
             </div>
             <button class="btn-switch-user" id="btnLogout">切替</button>
+          </div>
+        </div>
+
+        <div class="prop-row">
+          <div class="prop-name">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line></svg>
+            <span>Category</span>
+          </div>
+          <div class="prop-value">
+            <div class="radio-group">
+              <label><input type="radio" name="isDomestic" value="true" checked> 国内案件</label>
+              <label><input type="radio" name="isDomestic" value="false"> 輸出</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="prop-row" id="deliveryRow">
+          <div class="prop-name">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Delivery Date</span>
+          </div>
+          <div class="prop-value">
+            <input type="date" id="deliveryDate" class="notion-input" style="width: 150px;">
+            <span class="calc-value" id="calcPreview">自動計算</span>
           </div>
         </div>
       </div>
@@ -349,18 +458,40 @@
         <span id="btnText">＋ 新規見積書を作成</span>
       </button>
 
-      <!-- コールアウト結果 -->
       <div class="notion-callout" id="resultBox">
         <div class="callout-header">✓ 生成完了</div>
         <div class="callout-body" id="dispQuoteNo"></div>
+        <div class="callout-deadline" id="dispDeadlineWrap" style="display:none;">
+          ⚠️ 手配期限: <span class="deadline-date" id="dispDeadlineDate"></span>
+        </div>
         <a href="#" target="_blank" class="link-notion-style" id="linkOpenSheet">
           <span>スプレッドシートを開く</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
         </a>
       </div>
-    </div>
 
-    <div class="status-msg" id="statusMsg"></div>
+      <div class="status-msg" id="statusMsg"></div>
+
+      <!-- ★追加: 検索・進捗ビュー -->
+      <div class="notion-divider"></div>
+      
+      <div class="search-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Database Search</span>
+      </div>
+      
+      <div class="search-box-wrap">
+        <input type="text" id="searchInput" class="notion-input" placeholder="物件番号や顧客名を入力..." autocomplete="off">
+        <button class="notion-btn btn-secondary" id="btnSearch">
+          <div class="spin dark" id="searchSpinner" style="display:none;"></div>
+          <span id="searchText">検索</span>
+        </button>
+      </div>
+
+      <div class="result-list" id="searchResultList">
+        <!-- 検索結果がここに挿入されます -->
+      </div>
+    </div>
   </div>
 
 <script>
@@ -378,29 +509,45 @@
   const btnLogin = document.getElementById("btnLogin");
   const btnLogout = document.getElementById("btnLogout");
   const dispName = document.getElementById("dispName");
-  const dispRole = document.getElementById("dispRole");
   const avatarLetter = document.getElementById("avatarLetter");
+  const statusMsg = document.getElementById("statusMsg");
+
+  // 作成用
   const btnCreate = document.getElementById("btnCreate");
   const btnSpinner = document.getElementById("btnSpinner");
   const btnText = document.getElementById("btnText");
-  const statusMsg = document.getElementById("statusMsg");
   const resultBox = document.getElementById("resultBox");
   const dispQuoteNo = document.getElementById("dispQuoteNo");
   const linkOpenSheet = document.getElementById("linkOpenSheet");
+  const deliveryDateInput = document.getElementById("deliveryDate");
+  const radioDomestic = document.querySelectorAll('input[name="isDomestic"]');
+  const deliveryRow = document.getElementById("deliveryRow");
+  const dispDeadlineWrap = document.getElementById("dispDeadlineWrap");
+  const dispDeadlineDate = document.getElementById("dispDeadlineDate");
+
+  // 検索用
+  const btnSearch = document.getElementById("btnSearch");
+  const searchInput = document.getElementById("searchInput");
+  const searchSpinner = document.getElementById("searchSpinner");
+  const searchText = document.getElementById("searchText");
+  const searchResultList = document.getElementById("searchResultList");
 
   let currentUser = null;
 
+  // ラジオボタンの切り替え
+  radioDomestic.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      if(e.target.value === "true") deliveryRow.style.display = "flex";
+      else { deliveryRow.style.display = "none"; deliveryDateInput.value = ""; }
+    });
+  });
+
   const savedEmpId = localStorage.getItem("kz_emp_id");
-  if (savedEmpId && STAFF_MASTER[savedEmpId]) {
-    loginAs(savedEmpId);
-  }
+  if (savedEmpId && STAFF_MASTER[savedEmpId]) loginAs(savedEmpId);
 
   btnLogin.addEventListener("click", () => {
     const id = empIdInput.value.trim();
-    if (!id) {
-      showStatus("社員番号を入力してください", "error");
-      return;
-    }
+    if (!id) { showStatus("社員番号を入力してください", "error"); return; }
     if (STAFF_MASTER[id]) {
       localStorage.setItem("kz_emp_id", id);
       loginAs(id);
@@ -409,20 +556,21 @@
     }
   });
 
-  empIdInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") btnLogin.click();
-  });
+  empIdInput.addEventListener("keypress", (e) => { if (e.key === "Enter") btnLogin.click(); });
+  searchInput.addEventListener("keypress", (e) => { if (e.key === "Enter") btnSearch.click(); });
 
   function loginAs(id) {
     currentUser = STAFF_MASTER[id];
     currentUser.id = id;
     dispName.textContent = currentUser.name;
-    dispRole.textContent = currentUser.position;
     avatarLetter.textContent = currentUser.name.charAt(0).toUpperCase();
     loginView.style.display = "none";
     dashView.style.display = "block";
     resultBox.style.display = "none";
     statusMsg.textContent = "";
+    
+    // ログイン時に自動で最新一覧を取得
+    executeSearch("");
   }
 
   btnLogout.addEventListener("click", () => {
@@ -434,40 +582,45 @@
     statusMsg.textContent = "";
   });
 
+  // --- 見積書作成処理 ---
   btnCreate.addEventListener("click", async () => {
     if (!currentUser) return;
+    const isDomestic = document.querySelector('input[name="isDomestic"]:checked').value === "true";
+    const deliveryDate = deliveryDateInput.value;
+
+    if(isDomestic && !deliveryDate) { showStatus("国内案件は納入予定日を入力してください", "error"); return; }
 
     btnCreate.disabled = true;
     btnSpinner.style.display = "inline-block";
     btnText.textContent = "作成中...";
     statusMsg.className = "status-msg";
-    statusMsg.textContent = "台帳に採番・フォルダ作成中 (約10秒)...";
+    statusMsg.textContent = "台帳処理中...";
     resultBox.style.display = "none";
+    dispDeadlineWrap.style.display = "none";
 
     try {
       const response = await fetch(GAS_WEBAPP_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "createQuotation",
-          empId: currentUser.id,
-          apiKey: API_SECRET
-        })
+        body: JSON.stringify({ action: "createQuotation", empId: currentUser.id, apiKey: API_SECRET, isDomestic: isDomestic, deliveryDate: deliveryDate })
       });
-
       const res = await response.json();
 
       if (res.status === "success") {
         statusMsg.className = "status-msg success";
-        statusMsg.textContent = "作成が完了しました";
+        statusMsg.textContent = "作成完了";
         dispQuoteNo.textContent = res.quoteNo;
+        if(isDomestic && res.orderDeadline) {
+          dispDeadlineDate.textContent = res.orderDeadline;
+          dispDeadlineWrap.style.display = "block";
+        }
         linkOpenSheet.href = res.fileUrl;
         resultBox.style.display = "block";
-
         window.open(res.fileUrl, "_blank");
-      } else {
-        throw new Error(res.message || "作成に失敗しました");
-      }
+        
+        // 作成後、一覧をリロード
+        executeSearch("");
+      } else throw new Error(res.message || "失敗しました");
     } catch (err) {
       statusMsg.className = "status-msg error";
       statusMsg.textContent = err.message;
@@ -482,7 +635,76 @@
     statusMsg.className = "status-msg " + type;
     statusMsg.textContent = text;
   }
-</script>
 
+  // --- 進捗検索処理 ---
+  btnSearch.addEventListener("click", () => {
+    executeSearch(searchInput.value.trim());
+  });
+
+  async function executeSearch(query) {
+    btnSearch.disabled = true;
+    searchSpinner.style.display = "inline-block";
+    searchText.style.display = "none";
+    searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">検索中...</div>';
+
+    try {
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "searchProjects", empId: currentUser.id, apiKey: API_SECRET, query: query })
+      });
+      const res = await response.json();
+
+      if (res.status === "success") {
+        renderResults(res.data);
+      } else {
+        searchResultList.innerHTML = `<div style="color:red; font-size:13px;">エラー: ${res.message}</div>`;
+      }
+    } catch (err) {
+      searchResultList.innerHTML = '<div style="color:red; font-size:13px;">通信エラーが発生しました</div>';
+    } finally {
+      btnSearch.disabled = false;
+      searchSpinner.style.display = "none";
+      searchText.style.display = "inline";
+    }
+  }
+
+  function renderResults(data) {
+    if(!data || data.length === 0) {
+      searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">該当する案件が見つかりません。</div>';
+      return;
+    }
+
+    searchResultList.innerHTML = data.map(item => {
+      // ステータスに応じた色付け
+      let statusClass = '';
+      const s = item.status.toLowerCase();
+      if(s.includes('submitted')) statusClass = 'submitted';
+      else if(s.includes('negotiating')) statusClass = 'negotiating';
+      else if(s.includes('production') || s.includes('ordered')) statusClass = 'in-production';
+
+      const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="rc-quote-no">${item.quoteNo} ↗</a>` : `<span class="rc-quote-no">${item.quoteNo}</span>`;
+      
+      const deadlineHtml = item.orderDeadline ? `<span class="rc-deadline">手配期限: ${item.orderDeadline}</span>` : '';
+      const deliveryHtml = item.deliveryDate ? `<span>納入: ${item.deliveryDate}</span>` : '';
+
+      return `
+      <div class="result-card">
+        <div class="rc-header">
+          ${fileLink}
+          <span class="rc-status ${statusClass}">${item.status}</span>
+        </div>
+        <div class="rc-client">${item.client || '(顧客未入力)'}</div>
+        ${item.details ? `<div class="rc-details">${item.details}</div>` : ''}
+        <div class="rc-footer">
+          ${deliveryHtml}
+          ${deadlineHtml}
+        </div>
+      </div>
+      `;
+    }).join('');
+  }
+
+</script>
 </body>
 </html>
