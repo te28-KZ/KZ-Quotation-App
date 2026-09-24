@@ -274,7 +274,6 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ★ 追加: 検索ビューのスタイル */
     .notion-divider {
       height: 1px;
       background: var(--border-subtle);
@@ -296,10 +295,7 @@
       gap: 8px;
       margin-bottom: 16px;
     }
-
-    .search-box-wrap .notion-input {
-      max-width: 100%;
-    }
+    .search-box-wrap .notion-input { max-width: 100%; }
 
     .btn-secondary {
       background: #ffffff;
@@ -307,15 +303,9 @@
       border: 1px solid var(--border-subtle);
       padding: 6px 14px;
     }
-    .btn-secondary:hover {
-      background: var(--hover-bg);
-    }
+    .btn-secondary:hover { background: var(--hover-bg); }
 
-    .result-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .result-list { display: flex; flex-direction: column; gap: 8px; }
 
     .result-card {
       padding: 14px;
@@ -324,9 +314,7 @@
       background: #ffffff;
       transition: background 0.15s;
     }
-    .result-card:hover {
-      background: #fafaf9;
-    }
+    .result-card:hover { background: #fafaf9; }
 
     .rc-header {
       display: flex;
@@ -334,14 +322,7 @@
       align-items: center;
       margin-bottom: 8px;
     }
-
-    .rc-quote-no {
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: 600;
-      color: #1a5734;
-      text-decoration: none;
-    }
+    .rc-quote-no { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: #1a5734; text-decoration: none; }
     .rc-quote-no:hover { text-decoration: underline; }
 
     .rc-status {
@@ -352,28 +333,14 @@
       font-weight: 500;
       color: var(--text-main);
     }
-    
     .rc-status.submitted { background: #d3e5f7; color: #1d73c9; }
     .rc-status.negotiating { background: #fdf3c6; color: #b26b00; }
     .rc-status.in-production { background: #dcfce7; color: #166534; }
 
-    .rc-client {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .rc-details {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
+    .rc-client { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .rc-details { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
 
-    .rc-footer {
-      display: flex;
-      gap: 16px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+    .rc-footer { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); }
     .rc-deadline { color: var(--accent-red); font-weight: 500; }
 
   </style>
@@ -403,11 +370,15 @@
             <span>Employee ID</span>
           </div>
           <div class="prop-value">
-            <input type="text" id="empId" class="notion-input" placeholder="社員番号 (例: 0001)" autocomplete="off">
+            <input type="text" id="empId" class="notion-input" placeholder="社員番号を入力..." autocomplete="off">
           </div>
         </div>
       </div>
-      <button class="notion-btn" id="btnLogin">ログイン</button>
+      <button class="notion-btn" id="btnLogin" disabled>
+        <div class="spin" id="loginSpinner" style="display:inline-block;"></div>
+        <span id="loginText">データベースと同期中...</span>
+      </button>
+      <div class="status-msg" id="initStatusMsg"></div>
     </div>
 
     <!-- 2. ダッシュボード -->
@@ -472,7 +443,7 @@
 
       <div class="status-msg" id="statusMsg"></div>
 
-      <!-- ★追加: 検索・進捗ビュー -->
+      <!-- 検索・進捗ビュー -->
       <div class="notion-divider"></div>
       
       <div class="search-header">
@@ -488,20 +459,17 @@
         </button>
       </div>
 
-      <div class="result-list" id="searchResultList">
-        <!-- 検索結果がここに挿入されます -->
-      </div>
+      <div class="result-list" id="searchResultList"></div>
     </div>
   </div>
 
 <script>
+  // 【設定①】デプロイしたGASのWeb API URL
   const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzlzuj_8xAACqthJVYtLjq2wNLwdhUxmuf5yhgP0aQkpofW9LZ4naRDqypZa_MVtRhA/exec";
   const API_SECRET = "open ss1 rand kz";
 
-  const STAFF_MASTER = {
-    "0001": { name: "Tetsuya Goto", position: "Director" },
-    "0002": { name: "Nguyen Tien Thinh", position: "Deputy Director" }
-  };
+  // 動的取得用変数
+  let STAFF_MASTER = {};
 
   const loginView = document.getElementById("loginView");
   const dashView = document.getElementById("dashView");
@@ -511,6 +479,7 @@
   const dispName = document.getElementById("dispName");
   const avatarLetter = document.getElementById("avatarLetter");
   const statusMsg = document.getElementById("statusMsg");
+  const initStatusMsg = document.getElementById("initStatusMsg");
 
   // 作成用
   const btnCreate = document.getElementById("btnCreate");
@@ -542,8 +511,36 @@
     });
   });
 
-  const savedEmpId = localStorage.getItem("kz_emp_id");
-  if (savedEmpId && STAFF_MASTER[savedEmpId]) loginAs(savedEmpId);
+  // ★ 起動時にスプレッドシートから社員マスタを読み込む
+  async function loadStaffMaster() {
+    try {
+      const response = await fetch(GAS_WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "getStaffMaster", apiKey: API_SECRET })
+      });
+      const res = await response.json();
+      
+      if (res.status === "success") {
+        STAFF_MASTER = res.data;
+        document.getElementById("loginSpinner").style.display = "none";
+        document.getElementById("loginText").textContent = "ログイン";
+        btnLogin.disabled = false;
+
+        // 過去のログイン情報があれば自動ログイン
+        const savedEmpId = localStorage.getItem("kz_emp_id");
+        if (savedEmpId && STAFF_MASTER[savedEmpId]) loginAs(savedEmpId);
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (err) {
+      initStatusMsg.className = "status-msg error";
+      initStatusMsg.textContent = "社員リストの取得に失敗しました。再読み込みしてください。";
+    }
+  }
+
+  // 初回ロード実行
+  window.addEventListener('DOMContentLoaded', loadStaffMaster);
 
   btnLogin.addEventListener("click", () => {
     const id = empIdInput.value.trim();
@@ -552,7 +549,7 @@
       localStorage.setItem("kz_emp_id", id);
       loginAs(id);
     } else {
-      showStatus("該当する社員が見つかりません", "error");
+      showStatus("登録されていない社員番号です", "error");
     }
   });
 
@@ -632,8 +629,8 @@
   });
 
   function showStatus(text, type) {
-    statusMsg.className = "status-msg " + type;
-    statusMsg.textContent = text;
+    initStatusMsg.className = "status-msg " + type;
+    initStatusMsg.textContent = text;
   }
 
   // --- 進捗検索処理 ---
