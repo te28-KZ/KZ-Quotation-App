@@ -86,15 +86,32 @@
       font-weight: 500;
     }
 
-    /* メインコンテンツ（省略・既存のカンバンUIがここに入ります） */
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 24px;
-      justify-content: center;
-      align-items: center;
-      color: var(--text-muted);
+   <div class="kanban-board">
+        <!-- Draft列 -->
+        <div class="column">
+          <div class="col-header"><span class="badge" id="badge-draft">0</span> 1. Draft</div>
+          <!-- Javascriptがここにカードを挿入します -->
+          <div id="col-draft" class="card-list"></div>
+        </div>
+
+        <!-- Submitted列 -->
+        <div class="column">
+          <div class="col-header"><span class="badge" id="badge-submitted">0</span> 2. Submitted</div>
+          <div id="col-submitted" class="card-list"></div>
+        </div>
+
+        <!-- Negotiating列 -->
+        <div class="column">
+          <div class="col-header"><span class="badge" id="badge-negotiating">0</span> 3. Negotiating</div>
+          <div id="col-negotiating" class="card-list"></div>
+        </div>
+
+        <!-- Accepted列 -->
+        <div class="column">
+          <div class="col-header"><span class="badge" id="badge-accepted">0</span> 4. Accepted</div>
+          <div id="col-accepted" class="card-list"></div>
+        </div>
+      </div>
     }
   </style>
 </head>
@@ -122,6 +139,99 @@
   <main class="main-content">
     <p>（ここに前回作成したカンバンボードのHTMLが入ります）</p>
   </main>
+<!-- スクリプト -->
+  <script>
+    // GASのWebアプリURL（※ご自身のURLに差し替えてください）
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwYOUR_SCRIPT_ID/exec';
+    const API_SECRET = 'YOUR_API_SECRET'; // GAS側で設定したシークレットキー
 
+    // 画面ロード時に直近の案件を取得して表示
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchLatestProjects();
+    });
+
+    async function fetchLatestProjects() {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'searchProjects',
+            query: '', // 空欄で検索し、GAS側のslice(0, 5)で直近5件を取得
+            apiKey: API_SECRET,
+            empId: '10008' // テスト用の社員番号
+          })
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          renderKanbanBoard(result.data);
+        } else {
+          console.error('API Error:', result.message);
+        }
+      } catch (error) {
+        console.error('Fetch Error:', error);
+      }
+    }
+
+    function renderKanbanBoard(projects) {
+      // 1. 各列のコンテナをクリアする
+      const colDraft = document.getElementById('col-draft');
+      const colSubmitted = document.getElementById('col-submitted');
+      const colNegotiating = document.getElementById('col-negotiating');
+      const colAccepted = document.getElementById('col-accepted');
+      
+      [colDraft, colSubmitted, colNegotiating, colAccepted].forEach(col => col.innerHTML = '');
+
+      // 各列の件数カウンター
+      const counts = { draft: 0, submitted: 0, negotiating: 0, accepted: 0 };
+
+      // 2. データをループしてカードを生成・振り分け
+      projects.forEach(proj => {
+        // 金額のフォーマット（空または0の場合はグレー表示にする等の処理も可能）
+        const amountDisplay = (proj.amount && proj.amount !== '0') ? proj.amount : '金額未定';
+        
+        // カテゴリーやアラートのタグ生成
+        let tagsHtml = `<span class="tag tag-draft">${proj.category}</span>`;
+        if (proj.orderDeadline) {
+           // 期日が設定されていれば警告タグを追加
+           const formattedDate = proj.orderDeadline.substring(5); // yyyy-MM-dd -> MM-dd
+           tagsHtml += `<span class="tag tag-alert">⚠️ Deadline: ${formattedDate}</span>`;
+        }
+
+        // カードのHTML構造
+        const cardHtml = `
+          <div class="card" onclick="window.open('${proj.fileUrl}', '_blank')">
+            <div class="c-id">${proj.quoteNo}</div>
+            <div class="c-title">${proj.client} / ${amountDisplay}</div>
+            <div class="c-tags">${tagsHtml}</div>
+          </div>
+        `;
+
+        // 3. ステータスを判定して該当する列に挿入
+        const status = proj.status || '';
+        
+        if (status.includes('1. Draft')) {
+          colDraft.insertAdjacentHTML('beforeend', cardHtml);
+          counts.draft++;
+        } else if (status.includes('2. Submitted')) {
+          colSubmitted.insertAdjacentHTML('beforeend', cardHtml);
+          counts.submitted++;
+        } else if (status.includes('3. Negotiating')) {
+          colNegotiating.insertAdjacentHTML('beforeend', cardHtml);
+          counts.negotiating++;
+        } else if (status.includes('4. Accepted')) {
+          colAccepted.insertAdjacentHTML('beforeend', cardHtml);
+          counts.accepted++;
+        }
+      });
+
+      // 4. カラムヘッダーの件数バッジを更新
+      document.getElementById('badge-draft').textContent = counts.draft;
+      document.getElementById('badge-submitted').textContent = counts.submitted;
+      document.getElementById('badge-negotiating').textContent = counts.negotiating;
+      document.getElementById('badge-accepted').textContent = counts.accepted;
+    }
+  </script>
 </body>
 </html>
