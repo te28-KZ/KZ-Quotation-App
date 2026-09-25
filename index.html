@@ -36,6 +36,7 @@
       display: flex;
       flex-direction: column;
       padding: 12px 0;
+      flex-shrink: 0;
     }
     
     /* ロゴエリア */
@@ -84,7 +85,7 @@
       font-weight: 500;
     }
 
-    /* メインコンテンツとカンバンボード */
+    /* メインコンテンツ */
     .main-content {
       flex: 1;
       display: flex;
@@ -167,6 +168,7 @@
 </head>
 <body>
 
+  <!-- サイドバー -->
   <nav class="sidebar">
     <div class="workspace-switcher">
       <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -183,6 +185,7 @@
     <div class="nav-item">📅 Schedules</div>
   </nav>
 
+  <!-- カンバンエリア -->
   <main class="main-content">
     <div class="kanban-board">
       <div class="column">
@@ -204,9 +207,10 @@
     </div>
   </main>
 
+  <!-- 通信＆描画スクリプト -->
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec';
-    const API_SECRET = 'open ss1 rand kz';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec'; // 実際のGAS WebアプリURL
+    const API_SECRET = 'open ss1 rand kz'; // 設定したシークレットキー
 
     document.addEventListener('DOMContentLoaded', () => {
       fetchLatestProjects();
@@ -216,7 +220,7 @@
       try {
         const response = await fetch(API_URL, {
           method: 'POST',
-          headers: { 'Content-Type': ''text/plain' },
+          headers: { 'Content-Type': 'text/plain' }, // CORSプレフライト回避用
           body: JSON.stringify({
             action: 'searchProjects',
             query: '',
