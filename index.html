@@ -17,7 +17,6 @@
       --tag-default: #E3E2E0;
       --tag-blue: #D3E5EF;
       --tag-orange: #FADEC9;
-      --tag-green: #DBEDDB;
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       --font-serif: Lyon-Text, Georgia, "Yu Mincho", "Hiragino Mincho ProN", serif;
     }
@@ -111,9 +110,6 @@
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
     .btn-primary:hover {
       background-color: var(--btn-blue-hover);
@@ -198,7 +194,7 @@
     .tag-sub { background-color: var(--tag-blue); }
     .tag-alert { background-color: var(--tag-orange); }
 
-    /* モーダル共通スタイル (Notion風) */
+    /* モーダル共通 */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -321,6 +317,19 @@
       line-height: 1.4;
       color: var(--text-main);
       border: 1px solid var(--border);
+    }
+
+    /* ローディングスピナー */
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -466,13 +475,34 @@
     </div>
   </div>
 
+  <!-- 3. 作成中ローディングオーバーレイ -->
+  <div class="modal-overlay" id="loadingOverlay" style="z-index: 2000;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; color: #FFFFFF;">
+      <div class="spinner"></div>
+      <div style="font-size: 15px; font-weight: 500; letter-spacing: 0.02em;">Creating quotation... Please wait</div>
+    </div>
+  </div>
+
+  <!-- 4. 作成完了・確認モーダル (英語表記) -->
+  <div class="modal-overlay" id="confirmModalOverlay" style="z-index: 1500;">
+    <div class="modal-card" style="width: 440px; padding: 24px; box-sizing: border-box; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
+      <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Quotation Created</div>
+      <p id="confirmModalDesc" style="font-size: 13px; color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5;"></p>
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        <button class="btn-secondary" onclick="closeConfirmModal()">Later</button>
+        <button class="btn-primary" id="openSpreadsheetBtn">Open Spreadsheet</button>
+      </div>
+    </div>
+  </div>
+
   <!-- スクリプト -->
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec'; // 実際のGAS WebアプリURL
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec'; // 実際のGAS URL
     const API_SECRET = 'open ss1 rand kz'; // 設定したシークレットキー
     const CURRENT_EMP_ID = '10008';
 
-    let currentProjects = []; // 取得した全プロジェクトのキャッシュ
+    let currentProjects = [];
     let selectedQuoteNo = null;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -525,7 +555,6 @@
            tagsHtml += `<span class="tag tag-alert">⚠️ Deadline: ${formattedDate}</span>`;
         }
 
-        // カードクリックでモーダルを開く
         const cardHtml = `
           <div class="card" onclick="openEditModal('${proj.quoteNo}')">
             <div class="c-id">${proj.quoteNo}</div>
@@ -610,7 +639,7 @@
         const res = await response.json();
         if (res.status === 'success') {
           closeEditModal();
-          await fetchLatestProjects(); // カンバンを再読み込み（同期された金額や客先名が反映される）
+          await fetchLatestProjects();
         } else {
           alert('更新エラー: ' + res.message);
         }
@@ -637,10 +666,6 @@
     }
 
     async function submitCreateQuotation() {
-      const submitBtn = document.getElementById('submitCreateBtn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Creating...';
-
       const payload = {
         action: 'createQuotation',
         apiKey: API_SECRET,
@@ -650,6 +675,10 @@
         deliveryDate: document.getElementById('createDeliveryDate').value
       };
 
+      // 1. 入力モーダルを閉じ、ローディング画面を表示
+      closeCreateModal();
+      document.getElementById('loadingOverlay').classList.add('active');
+
       try {
         const response = await fetch(API_URL, {
           method: 'POST',
@@ -657,22 +686,42 @@
           body: JSON.stringify(payload)
         });
         const res = await response.json();
+        
         if (res.status === 'success') {
-          closeCreateModal();
-          // 作成されたスプレッドシートを別タブで自動で開く
-          if (res.fileUrl) {
-            window.open(res.fileUrl, '_blank');
-          }
-          await fetchLatestProjects(); // カンバン再取得（1. Draft列に追加される）
+          // 2. カンバンボードを最新化
+          await fetchLatestProjects();
+          // 3. 英語の確認画面を表示
+          showConfirmModal(res.quoteNo, res.fileUrl);
         } else {
-          alert('作成エラー: ' + res.message);
+          alert('Create Error: ' + res.message);
         }
       } catch (err) {
-        alert('通信エラーが発生しました');
+        alert('A network error occurred.');
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Create';
+        // ローディング画面を非表示化
+        document.getElementById('loadingOverlay').classList.remove('active');
       }
+    }
+
+    // ----------------------------------------------------
+    // 完了確認モーダル制御 (英語)
+    // ----------------------------------------------------
+    function showConfirmModal(quoteNo, fileUrl) {
+      document.getElementById('confirmModalDesc').innerHTML = `Quotation <b>${quoteNo}</b> has been generated.<br>Would you like to open the spreadsheet now?`;
+      
+      const openBtn = document.getElementById('openSpreadsheetBtn');
+      openBtn.onclick = () => {
+        if (fileUrl) {
+          window.open(fileUrl, '_blank');
+        }
+        closeConfirmModal();
+      };
+
+      document.getElementById('confirmModalOverlay').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModalOverlay').classList.remove('active');
     }
   </script>
 </body>
