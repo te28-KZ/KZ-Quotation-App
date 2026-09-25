@@ -84,29 +84,41 @@
       color: var(--text-main);
       font-weight: 500;
     }
+
+    /* ユーザーフッター */
     .user-profile {
       padding: 12px 16px;
       border-top: 1px solid var(--border);
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      justify-content: space-between;
     }
-    .user-label {
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .user-role {
       font-size: 11px;
       color: var(--text-muted);
     }
-    .user-select {
-      background: transparent;
-      border: 1px solid var(--border);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 13px;
-      color: var(--text-main);
-      outline: none;
+    .btn-logout {
+      background: none;
+      border: none;
+      color: var(--text-muted);
       cursor: pointer;
+      font-size: 12px;
+      padding: 4px;
+    }
+    .btn-logout:hover {
+      color: #EB5757;
     }
 
-    /* メインコンテンツコンテナ */
+    /* メインコンテンツ */
     .main-content {
       flex: 1;
       display: flex;
@@ -123,7 +135,6 @@
       display: flex;
     }
 
-    /* ヘッダー */
     .top-header {
       height: 52px;
       border-bottom: 1px solid var(--border);
@@ -185,9 +196,7 @@
       background-color: var(--btn-blue-hover);
     }
 
-    /* -----------------------------
-       Dashboard スタイル
-    ----------------------------- */
+    /* Dashboard */
     .dashboard-container {
       padding: 32px;
       display: flex;
@@ -275,9 +284,7 @@
       align-items: flex-end;
     }
 
-    /* -----------------------------
-       Projects (カンバン) スタイル
-    ----------------------------- */
+    /* Projects カンバン */
     .board-container {
       padding: 24px 32px;
       flex: 1;
@@ -496,6 +503,46 @@
       color: var(--text-main);
       border: 1px solid var(--border);
     }
+    .read-only-banner {
+      background-color: var(--tag-red);
+      color: #EB5757;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      display: none;
+    }
+
+    /* ログイン画面専用 */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .login-box {
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 32px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: rgba(15, 15, 15, 0.05) 0px 4px 16px;
+      text-align: center;
+    }
+    .login-box .logo-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
 
     /* ローディングスピナー */
     .spinner {
@@ -512,6 +559,29 @@
   </style>
 </head>
 <body>
+
+  <!-- ログイン画面 -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-box">
+      <div class="logo-area">
+        <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 35 L50 20 L80 35 L80 70 L50 85 L20 70 Z" fill="#000000"/>
+          <path d="M23 35 L50 22 L77 35 L50 48 Z" fill="#FFFFFF"/>
+          <path d="M23 38 L48 50 L48 80 L23 68 Z" fill="#FFFFFF"/>
+          <path d="M52 50 L77 38 L77 68 L52 80 Z" fill="#E3E2E0"/>
+          <text x="35.5" y="53" font-family="Georgia, serif" font-size="30" font-weight="900" fill="#000000" text-anchor="middle" transform="skewY(25)">B</text>
+        </svg>
+        <div class="logo-text" style="font-size: 22px;">Buddy</div>
+      </div>
+      <div style="font-size: 13px; color: var(--text-muted);">Please enter your Employee ID to continue.</div>
+      <div class="form-group" style="text-align: left;">
+        <label class="form-label">Employee ID / 社員番号</label>
+        <input type="text" id="loginEmpId" class="form-input" placeholder="e.g. 10008" onkeydown="if(event.key==='Enter') executeLogin()">
+      </div>
+      <div id="loginError" style="color: #EB5757; font-size: 12px; display: none;">Invalid Employee ID</div>
+      <button class="btn-primary" style="justify-content: center; padding: 10px;" onclick="executeLogin()">Log In</button>
+    </div>
+  </div>
 
   <!-- サイドバー -->
   <nav class="sidebar">
@@ -531,13 +601,13 @@
       <div class="nav-item">📅 Schedules</div>
     </div>
 
-    <!-- 担当者切り替え -->
+    <!-- ログイン中ユーザー表示 -->
     <div class="user-profile">
-      <span class="user-label">Logged in as:</span>
-      <select id="userSelector" class="user-select" onchange="onUserChange()">
-        <option value="10008">Tetsuya Goto</option>
-        <option value="15003">Nguyễn Tiến Thịnh</option>
-      </select>
+      <div class="user-info">
+        <span class="user-name" id="currentUserName">-</span>
+        <span class="user-role" id="currentUserRole">-</span>
+      </div>
+      <button class="btn-logout" title="Log out" onclick="executeLogout()">Sign out</button>
     </div>
   </nav>
 
@@ -552,7 +622,6 @@
       </header>
 
       <div class="dashboard-container">
-        <!-- KPI メトリクス -->
         <div class="metric-grid">
           <div class="metric-card">
             <div class="metric-label">Draft (作成中)</div>
@@ -572,7 +641,6 @@
           </div>
         </div>
 
-        <!-- アラート：手配期限が迫っている案件 -->
         <div class="dashboard-section">
           <div class="section-title">⚠️ Upcoming Order Deadlines (手配期限の迫る国内案件)</div>
           <div class="dash-list" id="dash-deadline-list">
@@ -580,7 +648,6 @@
           </div>
         </div>
 
-        <!-- 直近のアクティビティ（最近更新された案件） -->
         <div class="dashboard-section">
           <div class="section-title">🕒 Recent Activity (直近更新された案件)</div>
           <div class="dash-list" id="dash-recent-list">
@@ -590,7 +657,7 @@
       </div>
     </div>
 
-    <!-- 2. Projects (カンバン) ビュー -->
+    <!-- 2. Projects ビュー -->
     <div id="view-projects" class="view-panel">
       <header class="top-header">
         <div class="header-left">
@@ -640,6 +707,9 @@
         <button class="close-btn" onclick="closeEditModal()">&times;</button>
       </div>
       <div class="modal-body">
+        <div class="read-only-banner" id="readOnlyBanner">
+          🔒 閲覧専用モード：この案件の作成者のみ編集・更新が可能です。
+        </div>
         <div>
           <a id="editFileUrl" class="open-file-link" href="#" target="_blank">📄 見積書スプレッドシートを開く</a>
         </div>
@@ -676,7 +746,7 @@
           <label class="form-label">Details / 見積内容</label>
           <textarea id="editDetails" class="form-textarea" rows="2"></textarea>
         </div>
-        <div class="form-group">
+        <div class="form-group" id="memoGroup">
           <label class="form-label">New Memo / メモ追記</label>
           <input type="text" id="editNewMemo" class="form-input" placeholder="進捗・変更理由などを入力">
         </div>
@@ -686,7 +756,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-outline-primary" onclick="submitCreateRevision()">+ Create Revision</button>
+        <button class="btn-outline-primary" id="createRevisionBtn" onclick="submitCreateRevision()">+ Create Revision</button>
         <div class="modal-footer-right">
           <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
           <button class="btn-primary" id="saveEditBtn" onclick="saveProjectUpdate()">Save Changes</button>
@@ -756,26 +826,71 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec';
     const API_SECRET = 'open ss1 rand kz'; // 設定したシークレットキー
-    let currentEmpId = '10008';
 
+    // 社員マスタ（台帳と完全一致）
+    const STAFF_MASTER = {
+      '10008': { name: 'Tetsuya Goto', role: 'Director' },
+      '15003': { name: 'Nguyễn Tiến Thịnh', role: 'Deputy Director' }
+    };
+
+    let currentUser = null;
     let rawProjects = [];
     let selectedQuoteNo = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-      fetchLatestProjects();
+      checkLoginSession();
     });
 
+    // ----------------------------------------------------
+    // 認証・セッション管理
+    // ----------------------------------------------------
+    function checkLoginSession() {
+      const savedId = localStorage.getItem('buddy_emp_id');
+      if (savedId && STAFF_MASTER[savedId]) {
+        currentUser = { empId: savedId, ...STAFF_MASTER[savedId] };
+        applyLoginSuccess();
+      } else {
+        document.getElementById('loginOverlay').style.display = 'flex';
+      }
+    }
+
+    function executeLogin() {
+      const inputId = document.getElementById('loginEmpId').value.trim();
+      const errEl = document.getElementById('loginError');
+
+      if (STAFF_MASTER[inputId]) {
+        errEl.style.display = 'none';
+        localStorage.setItem('buddy_emp_id', inputId);
+        currentUser = { empId: inputId, ...STAFF_MASTER[inputId] };
+        applyLoginSuccess();
+      } else {
+        errEl.style.display = 'block';
+      }
+    }
+
+    function applyLoginSuccess() {
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('currentUserName').textContent = currentUser.name;
+      document.getElementById('currentUserRole').textContent = currentUser.role;
+      fetchLatestProjects();
+    }
+
+    function executeLogout() {
+      if (confirm('Sign out of Buddy?')) {
+        localStorage.removeItem('buddy_emp_id');
+        location.reload();
+      }
+    }
+
+    // ----------------------------------------------------
     // 画面切り替え
+    // ----------------------------------------------------
     function switchView(viewName) {
       document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
       document.getElementById('nav-projects').classList.toggle('active', viewName === 'projects');
 
       document.getElementById('view-dashboard').classList.toggle('active', viewName === 'dashboard');
       document.getElementById('view-projects').classList.toggle('active', viewName === 'projects');
-    }
-
-    function onUserChange() {
-      currentEmpId = document.getElementById('userSelector').value;
     }
 
     // 案件取得
@@ -788,7 +903,7 @@
             action: 'searchProjects',
             query: '',
             apiKey: API_SECRET,
-            empId: currentEmpId
+            empId: currentUser.empId
           })
         });
 
@@ -806,10 +921,9 @@
     }
 
     // ----------------------------------------------------
-    // Dashboard 描画ロジック
+    // Dashboard 描画
     // ----------------------------------------------------
     function renderDashboard(projects) {
-      // 1. KPI集計
       const counts = { draft: 0, submitted: 0, negotiating: 0, accepted: 0 };
       projects.forEach(p => {
         const s = p.status || '';
@@ -824,7 +938,6 @@
       document.getElementById('kpi-negotiating').textContent = counts.negotiating;
       document.getElementById('kpi-accepted').textContent = counts.accepted;
 
-      // 2. 手配期限アラートリスト（未完了かつ期限設定あり）
       const deadlineContainer = document.getElementById('dash-deadline-list');
       deadlineContainer.innerHTML = '';
 
@@ -853,7 +966,6 @@
         });
       }
 
-      // 3. 直近アクティビティ（最新5件）
       const recentContainer = document.getElementById('dash-recent-list');
       recentContainer.innerHTML = '';
       
@@ -880,7 +992,7 @@
     }
 
     // ----------------------------------------------------
-    // Projects フィルター＆カンバン描画
+    // Projects フィルター＆描画
     // ----------------------------------------------------
     function onFilterChange() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -955,14 +1067,23 @@
     }
 
     // ----------------------------------------------------
-    // 編集モーダル・改訂版作成
+    // 作成者判定 & 編集モーダル制御
     // ----------------------------------------------------
+    function isProjectOwner(proj) {
+      if (!proj || !currentUser) return false;
+      const sales = (proj.salesPerson || '').toLowerCase();
+      const myName = currentUser.name.toLowerCase();
+      // 苗字またはフルネームが含まれているか判定
+      const nameParts = myName.split(' ');
+      return sales.includes(myName) || nameParts.some(part => part.length > 2 && sales.includes(part));
+    }
+
     function openEditModal(quoteNo) {
       const proj = rawProjects.find(p => p.quoteNo === quoteNo);
       if (!proj) return;
 
       selectedQuoteNo = quoteNo;
-      document.getElementById('editModalTitle').textContent = `Project: ${proj.quoteNo}`;
+      document.getElementById('editModalTitle').textContent = `Project: ${proj.quoteNo} (担当: ${proj.salesPerson || '未設定'})`;
       document.getElementById('editFileUrl').href = proj.fileUrl || '#';
       document.getElementById('editClient').value = proj.client || '';
       document.getElementById('editAmount').value = proj.amount || '0';
@@ -972,6 +1093,37 @@
       document.getElementById('editDetails').value = proj.details || '';
       document.getElementById('editNewMemo').value = '';
       document.getElementById('editMemoHistory').textContent = proj.memo || '履歴なし';
+
+      // 作成者判定による制御
+      const isOwner = isProjectOwner(proj);
+      const readOnlyBanner = document.getElementById('readOnlyBanner');
+      const saveBtn = document.getElementById('saveEditBtn');
+      const revBtn = document.getElementById('createRevisionBtn');
+      const memoGroup = document.getElementById('memoGroup');
+
+      const inputs = [
+        document.getElementById('editStatus'),
+        document.getElementById('editDeliveryDate'),
+        document.getElementById('editTradeType'),
+        document.getElementById('editDetails'),
+        document.getElementById('editNewMemo')
+      ];
+
+      if (isOwner) {
+        // 作成者本人：編集可能
+        readOnlyBanner.style.display = 'none';
+        saveBtn.style.display = 'block';
+        revBtn.style.display = 'block';
+        memoGroup.style.display = 'flex';
+        inputs.forEach(el => el.disabled = false);
+      } else {
+        // 他ユーザー：完全閲覧専用
+        readOnlyBanner.style.display = 'block';
+        saveBtn.style.display = 'none';
+        revBtn.style.display = 'none';
+        memoGroup.style.display = 'none';
+        inputs.forEach(el => el.disabled = true);
+      }
 
       document.getElementById('editModalOverlay').classList.add('active');
     }
@@ -990,7 +1142,7 @@
       const payload = {
         action: 'updateProject',
         apiKey: API_SECRET,
-        empId: currentEmpId,
+        empId: currentUser.empId,
         quoteNo: selectedQuoteNo,
         status: document.getElementById('editStatus').value,
         deliveryDate: document.getElementById('editDeliveryDate').value,
@@ -1036,7 +1188,7 @@
           body: JSON.stringify({
             action: 'createRevision',
             apiKey: API_SECRET,
-            empId: currentEmpId,
+            empId: currentUser.empId,
             quoteNo: baseNo
           })
         });
@@ -1073,7 +1225,7 @@
       const payload = {
         action: 'createQuotation',
         apiKey: API_SECRET,
-        empId: currentEmpId,
+        empId: currentUser.empId,
         isDomestic: document.getElementById('createCategory').value,
         tradeType: document.getElementById('createTradeType').value,
         deliveryDate: document.getElementById('createDeliveryDate').value
