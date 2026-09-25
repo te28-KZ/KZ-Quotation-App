@@ -16,9 +16,7 @@
       --tag-default: #E3E2E0;
       --tag-blue: #D3E5EF;
       --tag-orange: #FADEC9;
-      /* 全体の基本フォント（A案） */
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      /* ロゴ用のセリフ体フォント（B案） */
       --font-serif: Lyon-Text, Georgia, "Yu Mincho", "Hiragino Mincho ProN", serif;
     }
     body {
@@ -40,7 +38,7 @@
       padding: 12px 0;
     }
     
-    /* ロゴエリア（B案 ＆ スタイル2適用） */
+    /* ロゴエリア */
     .workspace-switcher {
       padding: 8px 16px;
       margin-bottom: 16px;
@@ -53,15 +51,15 @@
       background-color: var(--bg-hover);
     }
     .logo-text {
-      font-family: var(--font-serif); /* B案：セリフ体 */
+      font-family: var(--font-serif);
       font-size: 18px;
       font-weight: 600;
       color: var(--text-main);
       letter-spacing: -0.02em;
     }
     .logo-icon-svg {
-      width: 36px;   /* 28px から 36px に拡大 */
-      height: 36px;  /* 28px から 36px に拡大 */
+      width: 36px;
+      height: 36px;
       flex-shrink: 0;
     }
 
@@ -86,66 +84,130 @@
       font-weight: 500;
     }
 
-   <div class="kanban-board">
-        <!-- Draft列 -->
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-draft">0</span> 1. Draft</div>
-          <!-- Javascriptがここにカードを挿入します -->
-          <div id="col-draft" class="card-list"></div>
-        </div>
-
-        <!-- Submitted列 -->
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-submitted">0</span> 2. Submitted</div>
-          <div id="col-submitted" class="card-list"></div>
-        </div>
-
-        <!-- Negotiating列 -->
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-negotiating">0</span> 3. Negotiating</div>
-          <div id="col-negotiating" class="card-list"></div>
-        </div>
-
-        <!-- Accepted列 -->
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-accepted">0</span> 4. Accepted</div>
-          <div id="col-accepted" class="card-list"></div>
-        </div>
-      </div>
+    /* メインコンテンツとカンバンボード */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 48px;
+      overflow-x: auto;
     }
+    .kanban-board {
+      display: flex;
+      gap: 16px;
+      min-width: 900px;
+      height: 100%;
+    }
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .col-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .badge {
+      background: var(--tag-default);
+      padding: 0 6px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--text-main);
+    }
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 100px;
+    }
+
+    /* カードデザイン */
+    .card {
+      background-color: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      box-shadow: rgba(15, 15, 15, 0.05) 0px 1px 2px;
+      cursor: pointer;
+    }
+    .card:hover {
+      background-color: var(--bg-sidebar);
+    }
+    .c-id {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .c-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .c-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: var(--text-main);
+    }
+    .tag-draft { background-color: var(--tag-default); }
+    .tag-sub { background-color: var(--tag-blue); }
+    .tag-alert { background-color: var(--tag-orange); }
   </style>
 </head>
 <body>
 
   <nav class="sidebar">
-    <!-- スタイル2: 3Dキューブアイコン ＋ B案: セリフ体フォント -->
     <div class="workspace-switcher">
-     <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 35 L50 20 L80 35 L80 70 L50 85 L20 70 Z" fill="#000000"/>
         <path d="M23 35 L50 22 L77 35 L50 48 Z" fill="#FFFFFF"/>
         <path d="M23 38 L48 50 L48 80 L23 68 Z" fill="#FFFFFF"/>
         <path d="M52 50 L77 38 L77 68 L52 80 Z" fill="#E3E2E0"/>
-        <!-- y座標を下げ、フォントサイズを微調整 -->
         <text x="35.5" y="53" font-family="Georgia, serif" font-size="30" font-weight="900" fill="#000000" text-anchor="middle" transform="skewY(25)">B</text>
       </svg>
       <div class="logo-text">Buddy</div>
     </div>
-
     <div class="nav-item">🏠 Dashboard</div>
     <div class="nav-item active">📂 Projects</div>
     <div class="nav-item">📅 Schedules</div>
   </nav>
 
   <main class="main-content">
-    <p>（ここに前回作成したカンバンボードのHTMLが入ります）</p>
+    <div class="kanban-board">
+      <div class="column">
+        <div class="col-header"><span class="badge" id="badge-draft">0</span> 1. Draft</div>
+        <div id="col-draft" class="card-list"></div>
+      </div>
+      <div class="column">
+        <div class="col-header"><span class="badge" id="badge-submitted">0</span> 2. Submitted</div>
+        <div id="col-submitted" class="card-list"></div>
+      </div>
+      <div class="column">
+        <div class="col-header"><span class="badge" id="badge-negotiating">0</span> 3. Negotiating</div>
+        <div id="col-negotiating" class="card-list"></div>
+      </div>
+      <div class="column">
+        <div class="col-header"><span class="badge" id="badge-accepted">0</span> 4. Accepted</div>
+        <div id="col-accepted" class="card-list"></div>
+      </div>
+    </div>
   </main>
-<!-- スクリプト -->
-  <script>
-    // GASのWebアプリURL（※ご自身のURLに差し替えてください）
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwYOUR_SCRIPT_ID/exec';
-    const API_SECRET = 'YOUR_API_SECRET'; // GAS側で設定したシークレットキー
 
-    // 画面ロード時に直近の案件を取得して表示
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwYOUR_SCRIPT_ID/exec';
+    const API_SECRET = 'YOUR_API_SECRET';
+
     document.addEventListener('DOMContentLoaded', () => {
       fetchLatestProjects();
     });
@@ -157,9 +219,9 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             action: 'searchProjects',
-            query: '', // 空欄で検索し、GAS側のslice(0, 5)で直近5件を取得
+            query: '',
             apiKey: API_SECRET,
-            empId: '10008' // テスト用の社員番号
+            empId: '10008'
           })
         });
 
@@ -175,7 +237,6 @@
     }
 
     function renderKanbanBoard(projects) {
-      // 1. 各列のコンテナをクリアする
       const colDraft = document.getElementById('col-draft');
       const colSubmitted = document.getElementById('col-submitted');
       const colNegotiating = document.getElementById('col-negotiating');
@@ -183,23 +244,17 @@
       
       [colDraft, colSubmitted, colNegotiating, colAccepted].forEach(col => col.innerHTML = '');
 
-      // 各列の件数カウンター
       const counts = { draft: 0, submitted: 0, negotiating: 0, accepted: 0 };
 
-      // 2. データをループしてカードを生成・振り分け
       projects.forEach(proj => {
-        // 金額のフォーマット（空または0の場合はグレー表示にする等の処理も可能）
         const amountDisplay = (proj.amount && proj.amount !== '0') ? proj.amount : '金額未定';
         
-        // カテゴリーやアラートのタグ生成
         let tagsHtml = `<span class="tag tag-draft">${proj.category}</span>`;
         if (proj.orderDeadline) {
-           // 期日が設定されていれば警告タグを追加
-           const formattedDate = proj.orderDeadline.substring(5); // yyyy-MM-dd -> MM-dd
+           const formattedDate = proj.orderDeadline.substring(5);
            tagsHtml += `<span class="tag tag-alert">⚠️ Deadline: ${formattedDate}</span>`;
         }
 
-        // カードのHTML構造
         const cardHtml = `
           <div class="card" onclick="window.open('${proj.fileUrl}', '_blank')">
             <div class="c-id">${proj.quoteNo}</div>
@@ -208,7 +263,6 @@
           </div>
         `;
 
-        // 3. ステータスを判定して該当する列に挿入
         const status = proj.status || '';
         
         if (status.includes('1. Draft')) {
@@ -226,7 +280,6 @@
         }
       });
 
-      // 4. カラムヘッダーの件数バッジを更新
       document.getElementById('badge-draft').textContent = counts.draft;
       document.getElementById('badge-submitted').textContent = counts.submitted;
       document.getElementById('badge-negotiating').textContent = counts.negotiating;
