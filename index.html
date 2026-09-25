@@ -38,6 +38,7 @@
       flex-direction: column;
       padding: 12px 0;
       flex-shrink: 0;
+      justify-content: space-between;
     }
     .workspace-switcher {
       padding: 8px 16px;
@@ -81,6 +82,27 @@
       color: var(--text-main);
       font-weight: 500;
     }
+    .user-profile {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .user-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .user-select {
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
 
     /* メインコンテンツ */
     .main-content {
@@ -96,10 +118,44 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 32px;
+      gap: 16px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
     }
     .page-title {
       font-size: 16px;
       font-weight: 600;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      width: 260px;
+    }
+    .search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13px;
+      width: 100%;
+      color: var(--text-main);
+    }
+    .filter-select {
+      border: 1px solid var(--border);
+      background: #FFF;
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
     }
     .btn-primary {
       background-color: var(--btn-blue);
@@ -194,7 +250,7 @@
     .tag-sub { background-color: var(--tag-blue); }
     .tag-alert { background-color: var(--tag-orange); }
 
-    /* モーダル共通 */
+    /* モーダル */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -281,9 +337,13 @@
       padding: 12px 24px;
       border-top: 1px solid var(--border);
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
       background-color: #FAFAFA;
+    }
+    .modal-footer-right {
+      display: flex;
+      gap: 10px;
     }
     .btn-secondary {
       background: #FFFFFF;
@@ -293,6 +353,19 @@
       border-radius: 4px;
       font-size: 13px;
       cursor: pointer;
+    }
+    .btn-outline-primary {
+      background: #FFFFFF;
+      border: 1px solid var(--btn-blue);
+      color: var(--btn-blue);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .btn-outline-primary:hover {
+      background: var(--tag-blue);
     }
     .open-file-link {
       font-size: 13px;
@@ -337,25 +410,47 @@
 
   <!-- サイドバー -->
   <nav class="sidebar">
-    <div class="workspace-switcher">
-      <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 35 L50 20 L80 35 L80 70 L50 85 L20 70 Z" fill="#000000"/>
-        <path d="M23 35 L50 22 L77 35 L50 48 Z" fill="#FFFFFF"/>
-        <path d="M23 38 L48 50 L48 80 L23 68 Z" fill="#FFFFFF"/>
-        <path d="M52 50 L77 38 L77 68 L52 80 Z" fill="#E3E2E0"/>
-        <text x="35.5" y="53" font-family="Georgia, serif" font-size="30" font-weight="900" fill="#000000" text-anchor="middle" transform="skewY(25)">B</text>
-      </svg>
-      <div class="logo-text">Buddy</div>
+    <div>
+      <div class="workspace-switcher">
+        <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 35 L50 20 L80 35 L80 70 L50 85 L20 70 Z" fill="#000000"/>
+          <path d="M23 35 L50 22 L77 35 L50 48 Z" fill="#FFFFFF"/>
+          <path d="M23 38 L48 50 L48 80 L23 68 Z" fill="#FFFFFF"/>
+          <path d="M52 50 L77 38 L77 68 L52 80 Z" fill="#E3E2E0"/>
+          <text x="35.5" y="53" font-family="Georgia, serif" font-size="30" font-weight="900" fill="#000000" text-anchor="middle" transform="skewY(25)">B</text>
+        </svg>
+        <div class="logo-text">Buddy</div>
+      </div>
+      <div class="nav-item">🏠 Dashboard</div>
+      <div class="nav-item active">📂 Projects</div>
+      <div class="nav-item">📅 Schedules</div>
     </div>
-    <div class="nav-item">🏠 Dashboard</div>
-    <div class="nav-item active">📂 Projects</div>
-    <div class="nav-item">📅 Schedules</div>
+
+    <!-- 担当者切り替えエリア（ログイン代替） -->
+    <div class="user-profile">
+      <span class="user-label">Logged in as:</span>
+      <select id="userSelector" class="user-select" onchange="onUserChange()">
+        <option value="10008">Tetsuya Goto</option>
+        <option value="15003">Nguyễn Tiến Thịnh</option>
+      </select>
+    </div>
   </nav>
 
-  <!-- メインエリア -->
+  <!-- メインコンテンツ -->
   <main class="main-content">
     <header class="top-header">
-      <div class="page-title">Projects</div>
+      <div class="header-left">
+        <div class="page-title">Projects</div>
+        <div class="search-box">
+          <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search No, Client, Details..." oninput="onFilterChange()">
+        </div>
+        <select id="salesFilter" class="filter-select" onchange="onFilterChange()">
+          <option value="ALL">All Sales Persons</option>
+          <option value="Tetsuya Goto">Goto Only</option>
+          <option value="Nguyễn Tiến Thịnh">Thịnh Only</option>
+        </select>
+      </div>
       <button class="btn-primary" onclick="openCreateModal()">+ New Project</button>
     </header>
 
@@ -435,8 +530,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
-        <button class="btn-primary" id="saveEditBtn" onclick="saveProjectUpdate()">Save Changes</button>
+        <button class="btn-outline-primary" onclick="submitCreateRevision()">+ Create Revision</button>
+        <div class="modal-footer-right">
+          <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+          <button class="btn-primary" id="saveEditBtn" onclick="saveProjectUpdate()">Save Changes</button>
+        </div>
       </div>
     </div>
   </div>
@@ -469,25 +567,27 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
-        <button class="btn-primary" id="submitCreateBtn" onclick="submitCreateQuotation()">Create</button>
+        <div class="modal-footer-right" style="width: 100%; justify-content: flex-end;">
+          <button class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
+          <button class="btn-primary" id="submitCreateBtn" onclick="submitCreateQuotation()">Create</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 3. 作成中ローディングオーバーレイ -->
+  <!-- 3. ローディングオーバーレイ -->
   <div class="modal-overlay" id="loadingOverlay" style="z-index: 2000;">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; color: #FFFFFF;">
       <div class="spinner"></div>
-      <div style="font-size: 15px; font-weight: 500; letter-spacing: 0.02em;">Creating quotation... Please wait</div>
+      <div id="loadingText" style="font-size: 15px; font-weight: 500; letter-spacing: 0.02em;">Processing... Please wait</div>
     </div>
   </div>
 
-  <!-- 4. 作成完了・確認モーダル (英語表記) -->
+  <!-- 4. 確認モーダル (英語) -->
   <div class="modal-overlay" id="confirmModalOverlay" style="z-index: 1500;">
     <div class="modal-card" style="width: 440px; padding: 24px; box-sizing: border-box; text-align: center;">
       <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
-      <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">Quotation Created</div>
+      <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);" id="confirmModalHeader">Quotation Created</div>
       <p id="confirmModalDesc" style="font-size: 13px; color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5;"></p>
       <div style="display: flex; justify-content: center; gap: 10px;">
         <button class="btn-secondary" onclick="closeConfirmModal()">Later</button>
@@ -499,15 +599,19 @@
   <!-- スクリプト -->
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec'; // 実際のGAS URL
-    const API_SECRET = 'open ss1 rand kz'; // 設定したシークレットキー
-    const CURRENT_EMP_ID = '10008';
+    const API_SECRET = 'open ss1 rand kzT'; // 設定したシークレットキー
+    let currentEmpId = '10008';
 
-    let currentProjects = [];
+    let rawProjects = []; // 取得した全案件
     let selectedQuoteNo = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       fetchLatestProjects();
     });
+
+    function onUserChange() {
+      currentEmpId = document.getElementById('userSelector').value;
+    }
 
     // 案件一覧の取得
     async function fetchLatestProjects() {
@@ -519,20 +623,43 @@
             action: 'searchProjects',
             query: '',
             apiKey: API_SECRET,
-            empId: CURRENT_EMP_ID
+            empId: currentEmpId
           })
         });
 
         const result = await response.json();
         if (result.status === 'success') {
-          currentProjects = result.data;
-          renderKanbanBoard(currentProjects);
+          rawProjects = result.data;
+          onFilterChange(); // フィルター・検索を適用して描画
         } else {
           console.error('API Error:', result.message);
         }
       } catch (error) {
         console.error('Fetch Error:', error);
       }
+    }
+
+    // 検索・絞り込みフィルターの実行
+    function onFilterChange() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const salesFilter = document.getElementById('salesFilter').value;
+
+      const filtered = rawProjects.filter(p => {
+        // 担当者フィルター
+        if (salesFilter !== 'ALL' && (!p.salesPerson || !p.salesPerson.includes(salesFilter))) {
+          return false;
+        }
+        // 検索キーワード
+        if (q) {
+          const matchNo = (p.quoteNo || '').toLowerCase().includes(q);
+          const matchClient = (p.client || '').toLowerCase().includes(q);
+          const matchDetails = (p.details || '').toLowerCase().includes(q);
+          return matchNo || matchClient || matchDetails;
+        }
+        return true;
+      });
+
+      renderKanbanBoard(filtered);
     }
 
     // カンバン描画
@@ -550,9 +677,12 @@
         const amountDisplay = (proj.amount && proj.amount !== '0') ? proj.amount : '金額未定';
         
         let tagsHtml = `<span class="tag tag-draft">${proj.category || '未設定'}</span>`;
+        if (proj.salesPerson) {
+          tagsHtml += `<span class="tag tag-sub">${proj.salesPerson.split(' ')[0]}</span>`;
+        }
         if (proj.orderDeadline) {
-           const formattedDate = proj.orderDeadline.substring(5);
-           tagsHtml += `<span class="tag tag-alert">⚠️ Deadline: ${formattedDate}</span>`;
+          const formattedDate = proj.orderDeadline.substring(5);
+          tagsHtml += `<span class="tag tag-alert">⚠️ Deadline: ${formattedDate}</span>`;
         }
 
         const cardHtml = `
@@ -586,10 +716,10 @@
     }
 
     // ----------------------------------------------------
-    // 編集モーダルの制御
+    // 編集モーダル・改訂版作成
     // ----------------------------------------------------
     function openEditModal(quoteNo) {
-      const proj = currentProjects.find(p => p.quoteNo === quoteNo);
+      const proj = rawProjects.find(p => p.quoteNo === quoteNo);
       if (!proj) return;
 
       selectedQuoteNo = quoteNo;
@@ -621,7 +751,7 @@
       const payload = {
         action: 'updateProject',
         apiKey: API_SECRET,
-        empId: CURRENT_EMP_ID,
+        empId: currentEmpId,
         quoteNo: selectedQuoteNo,
         status: document.getElementById('editStatus').value,
         deliveryDate: document.getElementById('editDeliveryDate').value,
@@ -651,8 +781,44 @@
       }
     }
 
+    // 改訂版（枝番）作成の実行
+    async function submitCreateRevision() {
+      if (!selectedQuoteNo) return;
+      if (!confirm(`Create a new revision from ${selectedQuoteNo}?`)) return;
+
+      const baseNo = selectedQuoteNo;
+      closeEditModal();
+      document.getElementById('loadingText').textContent = 'Generating revision... Please wait';
+      document.getElementById('loadingOverlay').classList.add('active');
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'createRevision',
+            apiKey: API_SECRET,
+            empId: currentEmpId,
+            quoteNo: baseNo
+          })
+        });
+
+        const res = await response.json();
+        if (res.status === 'success') {
+          await fetchLatestProjects();
+          showConfirmModal('Revision Created', res.quoteNo, res.fileUrl);
+        } else {
+          alert('Revision Error: ' + res.message);
+        }
+      } catch (err) {
+        alert('A network error occurred.');
+      } finally {
+        document.getElementById('loadingOverlay').classList.remove('active');
+      }
+    }
+
     // ----------------------------------------------------
-    // 新規作成モーダルの制御
+    // 新規作成
     // ----------------------------------------------------
     function openCreateModal() {
       document.getElementById('createCategory').value = '国内(Domestic)';
@@ -669,14 +835,14 @@
       const payload = {
         action: 'createQuotation',
         apiKey: API_SECRET,
-        empId: CURRENT_EMP_ID,
+        empId: currentEmpId,
         isDomestic: document.getElementById('createCategory').value,
         tradeType: document.getElementById('createTradeType').value,
         deliveryDate: document.getElementById('createDeliveryDate').value
       };
 
-      // 1. 入力モーダルを閉じ、ローディング画面を表示
       closeCreateModal();
+      document.getElementById('loadingText').textContent = 'Creating quotation... Please wait';
       document.getElementById('loadingOverlay').classList.add('active');
 
       try {
@@ -686,34 +852,29 @@
           body: JSON.stringify(payload)
         });
         const res = await response.json();
-        
         if (res.status === 'success') {
-          // 2. カンバンボードを最新化
           await fetchLatestProjects();
-          // 3. 英語の確認画面を表示
-          showConfirmModal(res.quoteNo, res.fileUrl);
+          showConfirmModal('Quotation Created', res.quoteNo, res.fileUrl);
         } else {
           alert('Create Error: ' + res.message);
         }
       } catch (err) {
         alert('A network error occurred.');
       } finally {
-        // ローディング画面を非表示化
         document.getElementById('loadingOverlay').classList.remove('active');
       }
     }
 
     // ----------------------------------------------------
-    // 完了確認モーダル制御 (英語)
+    // 確認モーダル
     // ----------------------------------------------------
-    function showConfirmModal(quoteNo, fileUrl) {
+    function showConfirmModal(headerTitle, quoteNo, fileUrl) {
+      document.getElementById('confirmModalHeader').textContent = headerTitle;
       document.getElementById('confirmModalDesc').innerHTML = `Quotation <b>${quoteNo}</b> has been generated.<br>Would you like to open the spreadsheet now?`;
       
       const openBtn = document.getElementById('openSpreadsheetBtn');
       openBtn.onclick = () => {
-        if (fileUrl) {
-          window.open(fileUrl, '_blank');
-        }
+        if (fileUrl) window.open(fileUrl, '_blank');
         closeConfirmModal();
       };
 
