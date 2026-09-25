@@ -60,8 +60,8 @@
       letter-spacing: -0.02em;
     }
     .logo-icon-svg {
-      width: 28px;
-      height: 28px;
+      width: 36px;   /* 28px から 36px に拡大 */
+      height: 36px;  /* 28px から 36px に拡大 */
       flex-shrink: 0;
     }
 
@@ -103,13 +103,13 @@
   <nav class="sidebar">
     <!-- スタイル2: 3Dキューブアイコン ＋ B案: セリフ体フォント -->
     <div class="workspace-switcher">
-      <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 35 L50 20 L80 35 L80 70 L50 85 L20 70 Z" fill="#000000"/>
         <path d="M23 35 L50 22 L77 35 L50 48 Z" fill="#FFFFFF"/>
         <path d="M23 38 L48 50 L48 80 L23 68 Z" fill="#FFFFFF"/>
         <path d="M52 50 L77 38 L77 68 L52 80 Z" fill="#E3E2E0"/>
-        <!-- 座標(x,y)とテキストの配置基準(text-anchor)を修正 -->
-        <text x="35.5" y="45" font-family="Georgia, serif" font-size="28" font-weight="900" fill="#000000" text-anchor="middle" transform="skewY(25)">B</text>
+        <!-- y座標を下げ、フォントサイズを微調整 -->
+        <text x="35.5" y="50" font-family="Georgia, serif" font-size="30" font-weight="900" fill="#000000" text-anchor="middle" transform="skewY(25)">B</text>
       </svg>
       <div class="logo-text">Buddy</div>
     </div>
