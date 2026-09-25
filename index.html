@@ -1,88 +1,127 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buddy - Projects</title>
   <style>
-    /* 共通設定 */
+    :root {
+      --bg-sidebar: #F7F7F5;
+      --bg-main: #FFFFFF;
+      --bg-hover: rgba(55, 53, 47, 0.08);
+      --text-main: #37352F;
+      --text-muted: rgba(55, 53, 47, 0.65);
+      --border: rgba(55, 53, 47, 0.09);
+      --btn-blue: #2383E2;
+      --tag-default: #E3E2E0;
+      --tag-blue: #D3E5EF;
+      --tag-orange: #FADEC9;
+      /* 全体の基本フォント（A案） */
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      /* ロゴ用のセリフ体フォント（B案） */
+      --font-serif: Lyon-Text, Georgia, "Yu Mincho", "Hiragino Mincho ProN", serif;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      background-color: var(--bg-main);
+    }
+    
+    /* サイドバー */
+    .sidebar {
+      width: 240px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+    }
+    
+    /* ロゴエリア（B案 ＆ スタイル2適用） */
     .workspace-switcher {
+      padding: 8px 16px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 8px 16px;
       cursor: pointer;
     }
-    
-    /* ----------------------------------
-       フォントパターンの設定（ここで変更）
-    ----------------------------------- */
+    .workspace-switcher:hover {
+      background-color: var(--bg-hover);
+    }
     .logo-text {
-      /* A案: デフォルト */
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      
-      /* B案: セリフ体にしたい場合はこちらを有効化 */
-      /* font-family: Lyon-Text, Georgia, "Yu Mincho", serif; */
-      
-      /* C案: モノスペース（等幅）にしたい場合はこちらを有効化 */
-      /* font-family: "SFMono-Regular", Menlo, Consolas, monospace; */
-      
+      font-family: var(--font-serif); /* B案：セリフ体 */
       font-size: 18px;
       font-weight: 600;
-      color: #37352F;
+      color: var(--text-main);
       letter-spacing: -0.02em;
     }
-
-    /* ----------------------------------
-       スタイル1：ダーク角丸アイコン (画像1枚目風)
-    ----------------------------------- */
-    .icon-style-1 {
+    .logo-icon-svg {
       width: 28px;
       height: 28px;
-      background-color: #37352F; /* Notionのダークグレー */
-      color: #FFFFFF;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 700;
-      font-family: -apple-system, sans-serif;
-      box-shadow: rgba(15, 15, 15, 0.1) 0px 1px 2px;
+      flex-shrink: 0;
     }
 
-    /* ----------------------------------
-       スタイル2：3Dキューブアイコン (画像2枚目風SVG)
-    ----------------------------------- */
-    .icon-style-2 {
-      width: 28px;
-      height: 28px;
+    /* ナビゲーションメニュー */
+    .nav-item {
+      padding: 6px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 2px 8px;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+    .nav-item:hover {
+      background-color: var(--bg-hover);
+    }
+    .nav-item.active {
+      background-color: var(--bg-hover);
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* メインコンテンツ（省略・既存のカンバンUIがここに入ります） */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-muted);
     }
   </style>
 </head>
-<body style="background-color: #F7F7F5; padding: 20px;">
+<body>
 
-  <!-- パターン1：角丸アイコン ＋ Buddy -->
-  <div class="workspace-switcher">
-    <div class="icon-style-1">B</div>
-    <div class="logo-text">Buddy</div>
-  </div>
+  <nav class="sidebar">
+    <!-- スタイル2: 3Dキューブアイコン ＋ B案: セリフ体フォント -->
+    <div class="workspace-switcher">
+      <svg class="logo-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 35 L50 20 L80 35 L80 70 L50 85 L20 70 Z" fill="#000000"/>
+        <path d="M23 35 L50 22 L77 35 L50 48 Z" fill="#FFFFFF"/>
+        <path d="M23 38 L48 50 L48 80 L23 68 Z" fill="#FFFFFF"/>
+        <path d="M52 50 L77 38 L77 68 L52 80 Z" fill="#E3E2E0"/>
+        <!-- キューブ側面の「B」もNotionに合わせて明朝・セリフ体に調整 -->
+        <text x="35" y="70" font-family="Georgia, serif" font-size="28" font-weight="900" fill="#000000" transform="skewY(25)">B</text>
+      </svg>
+      <div class="logo-text">Buddy</div>
+    </div>
 
-  <br><br>
+    <div class="nav-item">🏠 Dashboard</div>
+    <div class="nav-item active">📂 Projects</div>
+    <div class="nav-item">📅 Schedules</div>
+  </nav>
 
-  <!-- パターン2：3Dキューブ ＋ Buddy -->
-  <div class="workspace-switcher">
-    <svg class="icon-style-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- キューブの黒い外枠・影 -->
-      <path d="M20 35 L50 20 L80 35 L80 70 L50 85 L20 70 Z" fill="#000000"/>
-      <!-- 天面（白） -->
-      <path d="M23 35 L50 22 L77 35 L50 48 Z" fill="#FFFFFF"/>
-      <!-- 左側面（白） -->
-      <path d="M23 38 L48 50 L48 80 L23 68 Z" fill="#FFFFFF"/>
-      <!-- 右側面（少しグレー） -->
-      <path d="M52 50 L77 38 L77 68 L52 80 Z" fill="#E3E2E0"/>
-      <!-- 左側面の「B」 -->
-      <text x="35" y="70" font-family="serif" font-size="28" font-weight="900" fill="#000000" transform="skewY(25)">B</text>
-    </svg>
-    <div class="logo-text">Buddy</div>
-  </div>
+  <main class="main-content">
+    <p>（ここに前回作成したカンバンボードのHTMLが入ります）</p>
+  </main>
 
 </body>
 </html>
