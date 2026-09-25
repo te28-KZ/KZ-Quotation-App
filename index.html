@@ -3,516 +3,219 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quotation Workspace — KATZDEN VIETNAM</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
+  <title>Buddy - Sales & Operations</title>
   <style>
     :root {
-      --bg-canvas: #ffffff;
-      --text-main: #37352f;
-      --text-muted: #787774;
-      --text-placeholder: #9b9a97;
-      --border-subtle: #edece9;
-      --hover-bg: #efefed;
-      --btn-dark: #232323;
-      --btn-dark-hover: #000000;
-      --accent-red: #c9171e;
-      --callout-bg: #f7f6f3;
-      --font-mono: 'JetBrains Mono', monospace;
+      --bg-color: #F9FAFB;
+      --sidebar-bg: #1E3A8A; /* スマートネイビー */
+      --sidebar-text: #E0E7FF;
+      --accent-color: #F97316; /* コーラルオレンジ */
+      --text-main: #1F2937;
+      --text-muted: #6B7280;
+      --white: #FFFFFF;
+      --border: #E5E7EB;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+    }
+    
+    /* 左側サイドバー */
+    .sidebar {
+      width: 240px;
+      background-color: var(--sidebar-bg);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+    }
+    .logo-area {
+      padding: 24px;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 1px;
+    }
+    /* bとdがリンクするロゴの簡易表現 */
+    .logo-icon {
+      font-family: serif;
+      font-style: italic;
+      color: var(--accent-color);
+      font-weight: 900;
+    }
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .nav-item {
+      padding: 16px 24px;
+      color: var(--sidebar-text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .nav-item:hover, .nav-item.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--white);
+      border-left: 4px solid var(--accent-color);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-    body { background-color: var(--bg-canvas); color: var(--text-main); font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-    .notion-cover { width: 100%; height: 140px; background: linear-gradient(180deg, #f1f1ef 0%, #e8e7e4 100%); border-bottom: 1px solid var(--border-subtle); }
-    .notion-page { width: 100%; max-width: 680px; padding: 0 40px 80px 40px; position: relative; }
-    .notion-icon-wrap { width: 72px; height: 72px; margin-top: -36px; margin-bottom: 20px; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(15, 15, 15, 0.05); font-size: 34px; }
-    .notion-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; font-weight: 500; }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-red); }
-    .notion-title { font-size: 28px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; margin-bottom: 24px; line-height: 1.25; }
-    .notion-properties { display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 28px; }
-    .prop-row { display: flex; align-items: center; min-height: 32px; font-size: 14px; }
-    .prop-name { width: 150px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; font-size: 13px; flex-shrink: 0; }
-    .prop-value { flex: 1; display: flex; align-items: center; gap: 12px; }
-    
-    .notion-input { width: 100%; max-width: 260px; padding: 6px 10px; font-size: 14px; font-family: inherit; color: var(--text-main); background: #fafaf9; border: 1px solid var(--border-subtle); border-radius: 4px; outline: none; transition: all 0.15s ease; }
-    .notion-input:focus { background: #ffffff; border-color: #2383e2; box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.15); }
-    select.notion-input { cursor: pointer; }
+    /* メインコンテンツ */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      height: 64px;
+      background-color: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .create-btn {
+      background-color: var(--accent-color);
+      color: var(--white);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
+    }
+    .content-area {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
 
-    .radio-group { display: flex; align-items: center; gap: 16px; font-size: 14px; }
-    .radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-
-    .notion-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; font-size: 14px; font-weight: 500; color: #ffffff; background: var(--btn-dark); border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
-    .notion-btn:hover { background: var(--btn-dark-hover); }
-    .notion-btn:disabled { background: #e9e9e7; color: var(--text-placeholder); cursor: not-allowed; }
-
-    .notion-user-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--hover-bg); padding: 4px 10px 4px 6px; border-radius: 14px; font-size: 13px; font-weight: 500; }
-    .user-avatar { width: 20px; height: 20px; border-radius: 50%; background: var(--accent-red); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
-    .btn-switch-user { font-size: 12px; color: var(--text-muted); text-decoration: underline; cursor: pointer; background: none; border: none; }
-
-    .notion-callout { display: none; background: var(--callout-bg); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 16px 18px; margin-top: 24px; text-align: left; }
-    .callout-header { font-size: 13px; font-weight: 600; color: #287a4d; margin-bottom: 6px; }
-    .callout-body { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
-    .callout-deadline { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
-    .deadline-date { font-weight: 600; color: var(--accent-red); }
-
-    .link-notion-style { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2383e2; text-decoration: none; font-weight: 500; padding: 6px 10px; background: #ffffff; border: 1px solid #d3e5f7; border-radius: 4px; }
-    .link-notion-style:hover { background: #f0f7fe; }
-
-    .status-msg { margin-top: 14px; font-size: 13px; color: var(--text-muted); min-height: 20px; }
-    .status-msg.error { color: #eb5757; }
-    .status-msg.success { color: #287a4d; font-weight: 500; }
-
-    .spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
-    .spin.dark { border-color: rgba(0,0,0,0.1); border-top-color: #37352f; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .notion-divider { height: 1px; background: var(--border-subtle); margin: 40px 0 24px 0; }
-    .search-header { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text-main); }
-    .search-box-wrap { display: flex; gap: 8px; margin-bottom: 16px; }
-    .search-box-wrap .notion-input { max-width: 100%; }
-    .btn-secondary { background: #ffffff; color: var(--text-main); border: 1px solid var(--border-subtle); padding: 6px 14px; }
-    .btn-secondary:hover { background: var(--hover-bg); }
-
-    .result-list { display: flex; flex-direction: column; gap: 8px; }
-    .result-card { padding: 14px; border: 1px solid var(--border-subtle); border-radius: 6px; background: #ffffff; transition: background 0.15s; }
-    .result-card:hover { background: #fafaf9; }
-    .rc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .rc-quote-no { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: #1a5734; text-decoration: none; }
-    .rc-quote-no:hover { text-decoration: underline; }
-    
-    .rc-status { font-size: 11px; padding: 2px 6px; background: var(--hover-bg); border-radius: 4px; font-weight: 500; color: var(--text-main); }
-    .rc-client { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .rc-amount { font-size: 12px; color: #1a5734; font-weight: 600; padding: 2px 6px; background: #e8f5e9; border-radius: 4px; }
-    .rc-footer { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); align-items: center; }
-    .rc-deadline { color: var(--accent-red); font-weight: 500; }
-    .rc-badge { font-size: 11px; padding: 2px 6px; border: 1px solid var(--border-subtle); border-radius: 4px; color: var(--text-muted); }
-    
-    .btn-edit-sm { font-size: 11px; padding: 2px 8px; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; color: var(--text-muted); }
-    .btn-edit-sm:hover { background: var(--hover-bg); color: var(--text-main); }
-
-    /* モーダル */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-content { background: #ffffff; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
-    .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
-    .modal-form-row { margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-muted); }
-    .modal-form-row input, .modal-form-row select, .modal-form-row textarea { width: 100%; padding: 6px 10px; font-size: 14px; border: 1px solid var(--border-subtle); border-radius: 4px; font-family: inherit; outline: none; }
-    .modal-form-row textarea { resize: vertical; height: 70px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+    /* カンバンボード */
+    .kanban-board {
+      display: flex;
+      gap: 16px;
+      height: 100%;
+      min-width: 900px;
+    }
+    .kanban-column {
+      flex: 1;
+      background-color: #F3F4F6;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .column-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .kanban-card {
+      background-color: var(--white);
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      cursor: pointer;
+    }
+    .kanban-card:hover {
+      border-color: var(--sidebar-bg);
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .card-client {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+    .card-alert {
+      font-size: 12px;
+      color: var(--accent-color);
+      margin-top: 10px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <div class="notion-cover"></div>
-  <div class="notion-page">
-    <div class="notion-icon-wrap">📋</div>
-    <div class="notion-breadcrumb"><span class="status-dot"></span><span>KATZDEN VIETNAM</span><span>/</span><span>Sales & Operations</span></div>
-    <h1 class="notion-title">Quotation Workspace</h1>
 
-    <!-- 1. ログイン -->
-    <div id="loginView">
-      <div class="notion-properties">
-        <div class="prop-row">
-          <div class="prop-name">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>Employee ID</span>
-          </div>
-          <div class="prop-value">
-            <input type="text" id="empId" class="notion-input" placeholder="社員番号を入力..." autocomplete="off">
-          </div>
-        </div>
-      </div>
-      <button class="notion-btn" id="btnLogin" disabled>
-        <div class="spin" id="loginSpinner" style="display:inline-block;"></div>
-        <span id="loginText">データベースと同期中...</span>
-      </button>
-      <div class="status-msg" id="initStatusMsg"></div>
+  <!-- サイドバーナビゲーション -->
+  <nav class="sidebar">
+    <div class="logo-area">
+      <span class="logo-icon">b-d</span> Buddy
     </div>
+    <ul class="nav-menu">
+      <li class="nav-item">🏠 Dashboard</li>
+      <li class="nav-item active">📂 Projects</li>
+      <li class="nav-item">📅 Schedules</li>
+    </ul>
+  </nav>
 
-    <!-- 2. ダッシュボード -->
-    <div id="dashView" style="display: none;">
-      <div class="notion-properties">
-        <div class="prop-row">
-          <div class="prop-name">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>Created by</span>
-          </div>
-          <div class="prop-value">
-            <div class="notion-user-badge"><span class="user-avatar" id="avatarLetter">T</span><span id="dispName">--</span></div>
-            <button class="btn-switch-user" id="btnLogout">切替</button>
-          </div>
-        </div>
-        <div class="prop-row">
-          <div class="prop-name">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line></svg>
-            <span>Category</span>
-          </div>
-          <div class="prop-value">
-            <div class="radio-group">
-              <label><input type="radio" name="isDomestic" value="true" checked> 国内 (Domestic)</label>
-              <label><input type="radio" name="isDomestic" value="false"> 輸出 (Overseas)</label>
-            </div>
-          </div>
-        </div>
-        <div class="prop-row">
-          <div class="prop-name">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>
-            <span>Trade Type</span>
-          </div>
-          <div class="prop-value">
-            <select id="tradeType" class="notion-input">
-              <option value="Direct">直接取引 (Direct)</option>
-              <option value="Via Forwarder">通関業者経由 (Via Forwarder)</option>
-            </select>
-          </div>
-        </div>
-        <div class="prop-row" id="deliveryRow">
-          <div class="prop-name">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span>Delivery Date</span>
-          </div>
-          <div class="prop-value">
-            <input type="date" id="deliveryDate" class="notion-input" style="width: 150px;">
-          </div>
-        </div>
+  <!-- メインエリア -->
+  <main class="main-content">
+    <header class="header">
+      <div class="user-info" style="color: var(--text-muted); font-size: 14px;">
+        Employee ID: 10008 | Tetsuya Goto
       </div>
-
-      <button class="notion-btn" id="btnCreate">
-        <div class="spin" id="btnSpinner"></div>
-        <span id="btnText">＋ 新規見積書を作成</span>
-      </button>
-
-      <div class="notion-callout" id="resultBox">
-        <div class="callout-header">✓ 生成完了</div>
-        <div class="callout-body" id="dispQuoteNo"></div>
-        <div class="callout-deadline" id="dispDeadlineWrap" style="display:none;">⚠️ 手配期限: <span class="deadline-date" id="dispDeadlineDate"></span></div>
-        <a href="#" target="_blank" class="link-notion-style" id="linkOpenSheet">
-          <span>スプレッドシートを開く</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-        </a>
-      </div>
-      <div class="status-msg" id="statusMsg"></div>
-
-      <!-- 検索・進捗ビュー -->
-      <div class="notion-divider"></div>
-      
-      <div class="search-header">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <span>Database Search</span>
-      </div>
-      
-      <div class="search-box-wrap">
-        <input type="text" id="searchInput" class="notion-input" placeholder="物件番号や顧客名を入力..." autocomplete="off">
-        <button class="notion-btn btn-secondary" id="btnSearch">
-          <div class="spin dark" id="searchSpinner" style="display:none;"></div>
-          <span id="searchText">検索</span>
-        </button>
-      </div>
-
-      <div class="result-list" id="searchResultList"></div>
-    </div>
-  </div>
-
-  <!-- 編集モーダル -->
-  <div class="modal-overlay" id="editModal">
-    <div class="modal-content">
-      <div class="modal-title" id="modalQuoteTitle">案件編集</div>
-      <div class="modal-subtitle">※保存時に見積書の最新の「客先名」と「金額」が自動同期されます。</div>
-      <input type="hidden" id="editQuoteNo">
-      
-      <div class="modal-form-row">
-        <label>ステータス (Status)</label>
-        <select id="editStatus">
-          <option value="1. Draft">1. Draft (作成中)</option>
-          <option value="2. Submitted">2. Submitted (見積提出済)</option>
-          <option value="3. Negotiating">3. Negotiating (交渉中)</option>
-          <option value="4. Accepted">4. Accepted (受注確定)</option>
-          <option value="5. CAD / Drawing">5. CAD / Drawing (作図中)</option>
-          <option value="6. Production">6. Production (工場生産中)</option>
-          <option value="7. Delivered">7. Delivered (納入・出荷完了)</option>
-          <option value="8. Paid">8. Paid (入金完了)</option>
-          <option value="9. Lost / Cancelled">9. Lost / Cancelled (失注・キャンセル)</option>
-        </select>
-      </div>
-
-      <div class="modal-form-row">
-        <label>取引形態 (Trade Type)</label>
-        <select id="editTradeType">
-          <option value="直接取引(Direct)">直接取引 (Direct)</option>
-          <option value="通関業者経由(Via Forwarder)">通関業者経由 (Via Forwarder)</option>
-        </select>
-      </div>
-
-      <div class="modal-form-row">
-        <label>納入予定日 (Delivery Date)</label>
-        <input type="date" id="editDeliveryDate">
-      </div>
-
-      <div class="modal-form-row">
-        <label>見積もり内容 (Details) - 手動入力用</label>
-        <input type="text" id="editDetails" placeholder="製品名や仕様のメモ...">
-      </div>
-
-      <div class="modal-form-row">
-        <label>追加メモ・変更理由 (Memo)</label>
-        <textarea id="editMemo" placeholder="変更の理由などを入力すると履歴に残ります..."></textarea>
-      </div>
-
-      <div class="modal-actions">
-        <button class="notion-btn btn-secondary" id="btnCancelEdit">キャンセル</button>
-        <button class="notion-btn" id="btnSaveEdit">変更を保存</button>
-      </div>
-    </div>
-  </div>
-
-<script>
-  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec";
-  const API_SECRET = "open ss1 rand kz";
-
-  let STAFF_MASTER = {};
-  let currentSearchResults = [];
-  let currentUser = null;
-
-  const loginView = document.getElementById("loginView");
-  const dashView = document.getElementById("dashView");
-  const empIdInput = document.getElementById("empId");
-  const btnLogin = document.getElementById("btnLogin");
-  const btnLogout = document.getElementById("btnLogout");
-  const dispName = document.getElementById("dispName");
-  const avatarLetter = document.getElementById("avatarLetter");
-  const initStatusMsg = document.getElementById("initStatusMsg");
-  const statusMsg = document.getElementById("statusMsg");
-
-  const btnCreate = document.getElementById("btnCreate");
-  const btnSearch = document.getElementById("btnSearch");
-  const searchInput = document.getElementById("searchInput");
-  const searchResultList = document.getElementById("searchResultList");
-
-  document.querySelectorAll('input[name="isDomestic"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-      document.getElementById("deliveryRow").style.display = (e.target.value === "true") ? "flex" : "none";
-      if (e.target.value === "false") document.getElementById("deliveryDate").value = "";
-    });
-  });
-
-  async function loadStaffMaster() {
-    try {
-      const response = await fetch(GAS_WEBAPP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "getStaffMaster", apiKey: API_SECRET })
-      });
-      const res = await response.json();
-      if (res.status === "success") {
-        STAFF_MASTER = res.data;
-        document.getElementById("loginSpinner").style.display = "none";
-        document.getElementById("loginText").textContent = "ログイン";
-        btnLogin.disabled = false;
-        const savedEmpId = localStorage.getItem("kz_emp_id");
-        if (savedEmpId && STAFF_MASTER[savedEmpId]) loginAs(savedEmpId);
-      } else throw new Error(res.message);
-    } catch (err) {
-      initStatusMsg.className = "status-msg error";
-      initStatusMsg.textContent = "社員リストの取得に失敗しました。再読み込みしてください。";
-    }
-  }
-
-  window.addEventListener('DOMContentLoaded', loadStaffMaster);
-
-  btnLogin.addEventListener("click", () => {
-    const id = empIdInput.value.trim();
-    if (!id) return showStatus("社員番号を入力してください", "error");
-    if (STAFF_MASTER[id]) {
-      localStorage.setItem("kz_emp_id", id);
-      loginAs(id);
-    } else showStatus("登録されていない社員番号です", "error");
-  });
-
-  empIdInput.addEventListener("keypress", e => { if (e.key === "Enter") btnLogin.click(); });
-  searchInput.addEventListener("keypress", e => { if (e.key === "Enter") btnSearch.click(); });
-
-  function loginAs(id) {
-    currentUser = { id: id, ...STAFF_MASTER[id] };
-    dispName.textContent = currentUser.name;
-    avatarLetter.textContent = currentUser.name.charAt(0).toUpperCase();
-    loginView.style.display = "none";
-    dashView.style.display = "block";
-    executeSearch("");
-  }
-
-  btnLogout.addEventListener("click", () => {
-    localStorage.removeItem("kz_emp_id");
-    currentUser = null;
-    empIdInput.value = "";
-    dashView.style.display = "none";
-    loginView.style.display = "block";
-  });
-
-  btnCreate.addEventListener("click", async () => {
-    if (!currentUser) return;
-    const isDomestic = document.querySelector('input[name="isDomestic"]:checked').value === "true";
+      <button class="create-btn">+ 新規作成 (New Quote)</button>
+    </header>
     
-    btnCreate.disabled = true;
-    document.getElementById("btnSpinner").style.display = "inline-block";
-    document.getElementById("btnText").textContent = "作成中...";
-    statusMsg.className = "status-msg";
-    statusMsg.textContent = "台帳処理中...";
-
-    try {
-      const response = await fetch(GAS_WEBAPP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ 
-          action: "createQuotation", empId: currentUser.id, apiKey: API_SECRET, 
-          isDomestic: isDomestic, 
-          tradeType: document.getElementById("tradeType").value,
-          deliveryDate: document.getElementById("deliveryDate").value 
-        })
-      });
-      const res = await response.json();
-      if (res.status === "success") {
-        statusMsg.className = "status-msg success";
-        statusMsg.textContent = "作成完了";
-        document.getElementById("dispQuoteNo").textContent = res.quoteNo;
-        if(isDomestic && res.orderDeadline) {
-          document.getElementById("dispDeadlineDate").textContent = res.orderDeadline;
-          document.getElementById("dispDeadlineWrap").style.display = "block";
-        }
-        document.getElementById("linkOpenSheet").href = res.fileUrl;
-        document.getElementById("resultBox").style.display = "block";
-        window.open(res.fileUrl, "_blank");
-        executeSearch("");
-      } else throw new Error(res.message);
-    } catch (err) {
-      statusMsg.className = "status-msg error";
-      statusMsg.textContent = err.message;
-    } finally {
-      btnCreate.disabled = false;
-      document.getElementById("btnSpinner").style.display = "none";
-      document.getElementById("btnText").textContent = "＋ 新規見積書を作成";
-    }
-  });
-
-  function showStatus(text, type) {
-    initStatusMsg.className = "status-msg " + type;
-    initStatusMsg.textContent = text;
-  }
-
-  btnSearch.addEventListener("click", () => executeSearch(searchInput.value.trim()));
-
-  async function executeSearch(query) {
-    btnSearch.disabled = true;
-    document.getElementById("searchSpinner").style.display = "inline-block";
-    document.getElementById("searchText").style.display = "none";
-    searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">検索中...</div>';
-
-    try {
-      const response = await fetch(GAS_WEBAPP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "searchProjects", empId: currentUser.id, apiKey: API_SECRET, query: query })
-      });
-      const res = await response.json();
-      if (res.status === "success") {
-        currentSearchResults = res.data;
-        renderResults(res.data);
-      } else throw new Error(res.message);
-    } catch (err) {
-      searchResultList.innerHTML = '<div style="color:red; font-size:13px;">通信エラーが発生しました</div>';
-    } finally {
-      btnSearch.disabled = false;
-      document.getElementById("searchSpinner").style.display = "none";
-      document.getElementById("searchText").style.display = "inline";
-    }
-  }
-
-  function renderResults(data) {
-    if(!data || data.length === 0) {
-      searchResultList.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:10px;">該当する案件が見つかりません。</div>';
-      return;
-    }
-
-    searchResultList.innerHTML = data.map((item, index) => {
-      const fileLink = item.fileUrl ? `<a href="${item.fileUrl}" target="_blank" class="rc-quote-no">${item.quoteNo} ↗</a>` : `<span class="rc-quote-no">${item.quoteNo}</span>`;
-      const formattedAmt = item.amount && !isNaN(item.amount) ? Number(item.amount).toLocaleString() : item.amount;
-      const amountHtml = (formattedAmt && formattedAmt !== '0') ? `<span class="rc-amount">¥/₫ ${formattedAmt}</span>` : '';
-
-      return `
-      <div class="result-card">
-        <div class="rc-header">
-          ${fileLink}
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span class="rc-status">${item.status}</span>
-            <button class="btn-edit-sm" onclick="openEditModal(${index})">編集</button>
+    <section class="content-area">
+      <!-- カンバンボード -->
+      <div class="kanban-board">
+        
+        <!-- Draft列 -->
+        <div class="kanban-column">
+          <div class="column-title">1. Draft</div>
+          <div class="kanban-card">
+            <div class="card-title">2609000101-01</div>
+            <div class="card-client">後藤様邸 / $0.0</div>
           </div>
         </div>
-        <div class="rc-client">${item.client || '(顧客未入力)'} ${amountHtml}</div>
-        ${item.details ? `<div style="font-size:13px; color:var(--text-main); margin-bottom:6px;">内容: ${item.details}</div>` : ''}
-        <div class="rc-footer" style="margin-bottom: 6px;">
-          <span class="rc-badge">${item.category}</span>
-          <span class="rc-badge">${item.tradeType}</span>
+
+        <!-- Submitted列 -->
+        <div class="kanban-column">
+          <div class="column-title">2. Submitted</div>
+          <div class="kanban-card">
+            <div class="card-title">2609000301-01</div>
+            <div class="card-client">ABCDFRR / 10,000,000 VND</div>
+          </div>
         </div>
-        <div class="rc-footer">
-          ${item.deliveryDate ? `<span>納入: ${item.deliveryDate}</span>` : ''}
-          ${item.orderDeadline ? `<span class="rc-deadline">手配期限: ${item.orderDeadline}</span>` : ''}
+
+        <!-- Negotiating列 -->
+        <div class="kanban-column">
+          <div class="column-title">3. Negotiating</div>
+          <!-- 期限アラート付きのカード例 -->
+          <div class="kanban-card" style="border-left: 4px solid var(--accent-color);">
+            <div class="card-title">2609000201-01</div>
+            <div class="card-client">てすとおおおお / $0.0</div>
+            <div class="card-alert">⚠️ 手配期限: 2026-10-22</div>
+          </div>
         </div>
+
+        <!-- Accepted列 -->
+        <div class="kanban-column">
+          <div class="column-title">4. Accepted</div>
+          <!-- 案件なし -->
+        </div>
+
       </div>
-      `;
-    }).join('');
-  }
+    </section>
+  </main>
 
-  // --- 編集モーダル操作 ---
-  const editModal = document.getElementById("editModal");
-  window.openEditModal = function(index) {
-    const item = currentSearchResults[index];
-    if(!item) return;
-    document.getElementById("editQuoteNo").value = item.quoteNo;
-    document.getElementById("modalQuoteTitle").textContent = `案件編集: ${item.quoteNo}`;
-    document.getElementById("editStatus").value = item.status;
-    document.getElementById("editTradeType").value = item.tradeType;
-    document.getElementById("editDeliveryDate").value = item.deliveryDate || '';
-    document.getElementById("editDetails").value = item.details || '';
-    document.getElementById("editMemo").value = '';
-    editModal.style.display = "flex";
-  };
-
-  document.getElementById("btnCancelEdit").addEventListener("click", () => editModal.style.display = "none");
-
-  document.getElementById("btnSaveEdit").addEventListener("click", async () => {
-    const btn = document.getElementById("btnSaveEdit");
-    btn.disabled = true;
-    btn.textContent = "同期＆保存中...";
-
-    try {
-      const response = await fetch(GAS_WEBAPP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "updateProject",
-          empId: currentUser.id,
-          apiKey: API_SECRET,
-          quoteNo: document.getElementById("editQuoteNo").value,
-          status: document.getElementById("editStatus").value,
-          tradeType: document.getElementById("editTradeType").value,
-          deliveryDate: document.getElementById("editDeliveryDate").value,
-          details: document.getElementById("editDetails").value,
-          memo: document.getElementById("editMemo").value
-        })
-      });
-      const res = await response.json();
-      if (res.status === "success") {
-        editModal.style.display = "none";
-        executeSearch(searchInput.value.trim()); // 再検索して同期された情報を画面に反映
-      } else throw new Error(res.message);
-    } catch (err) {
-      alert("更新に失敗しました: " + err.message);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "変更を保存";
-    }
-  });
-</script>
 </body>
 </html>
