@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buddy - Projects</title>
+  <title>Buddy - Workspace</title>
   <style>
     :root {
       --bg-sidebar: #F7F7F5;
@@ -17,6 +17,8 @@
       --tag-default: #E3E2E0;
       --tag-blue: #D3E5EF;
       --tag-orange: #FADEC9;
+      --tag-red: #FFE2DD;
+      --tag-green: #DBEDDB;
       --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       --font-serif: Lyon-Text, Georgia, "Yu Mincho", "Hiragino Mincho ProN", serif;
     }
@@ -104,13 +106,24 @@
       cursor: pointer;
     }
 
-    /* メインコンテンツ */
+    /* メインコンテンツコンテナ */
     .main-content {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
+    .view-panel {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* ヘッダー */
     .top-header {
       height: 52px;
       border-bottom: 1px solid var(--border);
@@ -119,6 +132,7 @@
       justify-content: space-between;
       padding: 0 32px;
       gap: 16px;
+      flex-shrink: 0;
     }
     .header-left {
       display: flex;
@@ -171,7 +185,99 @@
       background-color: var(--btn-blue-hover);
     }
 
-    /* カンバンボード */
+    /* -----------------------------
+       Dashboard スタイル
+    ----------------------------- */
+    .dashboard-container {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: 1100px;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .metric-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      background: #FFF;
+      box-shadow: rgba(15, 15, 15, 0.03) 0px 1px 3px;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .metric-val {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .dashboard-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dash-list {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #FFF;
+    }
+    .dash-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+    .dash-row:last-child {
+      border-bottom: none;
+    }
+    .dash-row:hover {
+      background-color: var(--bg-sidebar);
+    }
+    .dash-col-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .dash-item-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .dash-item-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .dash-col-side {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
+    }
+
+    /* -----------------------------
+       Projects (カンバン) スタイル
+    ----------------------------- */
     .board-container {
       padding: 24px 32px;
       flex: 1;
@@ -211,8 +317,6 @@
       gap: 8px;
       min-height: 100px;
     }
-
-    /* カード */
     .card {
       background-color: var(--bg-main);
       border: 1px solid var(--border);
@@ -249,6 +353,7 @@
     .tag-draft { background-color: var(--tag-default); }
     .tag-sub { background-color: var(--tag-blue); }
     .tag-alert { background-color: var(--tag-orange); }
+    .tag-danger { background-color: var(--tag-red); color: #EB5757; }
 
     /* モーダル */
     .modal-overlay {
@@ -421,12 +526,12 @@
         </svg>
         <div class="logo-text">Buddy</div>
       </div>
-      <div class="nav-item">🏠 Dashboard</div>
-      <div class="nav-item active">📂 Projects</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">🏠 Dashboard</div>
+      <div class="nav-item" id="nav-projects" onclick="switchView('projects')">📂 Projects</div>
       <div class="nav-item">📅 Schedules</div>
     </div>
 
-    <!-- 担当者切り替えエリア（ログイン代替） -->
+    <!-- 担当者切り替え -->
     <div class="user-profile">
       <span class="user-label">Logged in as:</span>
       <select id="userSelector" class="user-select" onchange="onUserChange()">
@@ -438,45 +543,96 @@
 
   <!-- メインコンテンツ -->
   <main class="main-content">
-    <header class="top-header">
-      <div class="header-left">
-        <div class="page-title">Projects</div>
-        <div class="search-box">
-          <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
-          <input type="text" id="searchInput" class="search-input" placeholder="Search No, Client, Details..." oninput="onFilterChange()">
-        </div>
-        <select id="salesFilter" class="filter-select" onchange="onFilterChange()">
-          <option value="ALL">All Sales Persons</option>
-          <option value="Tetsuya Goto">Goto Only</option>
-          <option value="Nguyễn Tiến Thịnh">Thịnh Only</option>
-        </select>
-      </div>
-      <button class="btn-primary" onclick="openCreateModal()">+ New Project</button>
-    </header>
+    
+    <!-- 1. Dashboard ビュー -->
+    <div id="view-dashboard" class="view-panel active">
+      <header class="top-header">
+        <div class="page-title">Dashboard Overview</div>
+        <button class="btn-primary" onclick="openCreateModal()">+ New Project</button>
+      </header>
 
-    <div class="board-container">
-      <div class="kanban-board">
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-draft">0</span> 1. Draft</div>
-          <div id="col-draft" class="card-list"></div>
+      <div class="dashboard-container">
+        <!-- KPI メトリクス -->
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="metric-label">Draft (作成中)</div>
+            <div class="metric-val" id="kpi-draft">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Submitted (提出済)</div>
+            <div class="metric-val" id="kpi-submitted">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Negotiating (商談中)</div>
+            <div class="metric-val" id="kpi-negotiating">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Accepted (受注)</div>
+            <div class="metric-val" id="kpi-accepted">0</div>
+          </div>
         </div>
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-submitted">0</span> 2. Submitted</div>
-          <div id="col-submitted" class="card-list"></div>
+
+        <!-- アラート：手配期限が迫っている案件 -->
+        <div class="dashboard-section">
+          <div class="section-title">⚠️ Upcoming Order Deadlines (手配期限の迫る国内案件)</div>
+          <div class="dash-list" id="dash-deadline-list">
+            <div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">期限が迫っている未完了案件はありません</div>
+          </div>
         </div>
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-negotiating">0</span> 3. Negotiating</div>
-          <div id="col-negotiating" class="card-list"></div>
-        </div>
-        <div class="column">
-          <div class="col-header"><span class="badge" id="badge-accepted">0</span> 4. Accepted</div>
-          <div id="col-accepted" class="card-list"></div>
+
+        <!-- 直近のアクティビティ（最近更新された案件） -->
+        <div class="dashboard-section">
+          <div class="section-title">🕒 Recent Activity (直近更新された案件)</div>
+          <div class="dash-list" id="dash-recent-list">
+            <div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">読み込み中...</div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- 2. Projects (カンバン) ビュー -->
+    <div id="view-projects" class="view-panel">
+      <header class="top-header">
+        <div class="header-left">
+          <div class="page-title">Projects</div>
+          <div class="search-box">
+            <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search No, Client, Details..." oninput="onFilterChange()">
+          </div>
+          <select id="salesFilter" class="filter-select" onchange="onFilterChange()">
+            <option value="ALL">All Sales Persons</option>
+            <option value="Tetsuya Goto">Goto Only</option>
+            <option value="Nguyễn Tiến Thịnh">Thịnh Only</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="openCreateModal()">+ New Project</button>
+      </header>
+
+      <div class="board-container">
+        <div class="kanban-board">
+          <div class="column">
+            <div class="col-header"><span class="badge" id="badge-draft">0</span> 1. Draft</div>
+            <div id="col-draft" class="card-list"></div>
+          </div>
+          <div class="column">
+            <div class="col-header"><span class="badge" id="badge-submitted">0</span> 2. Submitted</div>
+            <div id="col-submitted" class="card-list"></div>
+          </div>
+          <div class="column">
+            <div class="col-header"><span class="badge" id="badge-negotiating">0</span> 3. Negotiating</div>
+            <div id="col-negotiating" class="card-list"></div>
+          </div>
+          <div class="column">
+            <div class="col-header"><span class="badge" id="badge-accepted">0</span> 4. Accepted</div>
+            <div id="col-accepted" class="card-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <!-- 1. 案件編集・詳細モーダル -->
+  <!-- 編集・詳細モーダル -->
   <div class="modal-overlay" id="editModalOverlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -539,7 +695,7 @@
     </div>
   </div>
 
-  <!-- 2. 新規作成モーダル -->
+  <!-- 新規作成モーダル -->
   <div class="modal-overlay" id="createModalOverlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -575,7 +731,7 @@
     </div>
   </div>
 
-  <!-- 3. ローディングオーバーレイ -->
+  <!-- ローディング -->
   <div class="modal-overlay" id="loadingOverlay" style="z-index: 2000;">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; color: #FFFFFF;">
       <div class="spinner"></div>
@@ -583,7 +739,7 @@
     </div>
   </div>
 
-  <!-- 4. 確認モーダル (英語) -->
+  <!-- 確認モーダル -->
   <div class="modal-overlay" id="confirmModalOverlay" style="z-index: 1500;">
     <div class="modal-card" style="width: 440px; padding: 24px; box-sizing: border-box; text-align: center;">
       <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
@@ -598,22 +754,31 @@
 
   <!-- スクリプト -->
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec'; // 実際のGAS URL
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMNOZ5_x44kuSpTAiH3yiTPL49nNATYnVBpOSDP0ddbhfk82KlC4IZJ-CKlO/exec';
     const API_SECRET = 'open ss1 rand kz'; // 設定したシークレットキー
     let currentEmpId = '10008';
 
-    let rawProjects = []; // 取得した全案件
+    let rawProjects = [];
     let selectedQuoteNo = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       fetchLatestProjects();
     });
 
+    // 画面切り替え
+    function switchView(viewName) {
+      document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
+      document.getElementById('nav-projects').classList.toggle('active', viewName === 'projects');
+
+      document.getElementById('view-dashboard').classList.toggle('active', viewName === 'dashboard');
+      document.getElementById('view-projects').classList.toggle('active', viewName === 'projects');
+    }
+
     function onUserChange() {
       currentEmpId = document.getElementById('userSelector').value;
     }
 
-    // 案件一覧の取得
+    // 案件取得
     async function fetchLatestProjects() {
       try {
         const response = await fetch(API_URL, {
@@ -630,7 +795,8 @@
         const result = await response.json();
         if (result.status === 'success') {
           rawProjects = result.data;
-          onFilterChange(); // フィルター・検索を適用して描画
+          renderDashboard(rawProjects);
+          onFilterChange();
         } else {
           console.error('API Error:', result.message);
         }
@@ -639,17 +805,91 @@
       }
     }
 
-    // 検索・絞り込みフィルターの実行
+    // ----------------------------------------------------
+    // Dashboard 描画ロジック
+    // ----------------------------------------------------
+    function renderDashboard(projects) {
+      // 1. KPI集計
+      const counts = { draft: 0, submitted: 0, negotiating: 0, accepted: 0 };
+      projects.forEach(p => {
+        const s = p.status || '';
+        if (s.includes('1. Draft')) counts.draft++;
+        else if (s.includes('2. Submitted')) counts.submitted++;
+        else if (s.includes('3. Negotiating')) counts.negotiating++;
+        else if (s.includes('4. Accepted')) counts.accepted++;
+      });
+
+      document.getElementById('kpi-draft').textContent = counts.draft;
+      document.getElementById('kpi-submitted').textContent = counts.submitted;
+      document.getElementById('kpi-negotiating').textContent = counts.negotiating;
+      document.getElementById('kpi-accepted').textContent = counts.accepted;
+
+      // 2. 手配期限アラートリスト（未完了かつ期限設定あり）
+      const deadlineContainer = document.getElementById('dash-deadline-list');
+      deadlineContainer.innerHTML = '';
+
+      const pendingWithDeadlines = projects
+        .filter(p => p.orderDeadline && !p.status.includes('4. Accepted') && !p.status.includes('9. Lost'))
+        .sort((a, b) => new Date(a.orderDeadline) - new Date(b.orderDeadline));
+
+      if (pendingWithDeadlines.length === 0) {
+        deadlineContainer.innerHTML = `<div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">期限が迫っている未完了案件はありません</div>`;
+      } else {
+        pendingWithDeadlines.slice(0, 5).forEach(p => {
+          const row = document.createElement('div');
+          row.className = 'dash-row';
+          row.onclick = () => openEditModal(p.quoteNo);
+          row.innerHTML = `
+            <div class="dash-col-main">
+              <span class="dash-item-title">${p.quoteNo} - ${p.client || '（未入力）'}</span>
+              <span class="dash-item-sub">${p.details || '内容未設定'} / 納入希望: ${p.deliveryDate || '未定'}</span>
+            </div>
+            <div class="dash-col-side">
+              <span class="tag tag-danger">⚠️ 手配期限: ${p.orderDeadline}</span>
+              <span class="tag tag-draft">${p.status}</span>
+            </div>
+          `;
+          deadlineContainer.appendChild(row);
+        });
+      }
+
+      // 3. 直近アクティビティ（最新5件）
+      const recentContainer = document.getElementById('dash-recent-list');
+      recentContainer.innerHTML = '';
+      
+      const recentProjects = projects.filter(p => p.quoteNo).slice(0, 5);
+      if (recentProjects.length === 0) {
+        recentContainer.innerHTML = `<div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">案件データがありません</div>`;
+      } else {
+        recentProjects.forEach(p => {
+          const row = document.createElement('div');
+          row.className = 'dash-row';
+          row.onclick = () => openEditModal(p.quoteNo);
+          row.innerHTML = `
+            <div class="dash-col-main">
+              <span class="dash-item-title">${p.quoteNo} - ${p.client || '（未入力）'}</span>
+              <span class="dash-item-sub">担当: ${p.salesPerson || '-'} / 金額: ${p.amount || '0'}</span>
+            </div>
+            <div class="dash-col-side">
+              <span class="tag tag-draft">${p.status}</span>
+            </div>
+          `;
+          recentContainer.appendChild(row);
+        });
+      }
+    }
+
+    // ----------------------------------------------------
+    // Projects フィルター＆カンバン描画
+    // ----------------------------------------------------
     function onFilterChange() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
       const salesFilter = document.getElementById('salesFilter').value;
 
       const filtered = rawProjects.filter(p => {
-        // 担当者フィルター
         if (salesFilter !== 'ALL' && (!p.salesPerson || !p.salesPerson.includes(salesFilter))) {
           return false;
         }
-        // 検索キーワード
         if (q) {
           const matchNo = (p.quoteNo || '').toLowerCase().includes(q);
           const matchClient = (p.client || '').toLowerCase().includes(q);
@@ -662,7 +902,6 @@
       renderKanbanBoard(filtered);
     }
 
-    // カンバン描画
     function renderKanbanBoard(projects) {
       const colDraft = document.getElementById('col-draft');
       const colSubmitted = document.getElementById('col-submitted');
@@ -781,7 +1020,6 @@
       }
     }
 
-    // 改訂版（枝番）作成の実行
     async function submitCreateRevision() {
       if (!selectedQuoteNo) return;
       if (!confirm(`Create a new revision from ${selectedQuoteNo}?`)) return;
@@ -865,9 +1103,6 @@
       }
     }
 
-    // ----------------------------------------------------
-    // 確認モーダル
-    // ----------------------------------------------------
     function showConfirmModal(headerTitle, quoteNo, fileUrl) {
       document.getElementById('confirmModalHeader').textContent = headerTitle;
       document.getElementById('confirmModalDesc').innerHTML = `Quotation <b>${quoteNo}</b> has been generated.<br>Would you like to open the spreadsheet now?`;
