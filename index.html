@@ -162,7 +162,7 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 4px 10px;
-      width: 260px;
+      width: 280px;
     }
     .search-input {
       border: none;
@@ -513,7 +513,7 @@
       display: none;
     }
 
-    /* ログイン画面専用 */
+    /* ログイン画面 */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -617,11 +617,18 @@
     <!-- 1. Dashboard ビュー -->
     <div id="view-dashboard" class="view-panel active">
       <header class="top-header">
-        <div class="page-title">Dashboard Overview</div>
+        <div class="header-left">
+          <div class="page-title">Dashboard Overview</div>
+          <div class="search-box">
+            <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
+            <input type="text" id="dashSearchInput" class="search-input" placeholder="Search No, Client, Details..." oninput="handleDashSearch(this.value)">
+          </div>
+        </div>
         <button class="btn-primary" onclick="openCreateModal()">+ New Project</button>
       </header>
 
       <div class="dashboard-container">
+        <!-- KPI メトリクス -->
         <div class="metric-grid">
           <div class="metric-card">
             <div class="metric-label">Draft (作成中)</div>
@@ -641,23 +648,17 @@
           </div>
         </div>
 
+        <!-- 手配期限アラート -->
         <div class="dashboard-section">
           <div class="section-title">⚠️ Upcoming Order Deadlines (手配期限の迫る国内案件)</div>
           <div class="dash-list" id="dash-deadline-list">
             <div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">期限が迫っている未完了案件はありません</div>
           </div>
         </div>
-
-        <div class="dashboard-section">
-          <div class="section-title">🕒 Recent Activity (直近更新された案件)</div>
-          <div class="dash-list" id="dash-recent-list">
-            <div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">読み込み中...</div>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- 2. Projects ビュー -->
+    <!-- 2. Projects (カンバン) ビュー -->
     <div id="view-projects" class="view-panel">
       <header class="top-header">
         <div class="header-left">
@@ -827,7 +828,6 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec';
     const API_SECRET = 'open ss1 rand kz'; // 設定したシークレットキー
 
-    // 社員マスタ（台帳と完全一致）
     const STAFF_MASTER = {
       '10008': { name: 'Tetsuya Goto', role: 'Director' },
       '15003': { name: 'Nguyễn Tiến Thịnh', role: 'Deputy Director' }
@@ -841,9 +841,7 @@
       checkLoginSession();
     });
 
-    // ----------------------------------------------------
-    // 認証・セッション管理
-    // ----------------------------------------------------
+    // 認証
     function checkLoginSession() {
       const savedId = localStorage.getItem('buddy_emp_id');
       if (savedId && STAFF_MASTER[savedId]) {
@@ -882,15 +880,22 @@
       }
     }
 
-    // ----------------------------------------------------
     // 画面切り替え
-    // ----------------------------------------------------
     function switchView(viewName) {
       document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
       document.getElementById('nav-projects').classList.toggle('active', viewName === 'projects');
 
       document.getElementById('view-dashboard').classList.toggle('active', viewName === 'dashboard');
       document.getElementById('view-projects').classList.toggle('active', viewName === 'projects');
+    }
+
+    // Dashboardからの検索処理（自動でProjectsに切り替えて絞り込み）
+    function handleDashSearch(query) {
+      switchView('projects');
+      const projectSearchInput = document.getElementById('searchInput');
+      projectSearchInput.value = query;
+      projectSearchInput.focus();
+      onFilterChange();
     }
 
     // 案件取得
@@ -920,9 +925,7 @@
       }
     }
 
-    // ----------------------------------------------------
-    // Dashboard 描画
-    // ----------------------------------------------------
+    // Dashboard 描画（KPIと手配期限のみ）
     function renderDashboard(projects) {
       const counts = { draft: 0, submitted: 0, negotiating: 0, accepted: 0 };
       projects.forEach(p => {
@@ -965,35 +968,9 @@
           deadlineContainer.appendChild(row);
         });
       }
-
-      const recentContainer = document.getElementById('dash-recent-list');
-      recentContainer.innerHTML = '';
-      
-      const recentProjects = projects.filter(p => p.quoteNo).slice(0, 5);
-      if (recentProjects.length === 0) {
-        recentContainer.innerHTML = `<div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">案件データがありません</div>`;
-      } else {
-        recentProjects.forEach(p => {
-          const row = document.createElement('div');
-          row.className = 'dash-row';
-          row.onclick = () => openEditModal(p.quoteNo);
-          row.innerHTML = `
-            <div class="dash-col-main">
-              <span class="dash-item-title">${p.quoteNo} - ${p.client || '（未入力）'}</span>
-              <span class="dash-item-sub">担当: ${p.salesPerson || '-'} / 金額: ${p.amount || '0'}</span>
-            </div>
-            <div class="dash-col-side">
-              <span class="tag tag-draft">${p.status}</span>
-            </div>
-          `;
-          recentContainer.appendChild(row);
-        });
-      }
     }
 
-    // ----------------------------------------------------
     // Projects フィルター＆描画
-    // ----------------------------------------------------
     function onFilterChange() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
       const salesFilter = document.getElementById('salesFilter').value;
@@ -1066,14 +1043,11 @@
       document.getElementById('badge-accepted').textContent = counts.accepted;
     }
 
-    // ----------------------------------------------------
     // 作成者判定 & 編集モーダル制御
-    // ----------------------------------------------------
     function isProjectOwner(proj) {
       if (!proj || !currentUser) return false;
       const sales = (proj.salesPerson || '').toLowerCase();
       const myName = currentUser.name.toLowerCase();
-      // 苗字またはフルネームが含まれているか判定
       const nameParts = myName.split(' ');
       return sales.includes(myName) || nameParts.some(part => part.length > 2 && sales.includes(part));
     }
@@ -1094,7 +1068,6 @@
       document.getElementById('editNewMemo').value = '';
       document.getElementById('editMemoHistory').textContent = proj.memo || '履歴なし';
 
-      // 作成者判定による制御
       const isOwner = isProjectOwner(proj);
       const readOnlyBanner = document.getElementById('readOnlyBanner');
       const saveBtn = document.getElementById('saveEditBtn');
@@ -1110,14 +1083,12 @@
       ];
 
       if (isOwner) {
-        // 作成者本人：編集可能
         readOnlyBanner.style.display = 'none';
         saveBtn.style.display = 'block';
         revBtn.style.display = 'block';
         memoGroup.style.display = 'flex';
         inputs.forEach(el => el.disabled = false);
       } else {
-        // 他ユーザー：完全閲覧専用
         readOnlyBanner.style.display = 'block';
         saveBtn.style.display = 'none';
         revBtn.style.display = 'none';
@@ -1207,9 +1178,7 @@
       }
     }
 
-    // ----------------------------------------------------
     // 新規作成
-    // ----------------------------------------------------
     function openCreateModal() {
       document.getElementById('createCategory').value = '国内(Domestic)';
       document.getElementById('createTradeType').value = 'Direct';
