@@ -776,6 +776,13 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
+          <label class="form-label">Quote Format / 見積先</label>
+          <select id="createQuoteFormat" class="form-select" onchange="onQuoteFormatChange()">
+            <option value="VN">国内顧客 (Vietnam Customer)</option>
+            <option value="JP">親会社 (Japan HQ) ※管理№ JP〜</option>
+          </select>
+        </div>
+        <div class="form-group" id="createCategoryGroup">
           <label class="form-label">Category / 区分</label>
           <select id="createCategory" class="form-select">
             <option value="国内(Domestic)">国内 (Domestic)</option>
@@ -1181,10 +1188,18 @@
 
     // 新規作成
     function openCreateModal() {
+      document.getElementById('createQuoteFormat').value = 'VN';
+      onQuoteFormatChange();
       document.getElementById('createCategory').value = '国内(Domestic)';
       document.getElementById('createTradeType').value = 'Direct';
       document.getElementById('createDeliveryDate').value = '';
       document.getElementById('createModalOverlay').classList.add('active');
+    }
+
+    // 親会社向けは区分（国内/輸出）が固定のため選択欄を隠す
+    function onQuoteFormatChange() {
+      const isJP = document.getElementById('createQuoteFormat').value === 'JP';
+      document.getElementById('createCategoryGroup').style.display = isJP ? 'none' : '';
     }
 
     function closeCreateModal() {
@@ -1196,6 +1211,7 @@
         action: 'createQuotation',
         apiKey: API_SECRET,
         empId: currentUser.empId,
+        quoteFormat: document.getElementById('createQuoteFormat').value,
         isDomestic: document.getElementById('createCategory').value,
         tradeType: document.getElementById('createTradeType').value,
         deliveryDate: document.getElementById('createDeliveryDate').value
