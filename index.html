@@ -569,6 +569,37 @@
       to { transform: rotate(360deg); }
     }
 
+    /* 物件管理 */
+    .pj-tabs { display: flex; gap: 4px; padding: 12px 32px 0 32px; }
+    .pj-tab { padding: 6px 12px; font-size: 13px; border-radius: 4px; cursor: pointer; color: var(--text-muted); }
+    .pj-tab.active { background: var(--bg-hover); color: var(--text-main); font-weight: 600; }
+    .pj-table-wrap { padding: 12px 32px 32px 32px; overflow: auto; flex: 1; }
+    .pj-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .pj-table th { text-align: left; font-weight: 500; color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; position: sticky; top: 0; background: #FFF; }
+    .pj-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .pj-table tbody tr.clickable { cursor: pointer; }
+    .pj-table tbody tr.clickable:hover { background: var(--bg-sidebar); }
+    .pj-table .num { text-align: right; white-space: nowrap; }
+    .pj-empty { padding: 32px; text-align: center; color: var(--text-muted); font-size: 13px; }
+    .stage-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 12px; white-space: nowrap; }
+    .stage-1 { background: #E3E2E0; color: #32302C; }
+    .stage-2 { background: #D3E5EF; color: #183347; }
+    .stage-3 { background: #DBEDDB; color: #1C3829; }
+    .stage-4 { background: #FDECC8; color: #402C1B; }
+    .stage-5 { background: #E8DEEE; color: #412454; }
+    .stage-6 { background: #EEE0DA; color: #442A1E; }
+    .stage-9 { background: #FFE2DD; color: #5D1715; }
+    .pj-quotes { border: 1px solid var(--border); border-radius: 6px; }
+    .pj-quote-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; cursor: pointer; }
+    .pj-quote-row:last-child { border-bottom: none; }
+    .pj-quote-row:hover { background: var(--bg-sidebar); }
+    .pj-add-quote { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+    .pj-add-quote select { flex: 1; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row-2 > .form-group { min-width: 0; }
+    .form-row-2 .form-input, .form-row-2 .form-select { width: 100%; box-sizing: border-box; min-width: 0; }
+    .form-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); }
+
     /* 言語切り替え */
     .lang-switch {
       display: flex;
@@ -635,7 +666,8 @@
         <div class="logo-text">Buddy</div>
       </div>
       <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')" data-i18n="nav.dashboard"></div>
-      <div class="nav-item" id="nav-projects" onclick="switchView('projects')" data-i18n="nav.projects"></div>
+      <div class="nav-item" id="nav-properties" onclick="switchView('properties')" data-i18n="nav.properties"></div>
+      <div class="nav-item" id="nav-projects" onclick="switchView('projects')" data-i18n="nav.quotes"></div>
       <div class="nav-item" data-i18n="nav.schedules"></div>
     </div>
 
@@ -715,7 +747,7 @@
     <div id="view-projects" class="view-panel">
       <header class="top-header">
         <div class="header-left">
-          <div class="page-title" data-i18n="projects.title"></div>
+          <div class="page-title" data-i18n="quotes.title"></div>
           <div class="search-box">
             <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
             <input type="text" id="searchInput" class="search-input" data-i18n-ph="search.ph" oninput="onFilterChange()">
@@ -747,10 +779,37 @@
       </div>
     </div>
 
+    <!-- 3. 物件 ビュー -->
+    <div id="view-properties" class="view-panel">
+      <header class="top-header">
+        <div class="header-left">
+          <div class="page-title" data-i18n="pj.title"></div>
+          <div class="search-box">
+            <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
+            <input type="text" id="pjSearch" class="search-input" data-i18n-ph="pj.searchPh" oninput="renderProjectsView()">
+          </div>
+          <select id="pjCategoryFilter" class="filter-select" onchange="renderProjectsView()">
+            <option value="ALL" data-i18n="pj.allCategories"></option>
+            <option value="domestic" data-i18n="cat.domestic"></option>
+            <option value="overseas" data-i18n="cat.overseas"></option>
+            <option value="hq" data-i18n="cat.hq"></option>
+          </select>
+          <select id="pjStageFilter" class="filter-select" onchange="renderProjectsView()"></select>
+          <select id="pjSalesFilter" class="filter-select" onchange="renderProjectsView()"></select>
+        </div>
+        <button class="btn-primary" onclick="openCreateModal()" data-i18n="btn.newProject"></button>
+      </header>
+      <div class="pj-tabs">
+        <div class="pj-tab active" id="pjTabList" onclick="setProjectsTab('list')" data-i18n="pj.tabList"></div>
+        <div class="pj-tab" id="pjTabClients" onclick="setProjectsTab('clients')" data-i18n="pj.tabClients"></div>
+      </div>
+      <div class="pj-table-wrap" id="pjContent"></div>
+    </div>
+
   </main>
 
   <!-- 編集・詳細モーダル -->
-  <div class="modal-overlay" id="editModalOverlay">
+  <div class="modal-overlay" id="editModalOverlay" style="z-index: 1200;">
     <div class="modal-card">
       <div class="modal-header">
         <span class="modal-title" id="editModalTitle"></span>
@@ -817,6 +876,80 @@
     </div>
   </div>
 
+  <!-- 物件 詳細モーダル -->
+  <div class="modal-overlay" id="projectModalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" id="pjModalTitle"></span>
+        <button class="close-btn" onclick="closeProjectModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="read-only-banner" id="pjReadOnlyBanner" data-i18n="pj.readonly"></div>
+        <div><a id="pjFolderLink" class="open-file-link" href="#" target="_blank" rel="noopener" data-i18n="pj.openFolder"></a></div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="pj.name"></label>
+          <input type="text" id="pjName" class="form-input">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-i18n="f.client"></label>
+            <input type="text" id="pjClient" class="form-input" list="clientList">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="pj.stage"></label>
+            <select id="pjStage" class="form-select"></select>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-i18n="f.delivery"></label>
+            <input type="date" id="pjDelivery" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="pj.orderAmount"></label>
+            <input type="text" id="pjAmount" class="form-input form-readonly" readonly>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-i18n="create.category"></label>
+            <input type="text" id="pjCategory" class="form-input form-readonly" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="row.owner"></label>
+            <input type="text" id="pjSales" class="form-input form-readonly" readonly>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="pj.quotes"></label>
+          <div class="pj-quotes" id="pjQuoteList"></div>
+          <div class="pj-add-quote" id="pjAddQuoteBox">
+            <select id="pjAddQuoteTrade" class="form-select">
+              <option value="Direct" data-i18n="trade.direct"></option>
+              <option value="Via Forwarder" data-i18n="trade.forwarder"></option>
+            </select>
+            <button class="btn-outline-primary" onclick="submitAddQuote()" data-i18n="pj.addQuote"></button>
+          </div>
+        </div>
+        <div class="form-group" id="pjMemoGroup">
+          <label class="form-label" data-i18n="f.newMemo"></label>
+          <input type="text" id="pjNewMemo" class="form-input" data-i18n-ph="f.newMemoPh">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="f.history"></label>
+          <div id="pjMemoHistory" class="memo-history"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-footer-right" style="width: 100%; justify-content: flex-end;">
+          <button class="btn-secondary" onclick="closeProjectModal()" data-i18n="btn.cancel"></button>
+          <button class="btn-primary" id="pjSaveBtn" onclick="saveProjectInfo()" data-i18n="btn.save"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <datalist id="clientList"></datalist>
+
   <!-- 提出後フォロー通知ポップアップ -->
   <div class="modal-overlay" id="followupModalOverlay" style="z-index: 1400;">
     <div class="modal-card" style="width: 480px; padding: 24px; box-sizing: border-box; text-align: center;">
@@ -832,7 +965,7 @@
     </div>
   </div>
 
-  <!-- 新規作成モーダル -->
+  <!-- 新規物件モーダル -->
   <div class="modal-overlay" id="createModalOverlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -841,35 +974,41 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label" data-i18n="create.format"></label>
-          <select id="createQuoteFormat" class="form-select" onchange="onQuoteFormatChange()">
-            <option value="VN" data-i18n="create.formatVN"></option>
-            <option value="JP" data-i18n="create.formatJP"></option>
-          </select>
-        </div>
-        <div class="form-group" id="createCategoryGroup">
-          <label class="form-label" data-i18n="create.category"></label>
-          <select id="createCategory" class="form-select">
-            <option value="国内(Domestic)" data-i18n="cat.domestic"></option>
-            <option value="輸出(Overseas)" data-i18n="cat.overseas"></option>
-          </select>
+          <label class="form-label" data-i18n="pj.name"></label>
+          <input type="text" id="createName" class="form-input" data-i18n-ph="pj.namePh">
         </div>
         <div class="form-group">
+          <label class="form-label" data-i18n="f.client"></label>
+          <input type="text" id="createClient" class="form-input" list="clientList" data-i18n-ph="pj.clientPh">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-i18n="create.category"></label>
+            <select id="createCategory" class="form-select" onchange="onCreateCategoryChange()">
+              <option value="domestic" data-i18n="cat.domestic"></option>
+              <option value="overseas" data-i18n="cat.overseas"></option>
+              <option value="hq" data-i18n="create.formatJP"></option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="create.delivery"></label>
+            <input type="date" id="createDeliveryDate" class="form-input">
+          </div>
+        </div>
+        <label class="form-check"><input type="checkbox" id="createWithQuote" checked onchange="onCreateCategoryChange()"> <span data-i18n="pj.withQuote"></span></label>
+        <div class="form-group" id="createTradeGroup">
           <label class="form-label" data-i18n="f.tradeType"></label>
           <select id="createTradeType" class="form-select">
             <option value="Direct" data-i18n="trade.direct"></option>
             <option value="Via Forwarder" data-i18n="trade.forwarder"></option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="create.delivery"></label>
-          <input type="date" id="createDeliveryDate" class="form-input">
-        </div>
+        <div id="createError" style="color: #EB5757; font-size: 12px; display: none;"></div>
       </div>
       <div class="modal-footer">
         <div class="modal-footer-right" style="width: 100%; justify-content: flex-end;">
           <button class="btn-secondary" onclick="closeCreateModal()" data-i18n="btn.cancel"></button>
-          <button class="btn-primary" id="submitCreateBtn" onclick="submitCreateQuotation()" data-i18n="btn.create"></button>
+          <button class="btn-primary" id="submitCreateBtn" onclick="submitCreateProject()" data-i18n="btn.create"></button>
         </div>
       </div>
     </div>
@@ -906,6 +1045,60 @@
      * ========================================================= */
     const I18N = {
       ja: {
+        'nav.properties': '🏗 物件',
+        'nav.quotes': '📄 見積',
+        'quotes.title': '見積',
+        'pj.title': '物件',
+        'pj.searchPh': '物件No・物件名・客先で検索...',
+        'pj.allCategories': '全区分',
+        'pj.allStages': '全段階',
+        'pj.activeStages': '進行中のみ',
+        'pj.allSales': '全担当者',
+        'pj.tabList': '一覧',
+        'pj.tabClients': '客先別集計',
+        'pj.readonly': '🔒 閲覧専用：この物件の担当者のみ編集できます。',
+        'pj.openFolder': '📁 物件フォルダを開く',
+        'pj.name': '物件名',
+        'pj.namePh': '例：RINGER HUT VINCOM 手すり',
+        'pj.clientPh': '一覧から選択、または新しい客先名を入力',
+        'pj.stage': '段階',
+        'pj.orderAmount': '受注金額',
+        'pj.quotes': '見積',
+        'pj.noQuotes': 'まだ見積がありません',
+        'pj.addQuote': '+ 見積を追加',
+        'pj.addQuoteConfirm': '物件 {no} に新しい見積を追加しますか？',
+        'pj.withQuote': '最初の見積も作成する',
+        'pj.nameRequired': '物件名を入力してください',
+        'pj.none': '該当する物件はありません',
+        'pj.colNo': '物件No',
+        'pj.colName': '物件名',
+        'pj.colClient': '客先',
+        'pj.colCategory': '区分',
+        'pj.colStage': '段階',
+        'pj.colOwner': '担当',
+        'pj.colAmount': '受注金額',
+        'pj.colDelivery': '納期',
+        'pj.colQuotes': '見積数',
+        'cs.projects': '物件数',
+        'cs.active': '進行中',
+        'cs.won': '受注',
+        'cs.lost': '失注',
+        'cs.winRate': '受注率',
+        'cs.amount': '受注金額合計',
+        'cs.note': '受注率 ＝ 受注 ÷（受注＋失注）。受注金額は通貨ごとに合計しています。',
+        'cs.noClient': '（客先未設定）',
+        'pj.created': '物件を作成しました',
+        'pj.createdDesc': '物件 <b>{no}</b> を作成しました。<br>物件フォルダを開きますか？',
+        'pj.createdWithQuoteDesc': '物件 <b>{no}</b> と見積 <b>{q}</b> を作成しました。<br>見積のスプレッドシートを開きますか？',
+        'btn.openFolder': 'フォルダを開く',
+        'loading.project': '物件を作成しています...',
+        'stage.1. Inquiry': '1. 引合',
+        'stage.2. Quoting': '2. 見積中',
+        'stage.3. Ordered': '3. 受注',
+        'stage.4. In Production': '4. 製作中',
+        'stage.5. Delivered': '5. 納品済',
+        'stage.6. Completed': '6. 完了',
+        'stage.9. Lost': '9. 失注',
         'login.prompt': '会社のGoogleアカウントでサインインしてください',
         'login.checking': 'サインインしています...',
         'login.notStaff': 'このGoogleアカウントは登録されていません。管理者にStaffシートへのメールアドレス登録を依頼してください。',
@@ -920,7 +1113,7 @@
         'user.signoutConfirm': 'Buddyからサインアウトしますか？',
         'dash.title': 'ダッシュボード',
         'search.ph': '見積No・客先・内容で検索...',
-        'btn.newProject': '+ 新規見積',
+        'btn.newProject': '+ 新規物件',
         'kpi.draft': '作成中',
         'kpi.submitted': '提出済',
         'kpi.negotiating': '商談中',
@@ -932,7 +1125,7 @@
         'projects.title': '案件',
         'filter.all': '全担当者',
         'filter.only': '{name} のみ',
-        'edit.title': '案件: {no}（担当: {sales}）',
+        'edit.title': '見積: {no}（担当: {sales}）',
         'edit.readonly': '🔒 閲覧専用：この案件の担当者のみ編集できます。',
         'edit.openFile': '📄 見積書スプレッドシートを開く',
         'f.client': '客先名',
@@ -976,7 +1169,7 @@
         'common.tbd': '未定',
         'common.unknown': '不明',
         'common.unset': '未設定',
-        'create.title': '新規見積の作成',
+        'create.title': '新規物件の作成',
         'create.format': '見積先',
         'create.formatVN': '国内顧客',
         'create.formatJP': '親会社（管理№ JP〜）',
@@ -1005,6 +1198,60 @@
         'status.9. Lost / Cancelled': '9. 失注・中止'
       },
       vi: {
+        'nav.properties': '🏗 Dự án',
+        'nav.quotes': '📄 Báo giá',
+        'quotes.title': 'Báo giá',
+        'pj.title': 'Dự án',
+        'pj.searchPh': 'Tìm theo số dự án, tên, khách hàng...',
+        'pj.allCategories': 'Tất cả phân loại',
+        'pj.allStages': 'Tất cả giai đoạn',
+        'pj.activeStages': 'Đang thực hiện',
+        'pj.allSales': 'Tất cả nhân viên',
+        'pj.tabList': 'Danh sách',
+        'pj.tabClients': 'Thống kê theo khách hàng',
+        'pj.readonly': '🔒 Chỉ xem: chỉ người phụ trách mới có thể chỉnh sửa dự án này.',
+        'pj.openFolder': '📁 Mở thư mục dự án',
+        'pj.name': 'Tên dự án',
+        'pj.namePh': 'Ví dụ: Lan can RINGER HUT VINCOM',
+        'pj.clientPh': 'Chọn từ danh sách hoặc nhập khách hàng mới',
+        'pj.stage': 'Giai đoạn',
+        'pj.orderAmount': 'Giá trị đơn hàng',
+        'pj.quotes': 'Báo giá',
+        'pj.noQuotes': 'Chưa có báo giá',
+        'pj.addQuote': '+ Thêm báo giá',
+        'pj.addQuoteConfirm': 'Thêm báo giá mới vào dự án {no}?',
+        'pj.withQuote': 'Tạo luôn báo giá đầu tiên',
+        'pj.nameRequired': 'Vui lòng nhập tên dự án',
+        'pj.none': 'Không có dự án phù hợp',
+        'pj.colNo': 'Số dự án',
+        'pj.colName': 'Tên dự án',
+        'pj.colClient': 'Khách hàng',
+        'pj.colCategory': 'Phân loại',
+        'pj.colStage': 'Giai đoạn',
+        'pj.colOwner': 'Phụ trách',
+        'pj.colAmount': 'Giá trị đơn hàng',
+        'pj.colDelivery': 'Ngày giao',
+        'pj.colQuotes': 'Số báo giá',
+        'cs.projects': 'Số dự án',
+        'cs.active': 'Đang thực hiện',
+        'cs.won': 'Đã nhận đơn',
+        'cs.lost': 'Mất đơn',
+        'cs.winRate': 'Tỷ lệ thắng',
+        'cs.amount': 'Tổng giá trị đơn hàng',
+        'cs.note': 'Tỷ lệ thắng = Đã nhận đơn ÷ (Đã nhận đơn + Mất đơn). Giá trị đơn hàng được cộng theo từng loại tiền tệ.',
+        'cs.noClient': '(Chưa có khách hàng)',
+        'pj.created': 'Đã tạo dự án',
+        'pj.createdDesc': 'Đã tạo dự án <b>{no}</b>.<br>Bạn có muốn mở thư mục dự án không?',
+        'pj.createdWithQuoteDesc': 'Đã tạo dự án <b>{no}</b> và báo giá <b>{q}</b>.<br>Bạn có muốn mở bảng tính báo giá không?',
+        'btn.openFolder': 'Mở thư mục',
+        'loading.project': 'Đang tạo dự án...',
+        'stage.1. Inquiry': '1. Yêu cầu',
+        'stage.2. Quoting': '2. Đang báo giá',
+        'stage.3. Ordered': '3. Đã nhận đơn',
+        'stage.4. In Production': '4. Đang sản xuất',
+        'stage.5. Delivered': '5. Đã giao hàng',
+        'stage.6. Completed': '6. Hoàn thành',
+        'stage.9. Lost': '9. Mất đơn',
         'login.prompt': 'Vui lòng đăng nhập bằng tài khoản Google của công ty',
         'login.checking': 'Đang đăng nhập...',
         'login.notStaff': 'Tài khoản Google này chưa được đăng ký. Vui lòng nhờ quản trị viên thêm email của bạn vào bảng Staff.',
@@ -1019,7 +1266,7 @@
         'user.signoutConfirm': 'Đăng xuất khỏi Buddy?',
         'dash.title': 'Tổng quan',
         'search.ph': 'Tìm theo số báo giá, khách hàng, nội dung...',
-        'btn.newProject': '+ Báo giá mới',
+        'btn.newProject': '+ Dự án mới',
         'kpi.draft': 'Bản nháp',
         'kpi.submitted': 'Đã gửi',
         'kpi.negotiating': 'Đang đàm phán',
@@ -1031,7 +1278,7 @@
         'projects.title': 'Dự án',
         'filter.all': 'Tất cả nhân viên',
         'filter.only': 'Chỉ {name}',
-        'edit.title': 'Dự án: {no} (Phụ trách: {sales})',
+        'edit.title': 'Báo giá: {no} (Phụ trách: {sales})',
         'edit.readonly': '🔒 Chỉ xem: chỉ người phụ trách mới có thể chỉnh sửa báo giá này.',
         'edit.openFile': '📄 Mở bảng tính báo giá',
         'f.client': 'Khách hàng',
@@ -1075,7 +1322,7 @@
         'common.tbd': 'Chưa xác định',
         'common.unknown': 'Không rõ',
         'common.unset': 'Chưa đặt',
-        'create.title': 'Tạo báo giá mới',
+        'create.title': 'Tạo dự án mới',
         'create.format': 'Đối tượng báo giá',
         'create.formatVN': 'Khách hàng trong nước',
         'create.formatJP': 'Công ty mẹ Nhật Bản (Số JP〜)',
@@ -1104,6 +1351,60 @@
         'status.9. Lost / Cancelled': '9. Mất đơn / Hủy'
       },
       en: {
+        'nav.properties': '🏗 Projects',
+        'nav.quotes': '📄 Quotes',
+        'quotes.title': 'Quotes',
+        'pj.title': 'Projects',
+        'pj.searchPh': 'Search No, project, client...',
+        'pj.allCategories': 'All categories',
+        'pj.allStages': 'All stages',
+        'pj.activeStages': 'Active only',
+        'pj.allSales': 'All owners',
+        'pj.tabList': 'List',
+        'pj.tabClients': 'By client',
+        'pj.readonly': '🔒 Read-only: only the owner of this project can edit it.',
+        'pj.openFolder': '📁 Open project folder',
+        'pj.name': 'Project name',
+        'pj.namePh': 'e.g. RINGER HUT VINCOM handrail',
+        'pj.clientPh': 'Pick from the list or type a new client',
+        'pj.stage': 'Stage',
+        'pj.orderAmount': 'Order amount',
+        'pj.quotes': 'Quotes',
+        'pj.noQuotes': 'No quotes yet',
+        'pj.addQuote': '+ Add quote',
+        'pj.addQuoteConfirm': 'Add a new quote to project {no}?',
+        'pj.withQuote': 'Also create the first quote',
+        'pj.nameRequired': 'Please enter a project name',
+        'pj.none': 'No matching projects',
+        'pj.colNo': 'No.',
+        'pj.colName': 'Project',
+        'pj.colClient': 'Client',
+        'pj.colCategory': 'Category',
+        'pj.colStage': 'Stage',
+        'pj.colOwner': 'Owner',
+        'pj.colAmount': 'Order amount',
+        'pj.colDelivery': 'Delivery',
+        'pj.colQuotes': 'Quotes',
+        'cs.projects': 'Projects',
+        'cs.active': 'Active',
+        'cs.won': 'Won',
+        'cs.lost': 'Lost',
+        'cs.winRate': 'Win rate',
+        'cs.amount': 'Total order amount',
+        'cs.note': 'Win rate = won ÷ (won + lost). Order amounts are totaled per currency.',
+        'cs.noClient': '(No client)',
+        'pj.created': 'Project Created',
+        'pj.createdDesc': 'Project <b>{no}</b> has been created.<br>Open the project folder now?',
+        'pj.createdWithQuoteDesc': 'Project <b>{no}</b> and quote <b>{q}</b> have been created.<br>Open the quotation spreadsheet now?',
+        'btn.openFolder': 'Open Folder',
+        'loading.project': 'Creating project... Please wait',
+        'stage.1. Inquiry': '1. Inquiry',
+        'stage.2. Quoting': '2. Quoting',
+        'stage.3. Ordered': '3. Ordered',
+        'stage.4. In Production': '4. In Production',
+        'stage.5. Delivered': '5. Delivered',
+        'stage.6. Completed': '6. Completed',
+        'stage.9. Lost': '9. Lost',
         'login.prompt': 'Please sign in with your company Google account.',
         'login.checking': 'Signing in...',
         'login.notStaff': 'This Google account is not registered. Ask your administrator to add your email to the Staff sheet.',
@@ -1130,7 +1431,7 @@
         'projects.title': 'Projects',
         'filter.all': 'All Sales Persons',
         'filter.only': '{name} only',
-        'edit.title': 'Project: {no} (Owner: {sales})',
+        'edit.title': 'Quote: {no} (Owner: {sales})',
         'edit.readonly': '🔒 Read-only: only the owner of this quote can edit it.',
         'edit.openFile': '📄 Open quotation spreadsheet',
         'f.client': 'Client',
@@ -1174,7 +1475,7 @@
         'common.tbd': 'TBD',
         'common.unknown': 'Unknown',
         'common.unset': 'Not set',
-        'create.title': 'Create New Quote',
+        'create.title': 'Create New Project',
         'create.format': 'Quote Format',
         'create.formatVN': 'Vietnam Customer',
         'create.formatJP': 'Japan HQ (No. JP〜)',
@@ -1256,9 +1557,11 @@
       renderGoogleButton();
       if (currentUser) {
         buildSalesFilter();
+        buildStageOptions();
         renderDashboard(rawProjects);
         renderFollowUps();
         onFilterChange();
+        renderProjectsView();
         api('setLanguage', { lang: lang }).catch(() => {});
       }
     }
@@ -1282,6 +1585,11 @@
     const FOLLOWUP_CHECK_INTERVAL = 60 * 60 * 1000; // 1時間ごと
     const notifiedFollowUps = new Set(); // デスクトップ通知済み（同じ案件を何度も通知しない）
     let googleClientId = '';
+    let projectsData = [];             // 物件一覧（見積を含む）
+    let clientsList = [];              // 客先一覧
+    let projectStages = ['1. Inquiry', '2. Quoting', '3. Ordered', '4. In Production', '5. Delivered', '6. Completed', '9. Lost'];
+    let pjTab = 'list';
+    let selectedProjectNo = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       applyI18n();
@@ -1397,7 +1705,9 @@
       document.getElementById('currentUserName').textContent = user.name;
       document.getElementById('currentUserRole').textContent = user.position;
       buildSalesFilter();
+      buildStageOptions();
       fetchLatestProjects();
+      fetchProjects();
       if (!followUpTimer) followUpTimer = setInterval(fetchFollowUps, FOLLOWUP_CHECK_INTERVAL);
     }
 
@@ -1421,16 +1731,22 @@
       sel.innerHTML = `<option value="ALL">${esc(t('filter.all'))}</option>`
         + staffNames.map(n => `<option value="${esc(n)}">${esc(t('filter.only', { name: n }))}</option>`).join('');
       sel.value = [...sel.options].some(o => o.value === prev) ? prev : 'ALL';
+
+      const pjSel = document.getElementById('pjSalesFilter');
+      const pjPrev = pjSel.value || 'ALL';
+      pjSel.innerHTML = `<option value="ALL">${esc(t('pj.allSales'))}</option>`
+        + staffNames.map(n => `<option value="${esc(n)}">${esc(t('filter.only', { name: n }))}</option>`).join('');
+      pjSel.value = [...pjSel.options].some(o => o.value === pjPrev) ? pjPrev : 'ALL';
     }
 
     /* =========================================================
      * 画面切り替え・検索
      * ========================================================= */
     function switchView(viewName) {
-      document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
-      document.getElementById('nav-projects').classList.toggle('active', viewName === 'projects');
-      document.getElementById('view-dashboard').classList.toggle('active', viewName === 'dashboard');
-      document.getElementById('view-projects').classList.toggle('active', viewName === 'projects');
+      ['dashboard', 'properties', 'projects'].forEach(v => {
+        document.getElementById('nav-' + v).classList.toggle('active', viewName === v);
+        document.getElementById('view-' + v).classList.toggle('active', viewName === v);
+      });
     }
 
     // Dashboardからの検索処理（自動でProjectsに切り替えて絞り込み）
@@ -1713,7 +2029,8 @@
 
     function openEditModal(quoteNo) {
       // 直近10件に含まれない古い案件（フォロー通知から開いた場合）も開けるようにする
-      const proj = rawProjects.find(p => p.quoteNo === quoteNo) || followUpProjects.find(p => p.quoteNo === quoteNo);
+      const proj = rawProjects.find(p => p.quoteNo === quoteNo) || followUpProjects.find(p => p.quoteNo === quoteNo)
+        || projectsData.flatMap(pj => pj.quotes || []).find(q => q.quoteNo === quoteNo);
       if (!proj) return;
 
       selectedQuoteNo = quoteNo;
@@ -1777,6 +2094,7 @@
         if (res.status === 'success') {
           closeEditModal();
           await fetchLatestProjects();
+          fetchProjects();
         } else {
           alert(t('err.update') + res.message);
         }
@@ -1800,7 +2118,8 @@
         const res = await api('createRevision', { quoteNo: baseNo });
         if (res.status === 'success') {
           await fetchLatestProjects();
-          showConfirmModal('confirm.revCreated', res.quoteNo, res.fileUrl);
+          fetchProjects();
+          showConfirmModal('confirm.revCreated', t('confirm.desc', { no: esc(res.quoteNo) }), res.fileUrl);
         } else {
           alert(t('err.revision') + res.message);
         }
@@ -1812,43 +2131,317 @@
     }
 
     /* =========================================================
-     * 新規作成
+     * 物件（一覧・客先別集計・詳細・新規作成）
      * ========================================================= */
-    function openCreateModal() {
-      document.getElementById('createQuoteFormat').value = 'VN';
-      onQuoteFormatChange();
-      document.getElementById('createCategory').value = '国内(Domestic)';
-      document.getElementById('createTradeType').value = 'Direct';
-      document.getElementById('createDeliveryDate').value = '';
-      document.getElementById('createModalOverlay').classList.add('active');
+    async function fetchProjects() {
+      try {
+        const res = await api('getProjects');
+        if (res.status !== 'success') { console.error('Projects API Error:', res.message); return; }
+        projectsData = res.projects || [];
+        clientsList = res.clients || [];
+        if (res.stages) projectStages = res.stages;
+        document.getElementById('clientList').innerHTML = clientsList.map(c => `<option value="${esc(c)}"></option>`).join('');
+        buildStageOptions();
+        renderProjectsView();
+        if (selectedProjectNo) openProjectModal(selectedProjectNo, true);
+      } catch (e) {
+        console.error('Projects Fetch Error:', e);
+      }
     }
 
-    // 親会社向けは区分（国内/輸出）が固定のため選択欄を隠す
-    function onQuoteFormatChange() {
-      const isJP = document.getElementById('createQuoteFormat').value === 'JP';
-      document.getElementById('createCategoryGroup').style.display = isJP ? 'none' : '';
+    function stageLabel(stage) {
+      const n = parseInt(stage, 10);
+      const key = Object.keys(I18N.en).find(k => k.startsWith('stage.') && parseInt(k.slice(6), 10) === n);
+      return key ? t(key) : (stage || '');
+    }
+
+    function stageTag(stage) {
+      const n = parseInt(stage, 10) || 1;
+      return `<span class="stage-tag stage-${n}">${esc(stageLabel(stage))}</span>`;
+    }
+
+    function catKey(category) {
+      const c = String(category || '');
+      if (c.includes('親会社') || /japan hq/i.test(c)) return 'hq';
+      if (c.includes('輸出') || /overseas/i.test(c)) return 'overseas';
+      return 'domestic';
+    }
+
+    function buildStageOptions() {
+      const filter = document.getElementById('pjStageFilter');
+      const prev = filter.value || 'ACTIVE';
+      filter.innerHTML = `<option value="ACTIVE">${esc(t('pj.activeStages'))}</option><option value="ALL">${esc(t('pj.allStages'))}</option>`
+        + projectStages.map(st => `<option value="${esc(st)}">${esc(stageLabel(st))}</option>`).join('');
+      filter.value = [...filter.options].some(o => o.value === prev) ? prev : 'ACTIVE';
+      const sel = document.getElementById('pjStage');
+      const cur = sel.value;
+      sel.innerHTML = projectStages.map(st => `<option value="${esc(st)}">${esc(stageLabel(st))}</option>`).join('');
+      if (cur) sel.value = cur;
+    }
+
+    function setProjectsTab(tab) {
+      pjTab = tab;
+      document.getElementById('pjTabList').classList.toggle('active', tab === 'list');
+      document.getElementById('pjTabClients').classList.toggle('active', tab === 'clients');
+      renderProjectsView();
+    }
+
+    function filteredProjects(ignoreStage) {
+      const q = document.getElementById('pjSearch').value.toLowerCase().trim();
+      const cat = document.getElementById('pjCategoryFilter').value;
+      const stage = document.getElementById('pjStageFilter').value;
+      const sales = document.getElementById('pjSalesFilter').value || 'ALL';
+      return projectsData.filter(p => {
+        if (cat !== 'ALL' && catKey(p.category) !== cat) return false;
+        if (sales !== 'ALL' && !salesMatches(p.salesPerson, sales)) return false;
+        if (!ignoreStage) {
+          const n = parseInt(p.stage, 10);
+          if (stage === 'ACTIVE' && (n >= 6)) return false;
+          if (stage !== 'ACTIVE' && stage !== 'ALL' && p.stage !== stage) return false;
+        }
+        if (q) {
+          const hay = [p.projectNo, p.name, p.client, ...(p.quotes || []).map(x => x.quoteNo)].join(' ').toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderProjectsView() {
+      const box = document.getElementById('pjContent');
+      if (!box) return;
+      // 客先別集計では段階の絞り込みを使わない（受注率を正しく出すため）
+      document.getElementById('pjStageFilter').style.display = pjTab === 'clients' ? 'none' : '';
+      if (pjTab === 'clients') { box.innerHTML = renderClientSummary(filteredProjects(true)); return; }
+
+      const list = filteredProjects(false);
+      if (list.length === 0) { box.innerHTML = `<div class="pj-empty">${esc(t('pj.none'))}</div>`; return; }
+      const rows = list.map(p => `
+        <tr class="clickable" onclick="openProjectModal('${esc(p.projectNo)}')">
+          <td style="white-space: nowrap;">${esc(p.projectNo)}</td>
+          <td>${esc(p.name)}</td>
+          <td>${esc(p.client || '-')}</td>
+          <td><span class="tag tag-draft">${esc(categoryLabel(p.category))}</span></td>
+          <td>${stageTag(p.stage)}</td>
+          <td>${esc((p.salesPerson || '').split(' ')[0])}</td>
+          <td class="num">${esc(p.orderAmount || '-')}</td>
+          <td style="white-space: nowrap;">${esc(p.deliveryDate || '-')}</td>
+          <td class="num">${(p.quotes || []).length}</td>
+        </tr>`).join('');
+      box.innerHTML = `<table class="pj-table"><thead><tr>
+          <th>${esc(t('pj.colNo'))}</th><th>${esc(t('pj.colName'))}</th><th>${esc(t('pj.colClient'))}</th>
+          <th>${esc(t('pj.colCategory'))}</th><th>${esc(t('pj.colStage'))}</th><th>${esc(t('pj.colOwner'))}</th>
+          <th class="num">${esc(t('pj.colAmount'))}</th><th>${esc(t('pj.colDelivery'))}</th><th class="num">${esc(t('pj.colQuotes'))}</th>
+        </tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    // 金額文字列 → { cur, val }（$ / ₫ / ¥ を判定。通貨ごとに合計するため）
+    function parseAmount(str) {
+      const s = String(str || '').trim();
+      if (!s || s === '0' || s === '-') return null;
+      let cur = 'OTHER';
+      if (s.includes('$') || /usd/i.test(s)) cur = 'USD';
+      else if (s.includes('₫') || /vnd|đ/i.test(s)) cur = 'VND';
+      else if (s.includes('¥') || s.includes('円') || /jpy/i.test(s)) cur = 'JPY';
+      let num;
+      if (cur === 'VND') num = parseFloat(s.replace(/[^\d]/g, ''));
+      else num = parseFloat(s.replace(/[^\d.]/g, ''));
+      return isNaN(num) || num === 0 ? null : { cur, val: num };
+    }
+
+    function formatTotals(totals) {
+      const fmt = { USD: v => '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    VND: v => Math.round(v).toLocaleString('en-US') + ' ₫',
+                    JPY: v => '¥' + Math.round(v).toLocaleString('en-US'),
+                    OTHER: v => v.toLocaleString('en-US') };
+      const parts = Object.keys(totals).filter(k => totals[k]).map(k => fmt[k](totals[k]));
+      return parts.length ? parts.join('<br>') : '-';
+    }
+
+    function renderClientSummary(list) {
+      const map = {};
+      list.forEach(p => {
+        const key = p.client || t('cs.noClient');
+        const m = map[key] || (map[key] = { client: key, projects: 0, active: 0, won: 0, lost: 0, totals: {} });
+        const n = parseInt(p.stage, 10);
+        m.projects++;
+        if (n >= 3 && n <= 6) m.won++;
+        else if (n === 9) m.lost++;
+        if (n <= 5) m.active++;
+        const a = parseAmount(p.orderAmount);
+        if (a && n >= 3 && n <= 6) m.totals[a.cur] = (m.totals[a.cur] || 0) + a.val;
+      });
+      const rows = Object.values(map).sort((a, b) => (b.won - a.won) || (b.projects - a.projects) || a.client.localeCompare(b.client));
+      if (rows.length === 0) return `<div class="pj-empty">${esc(t('pj.none'))}</div>`;
+      const body = rows.map(r => {
+        const closed = r.won + r.lost;
+        const rate = closed ? Math.round(r.won / closed * 100) + '%' : '-';
+        return `<tr class="clickable" onclick="filterByClient(${esc(JSON.stringify(r.client))})">
+          <td>${esc(r.client)}</td><td class="num">${r.projects}</td><td class="num">${r.active}</td>
+          <td class="num">${r.won}</td><td class="num">${r.lost}</td><td class="num">${rate}</td>
+          <td class="num">${formatTotals(r.totals)}</td></tr>`;
+      }).join('');
+      return `<table class="pj-table"><thead><tr>
+          <th>${esc(t('pj.colClient'))}</th><th class="num">${esc(t('cs.projects'))}</th><th class="num">${esc(t('cs.active'))}</th>
+          <th class="num">${esc(t('cs.won'))}</th><th class="num">${esc(t('cs.lost'))}</th><th class="num">${esc(t('cs.winRate'))}</th>
+          <th class="num">${esc(t('cs.amount'))}</th>
+        </tr></thead><tbody>${body}</tbody></table>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">${esc(t('cs.note'))}</div>`;
+    }
+
+    // 客先別集計の行をクリック → その客先の物件一覧へ
+    function filterByClient(client) {
+      document.getElementById('pjSearch').value = client === t('cs.noClient') ? '' : client;
+      document.getElementById('pjStageFilter').value = 'ALL';
+      setProjectsTab('list');
+    }
+
+    function openProjectModal(projectNo, keepInputs) {
+      const p = projectsData.find(x => x.projectNo === projectNo);
+      if (!p) return;
+      selectedProjectNo = projectNo;
+      document.getElementById('pjModalTitle').textContent = `${p.projectNo}  ${p.name}`;
+      document.getElementById('pjFolderLink').href = p.folderUrl || '#';
+      if (!keepInputs) {
+        document.getElementById('pjName').value = p.name || '';
+        document.getElementById('pjClient').value = p.client || '';
+        document.getElementById('pjStage').value = p.stage || '1. Inquiry';
+        document.getElementById('pjDelivery').value = p.deliveryDate || '';
+        document.getElementById('pjNewMemo').value = '';
+      }
+      document.getElementById('pjAmount').value = p.orderAmount || '-';
+      document.getElementById('pjCategory').value = categoryLabel(p.category);
+      document.getElementById('pjSales').value = p.salesPerson || '';
+      document.getElementById('pjMemoHistory').textContent = p.memo || t('f.noHistory');
+
+      const ql = document.getElementById('pjQuoteList');
+      const quotes = p.quotes || [];
+      ql.innerHTML = quotes.length ? '' : `<div class="pj-empty" style="padding: 12px;">${esc(t('pj.noQuotes'))}</div>`;
+      quotes.forEach(q => {
+        const row = document.createElement('div');
+        row.className = 'pj-quote-row';
+        row.onclick = () => openEditModal(q.quoteNo);
+        row.innerHTML = `<div><b>${esc(q.quoteNo)}</b> <span style="color: var(--text-muted);">${esc(q.details || '')}</span></div>
+          <div style="display: flex; gap: 8px; align-items: center;"><span>${esc(q.amount && q.amount !== '0' ? q.amount : '')}</span>
+          <span class="tag tag-draft">${esc(statusLabel(q.status))}</span></div>`;
+        ql.appendChild(row);
+      });
+
+      const isOwner = salesMatches(p.salesPerson, currentUser.name);
+      document.getElementById('pjReadOnlyBanner').style.display = isOwner ? 'none' : 'block';
+      document.getElementById('pjSaveBtn').style.display = isOwner ? 'block' : 'none';
+      document.getElementById('pjAddQuoteBox').style.display = isOwner ? 'flex' : 'none';
+      document.getElementById('pjMemoGroup').style.display = isOwner ? 'flex' : 'none';
+      ['pjName', 'pjClient', 'pjStage', 'pjDelivery'].forEach(id => document.getElementById(id).disabled = !isOwner);
+      document.getElementById('projectModalOverlay').classList.add('active');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModalOverlay').classList.remove('active');
+      selectedProjectNo = null;
+    }
+
+    async function saveProjectInfo() {
+      if (!selectedProjectNo) return;
+      const btn = document.getElementById('pjSaveBtn');
+      btn.disabled = true;
+      btn.textContent = t('btn.saving');
+      try {
+        const res = await api('updateProjectInfo', {
+          projectNo: selectedProjectNo,
+          name: document.getElementById('pjName').value,
+          client: document.getElementById('pjClient').value,
+          stage: document.getElementById('pjStage').value,
+          deliveryDate: document.getElementById('pjDelivery').value,
+          memo: document.getElementById('pjNewMemo').value
+        });
+        if (res.status === 'success') {
+          closeProjectModal();
+          await fetchProjects();
+        } else {
+          alert(t('err.update') + res.message);
+        }
+      } catch (e) {
+        if (e.message !== 'AUTH') alert(t('err.network'));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = t('btn.save');
+      }
+    }
+
+    async function submitAddQuote() {
+      if (!selectedProjectNo) return;
+      if (!confirm(t('pj.addQuoteConfirm', { no: selectedProjectNo }))) return;
+      const projectNo = selectedProjectNo;
+      showLoading('loading.creating');
+      try {
+        const res = await api('addQuoteToProject', { projectNo: projectNo, tradeType: document.getElementById('pjAddQuoteTrade').value });
+        if (res.status === 'success') {
+          await Promise.all([fetchProjects(), fetchLatestProjects()]);
+          showConfirmModal('confirm.created', t('confirm.desc', { no: esc(res.quoteNo) }), res.fileUrl);
+        } else {
+          alert(t('err.create') + res.message);
+        }
+      } catch (e) {
+        if (e.message !== 'AUTH') alert(t('err.network'));
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 新規物件
+    function openCreateModal() {
+      document.getElementById('createName').value = '';
+      document.getElementById('createClient').value = '';
+      document.getElementById('createCategory').value = 'domestic';
+      document.getElementById('createDeliveryDate').value = '';
+      document.getElementById('createWithQuote').checked = true;
+      document.getElementById('createTradeType').value = 'Direct';
+      document.getElementById('createError').style.display = 'none';
+      onCreateCategoryChange();
+      document.getElementById('createModalOverlay').classList.add('active');
+      setTimeout(() => document.getElementById('createName').focus(), 50);
+    }
+
+    function onCreateCategoryChange() {
+      document.getElementById('createTradeGroup').style.display = document.getElementById('createWithQuote').checked ? '' : 'none';
     }
 
     function closeCreateModal() {
       document.getElementById('createModalOverlay').classList.remove('active');
     }
 
-    async function submitCreateQuotation() {
+    async function submitCreateProject() {
+      const name = document.getElementById('createName').value.trim();
+      if (!name) {
+        const err = document.getElementById('createError');
+        err.textContent = t('pj.nameRequired');
+        err.style.display = 'block';
+        return;
+      }
+      const cat = document.getElementById('createCategory').value;
+      const withQuote = document.getElementById('createWithQuote').checked;
       const payload = {
-        quoteFormat: document.getElementById('createQuoteFormat').value,
-        isDomestic: document.getElementById('createCategory').value,
+        name: name,
+        client: document.getElementById('createClient').value.trim(),
+        quoteFormat: cat === 'hq' ? 'JP' : 'VN',
+        isDomestic: cat === 'domestic' ? '国内(Domestic)' : '輸出(Overseas)',
         tradeType: document.getElementById('createTradeType').value,
-        deliveryDate: document.getElementById('createDeliveryDate').value
+        deliveryDate: document.getElementById('createDeliveryDate').value,
+        withQuote: withQuote
       };
 
       closeCreateModal();
-      showLoading('loading.creating');
-
+      showLoading(withQuote ? 'loading.creating' : 'loading.project');
       try {
-        const res = await api('createQuotation', payload);
+        const res = await api('createProject', payload);
         if (res.status === 'success') {
-          await fetchLatestProjects();
-          showConfirmModal('confirm.created', res.quoteNo, res.fileUrl);
+          await Promise.all([fetchProjects(), fetchLatestProjects()]);
+          if (res.quoteNo) {
+            showConfirmModal('pj.created', t('pj.createdWithQuoteDesc', { no: esc(res.projectNo), q: esc(res.quoteNo) }), res.fileUrl);
+          } else {
+            showConfirmModal('pj.created', t('pj.createdDesc', { no: esc(res.projectNo) }), res.folderUrl, 'btn.openFolder');
+          }
         } else {
           alert(t('err.create') + res.message);
         }
@@ -1868,9 +2461,11 @@
       document.getElementById('loadingOverlay').classList.remove('active');
     }
 
-    function showConfirmModal(headerKey, quoteNo, fileUrl) {
+    function showConfirmModal(headerKey, descHtml, url, openBtnKey) {
       document.getElementById('confirmModalHeader').textContent = t(headerKey);
-      document.getElementById('confirmModalDesc').innerHTML = t('confirm.desc', { no: esc(quoteNo) });
+      document.getElementById('confirmModalDesc').innerHTML = descHtml;
+      document.getElementById('openSpreadsheetBtn').textContent = t(openBtnKey || 'btn.openSheet');
+      const fileUrl = url;
 
       document.getElementById('openSpreadsheetBtn').onclick = () => {
         if (fileUrl) window.open(fileUrl, '_blank', 'noopener');
