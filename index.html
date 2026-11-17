@@ -362,6 +362,17 @@
     .tag-sub { background-color: var(--tag-blue); }
     .tag-alert { background-color: var(--tag-orange); }
     .tag-danger { background-color: var(--tag-red); color: #EB5757; }
+    .tag-followup { background-color: #FDECC8; color: #9F6B00; font-weight: 600; }
+
+    .tag-snooze { background-color: #E3E2E0; color: #5A5A5A; }
+
+    /* 提出後フォロー通知ポップアップ */
+    .followup-list { text-align: left; max-height: 260px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; margin: 0 0 16px 0; }
+    .followup-item { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 13px; cursor: pointer; }
+    .followup-item:last-child { border-bottom: none; }
+    .followup-item:hover { background-color: var(--bg-sidebar); }
+    .followup-item-sub { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+    .followup-notify-btn { background: none; border: none; color: #2383E2; font-size: 12px; cursor: pointer; padding: 0; margin-bottom: 12px; }
 
     /* モーダル */
     .modal-overlay {
@@ -557,7 +568,31 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    /* 言語切り替え */
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+    .lang-select {
+      font-size: 12px;
+      padding: 3px 6px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #FFF;
+      color: var(--text-main);
+      cursor: pointer;
+    }
+    .login-box .lang-select { align-self: center; }
   </style>
+  <!-- Googleログイン -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -574,13 +609,15 @@
         </svg>
         <div class="logo-text" style="font-size: 22px;">Buddy</div>
       </div>
-      <div style="font-size: 13px; color: var(--text-muted);">Please enter your Employee ID to continue.</div>
-      <div class="form-group" style="text-align: left;">
-        <label class="form-label">Employee ID / 社員番号</label>
-        <input type="text" id="loginEmpId" class="form-input" placeholder="e.g. 10008" onkeydown="if(event.key==='Enter') executeLogin()">
-      </div>
-      <div id="loginError" style="color: #EB5757; font-size: 12px; display: none;">Invalid Employee ID</div>
-      <button class="btn-primary" style="justify-content: center; padding: 10px;" onclick="executeLogin()">Log In</button>
+      <div style="font-size: 13px; color: var(--text-muted);" data-i18n="login.prompt"></div>
+      <div id="googleBtn" style="display: flex; justify-content: center; min-height: 44px;"></div>
+      <div id="loginStatus" style="font-size: 12px; color: var(--text-muted); display: none;"></div>
+      <div id="loginError" style="color: #EB5757; font-size: 12px; display: none; line-height: 1.5;"></div>
+      <select class="lang-select" onchange="setLang(this.value)" aria-label="Language">
+        <option value="ja">日本語</option>
+        <option value="vi">Tiếng Việt</option>
+        <option value="en">English</option>
+      </select>
     </div>
   </div>
 
@@ -597,64 +634,79 @@
         </svg>
         <div class="logo-text">Buddy</div>
       </div>
-      <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">🏠 Dashboard</div>
-      <div class="nav-item" id="nav-projects" onclick="switchView('projects')">📂 Projects</div>
-      <div class="nav-item">📅 Schedules</div>
+      <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')" data-i18n="nav.dashboard"></div>
+      <div class="nav-item" id="nav-projects" onclick="switchView('projects')" data-i18n="nav.projects"></div>
+      <div class="nav-item" data-i18n="nav.schedules"></div>
     </div>
 
-    <!-- ログイン中ユーザー表示 -->
-    <div class="user-profile">
-      <div class="user-info">
-        <span class="user-name" id="currentUserName">-</span>
-        <span class="user-role" id="currentUserRole">-</span>
+    <div>
+      <!-- 言語切り替え -->
+      <div class="lang-switch">
+        <span data-i18n="lang.label"></span>
+        <select class="lang-select" onchange="setLang(this.value)" aria-label="Language">
+          <option value="ja">日本語</option>
+          <option value="vi">Tiếng Việt</option>
+          <option value="en">English</option>
+        </select>
       </div>
-      <button class="btn-logout" title="Log out" onclick="executeLogout()">Sign out</button>
+      <!-- ログイン中ユーザー表示 -->
+      <div class="user-profile">
+        <div class="user-info">
+          <span class="user-name" id="currentUserName">-</span>
+          <span class="user-role" id="currentUserRole">-</span>
+        </div>
+        <button class="btn-logout" onclick="executeLogout()" data-i18n="user.signout"></button>
+      </div>
     </div>
   </nav>
 
   <!-- メインコンテンツ -->
   <main class="main-content">
-    
+
     <!-- 1. Dashboard ビュー -->
     <div id="view-dashboard" class="view-panel active">
       <header class="top-header">
         <div class="header-left">
-          <div class="page-title">Dashboard Overview</div>
+          <div class="page-title" data-i18n="dash.title"></div>
           <div class="search-box">
             <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
-            <input type="text" id="dashSearchInput" class="search-input" placeholder="Search No, Client, Details..." oninput="handleDashSearch(this.value)">
+            <input type="text" id="dashSearchInput" class="search-input" data-i18n-ph="search.ph" oninput="handleDashSearch(this.value)">
           </div>
         </div>
-        <button class="btn-primary" onclick="openCreateModal()">+ New Project</button>
+        <button class="btn-primary" onclick="openCreateModal()" data-i18n="btn.newProject"></button>
       </header>
 
       <div class="dashboard-container">
         <!-- KPI メトリクス -->
         <div class="metric-grid">
           <div class="metric-card">
-            <div class="metric-label">Draft (作成中)</div>
+            <div class="metric-label" data-i18n="kpi.draft"></div>
             <div class="metric-val" id="kpi-draft">0</div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">Submitted (提出済)</div>
+            <div class="metric-label" data-i18n="kpi.submitted"></div>
             <div class="metric-val" id="kpi-submitted">0</div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">Negotiating (商談中)</div>
+            <div class="metric-label" data-i18n="kpi.negotiating"></div>
             <div class="metric-val" id="kpi-negotiating">0</div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">Accepted (受注)</div>
+            <div class="metric-label" data-i18n="kpi.accepted"></div>
             <div class="metric-val" id="kpi-accepted">0</div>
           </div>
         </div>
 
+        <!-- 提出後フォロー通知 -->
+        <div class="dashboard-section">
+          <div class="section-title" id="followupTitle"></div>
+          <div class="dash-list" id="dash-followup-list"></div>
+        </div>
+
         <!-- 手配期限アラート -->
         <div class="dashboard-section">
-          <div class="section-title">⚠️ Upcoming Order Deadlines (手配期限の迫る国内案件)</div>
-          <div class="dash-list" id="dash-deadline-list">
-            <div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">期限が迫っている未完了案件はありません</div>
-          </div>
+          <div class="section-title" data-i18n="deadline.title"></div>
+          <div class="dash-list" id="dash-deadline-list"></div>
         </div>
       </div>
     </div>
@@ -663,36 +715,32 @@
     <div id="view-projects" class="view-panel">
       <header class="top-header">
         <div class="header-left">
-          <div class="page-title">Projects</div>
+          <div class="page-title" data-i18n="projects.title"></div>
           <div class="search-box">
             <span style="font-size: 13px; margin-right: 6px; color: var(--text-muted);">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search No, Client, Details..." oninput="onFilterChange()">
+            <input type="text" id="searchInput" class="search-input" data-i18n-ph="search.ph" oninput="onFilterChange()">
           </div>
-          <select id="salesFilter" class="filter-select" onchange="onFilterChange()">
-            <option value="ALL">All Sales Persons</option>
-            <option value="Tetsuya Goto">Goto Only</option>
-            <option value="Nguyễn Tiến Thịnh">Thịnh Only</option>
-          </select>
+          <select id="salesFilter" class="filter-select" onchange="onFilterChange()"></select>
         </div>
-        <button class="btn-primary" onclick="openCreateModal()">+ New Project</button>
+        <button class="btn-primary" onclick="openCreateModal()" data-i18n="btn.newProject"></button>
       </header>
 
       <div class="board-container">
         <div class="kanban-board">
           <div class="column">
-            <div class="col-header"><span class="badge" id="badge-draft">0</span> 1. Draft</div>
+            <div class="col-header"><span class="badge" id="badge-draft">0</span> <span data-status="1. Draft"></span></div>
             <div id="col-draft" class="card-list"></div>
           </div>
           <div class="column">
-            <div class="col-header"><span class="badge" id="badge-submitted">0</span> 2. Submitted</div>
+            <div class="col-header"><span class="badge" id="badge-submitted">0</span> <span data-status="2. Submitted"></span></div>
             <div id="col-submitted" class="card-list"></div>
           </div>
           <div class="column">
-            <div class="col-header"><span class="badge" id="badge-negotiating">0</span> 3. Negotiating</div>
+            <div class="col-header"><span class="badge" id="badge-negotiating">0</span> <span data-status="3. Negotiating"></span></div>
             <div id="col-negotiating" class="card-list"></div>
           </div>
           <div class="column">
-            <div class="col-header"><span class="badge" id="badge-accepted">0</span> 4. Accepted</div>
+            <div class="col-header"><span class="badge" id="badge-accepted">0</span> <span data-status="4. Accepted"></span></div>
             <div id="col-accepted" class="card-list"></div>
           </div>
         </div>
@@ -705,64 +753,81 @@
   <div class="modal-overlay" id="editModalOverlay">
     <div class="modal-card">
       <div class="modal-header">
-        <span class="modal-title" id="editModalTitle">Edit Project</span>
+        <span class="modal-title" id="editModalTitle"></span>
         <button class="close-btn" onclick="closeEditModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="read-only-banner" id="readOnlyBanner">
-          🔒 閲覧専用モード：この案件の作成者のみ編集・更新が可能です。
-        </div>
+        <div class="read-only-banner" id="readOnlyBanner" data-i18n="edit.readonly"></div>
         <div>
-          <a id="editFileUrl" class="open-file-link" href="#" target="_blank">📄 見積書スプレッドシートを開く</a>
+          <a id="editFileUrl" class="open-file-link" href="#" target="_blank" rel="noopener" data-i18n="edit.openFile"></a>
         </div>
         <div class="form-group">
-          <label class="form-label">Client / 客先名</label>
+          <label class="form-label" data-i18n="f.client"></label>
           <input type="text" id="editClient" class="form-input form-readonly" readonly>
         </div>
         <div class="form-group">
-          <label class="form-label">Amount / 見積金額</label>
+          <label class="form-label" data-i18n="f.amount"></label>
           <input type="text" id="editAmount" class="form-input form-readonly" readonly>
         </div>
         <div class="form-group">
-          <label class="form-label">Status / ステータス</label>
-          <select id="editStatus" class="form-select">
-            <option value="1. Draft">1. Draft (作成中)</option>
-            <option value="2. Submitted">2. Submitted (提出済)</option>
-            <option value="3. Negotiating">3. Negotiating (商談中)</option>
-            <option value="4. Accepted">4. Accepted (受注・採用)</option>
-            <option value="9. Lost / Cancelled">9. Lost / Cancelled (失注・中止)</option>
+          <label class="form-label" data-i18n="f.status"></label>
+          <select id="editStatus" class="form-select" onchange="toggleNextFollowUp()">
+            <option value="1. Draft" data-status="1. Draft"></option>
+            <option value="2. Submitted" data-status="2. Submitted"></option>
+            <option value="3. Negotiating" data-status="3. Negotiating"></option>
+            <option value="4. Accepted" data-status="4. Accepted"></option>
+            <option value="9. Lost / Cancelled" data-status="9. Lost / Cancelled"></option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Delivery Date / 納入希望日</label>
+          <label class="form-label" data-i18n="f.delivery"></label>
           <input type="date" id="editDeliveryDate" class="form-input">
         </div>
+        <div class="form-group" id="nextFollowUpGroup">
+          <label class="form-label" data-i18n="f.nextFollowUp"></label>
+          <input type="date" id="editNextFollowUp" class="form-input">
+        </div>
         <div class="form-group">
-          <label class="form-label">Trade Type / 取引形態</label>
+          <label class="form-label" data-i18n="f.tradeType"></label>
           <select id="editTradeType" class="form-select">
-            <option value="直接取引(Direct)">直接取引(Direct)</option>
-            <option value="通関業者経由(Via Forwarder)">通関業者経由(Via Forwarder)</option>
+            <option value="直接取引(Direct)" data-i18n="trade.direct"></option>
+            <option value="通関業者経由(Via Forwarder)" data-i18n="trade.forwarder"></option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Details / 見積内容</label>
+          <label class="form-label" data-i18n="f.details"></label>
           <textarea id="editDetails" class="form-textarea" rows="2"></textarea>
         </div>
         <div class="form-group" id="memoGroup">
-          <label class="form-label">New Memo / メモ追記</label>
-          <input type="text" id="editNewMemo" class="form-input" placeholder="進捗・変更理由などを入力">
+          <label class="form-label" data-i18n="f.newMemo"></label>
+          <input type="text" id="editNewMemo" class="form-input" data-i18n-ph="f.newMemoPh">
         </div>
         <div class="form-group">
-          <label class="form-label">History / 変更履歴</label>
+          <label class="form-label" data-i18n="f.history"></label>
           <div id="editMemoHistory" class="memo-history"></div>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-outline-primary" id="createRevisionBtn" onclick="submitCreateRevision()">+ Create Revision</button>
+        <button class="btn-outline-primary" id="createRevisionBtn" onclick="submitCreateRevision()" data-i18n="btn.revision"></button>
         <div class="modal-footer-right">
-          <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
-          <button class="btn-primary" id="saveEditBtn" onclick="saveProjectUpdate()">Save Changes</button>
+          <button class="btn-secondary" onclick="closeEditModal()" data-i18n="btn.cancel"></button>
+          <button class="btn-primary" id="saveEditBtn" onclick="saveProjectUpdate()" data-i18n="btn.save"></button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提出後フォロー通知ポップアップ -->
+  <div class="modal-overlay" id="followupModalOverlay" style="z-index: 1400;">
+    <div class="modal-card" style="width: 480px; padding: 24px; box-sizing: border-box; text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 8px;">📮</div>
+      <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);" data-i18n="fu.popupTitle"></div>
+      <p id="followupModalDesc" style="font-size: 13px; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.5;"></p>
+      <div class="followup-list" id="followupModalList"></div>
+      <button class="followup-notify-btn" id="enableDesktopNotifyBtn" onclick="enableDesktopNotify()" style="display: none;" data-i18n="fu.enableNotify"></button>
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        <button class="btn-secondary" onclick="openFollowupDashboard()" data-i18n="fu.viewList"></button>
+        <button class="btn-primary" onclick="closeFollowupModal()" data-i18n="fu.ack"></button>
       </div>
     </div>
   </div>
@@ -771,40 +836,40 @@
   <div class="modal-overlay" id="createModalOverlay">
     <div class="modal-card">
       <div class="modal-header">
-        <span class="modal-title">Create New Quote</span>
+        <span class="modal-title" data-i18n="create.title"></span>
         <button class="close-btn" onclick="closeCreateModal()">&times;</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Quote Format / 見積先</label>
+          <label class="form-label" data-i18n="create.format"></label>
           <select id="createQuoteFormat" class="form-select" onchange="onQuoteFormatChange()">
-            <option value="VN">国内顧客 (Vietnam Customer)</option>
-            <option value="JP">親会社 (Japan HQ) ※管理№ JP〜</option>
+            <option value="VN" data-i18n="create.formatVN"></option>
+            <option value="JP" data-i18n="create.formatJP"></option>
           </select>
         </div>
         <div class="form-group" id="createCategoryGroup">
-          <label class="form-label">Category / 区分</label>
+          <label class="form-label" data-i18n="create.category"></label>
           <select id="createCategory" class="form-select">
-            <option value="国内(Domestic)">国内 (Domestic)</option>
-            <option value="輸出(Overseas)">輸出 (Overseas)</option>
+            <option value="国内(Domestic)" data-i18n="cat.domestic"></option>
+            <option value="輸出(Overseas)" data-i18n="cat.overseas"></option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Trade Type / 取引形態</label>
+          <label class="form-label" data-i18n="f.tradeType"></label>
           <select id="createTradeType" class="form-select">
-            <option value="Direct">直接取引 (Direct)</option>
-            <option value="Via Forwarder">通関業者経由 (Via Forwarder)</option>
+            <option value="Direct" data-i18n="trade.direct"></option>
+            <option value="Via Forwarder" data-i18n="trade.forwarder"></option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Delivery Date / 納入希望日 (※国内は手配期限を自動計算)</label>
+          <label class="form-label" data-i18n="create.delivery"></label>
           <input type="date" id="createDeliveryDate" class="form-input">
         </div>
       </div>
       <div class="modal-footer">
         <div class="modal-footer-right" style="width: 100%; justify-content: flex-end;">
-          <button class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
-          <button class="btn-primary" id="submitCreateBtn" onclick="submitCreateQuotation()">Create</button>
+          <button class="btn-secondary" onclick="closeCreateModal()" data-i18n="btn.cancel"></button>
+          <button class="btn-primary" id="submitCreateBtn" onclick="submitCreateQuotation()" data-i18n="btn.create"></button>
         </div>
       </div>
     </div>
@@ -814,7 +879,7 @@
   <div class="modal-overlay" id="loadingOverlay" style="z-index: 2000;">
     <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; color: #FFFFFF;">
       <div class="spinner"></div>
-      <div id="loadingText" style="font-size: 15px; font-weight: 500; letter-spacing: 0.02em;">Processing... Please wait</div>
+      <div id="loadingText" style="font-size: 15px; font-weight: 500; letter-spacing: 0.02em;"></div>
     </div>
   </div>
 
@@ -822,11 +887,11 @@
   <div class="modal-overlay" id="confirmModalOverlay" style="z-index: 1500;">
     <div class="modal-card" style="width: 440px; padding: 24px; box-sizing: border-box; text-align: center;">
       <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
-      <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);" id="confirmModalHeader">Quotation Created</div>
+      <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);" id="confirmModalHeader"></div>
       <p id="confirmModalDesc" style="font-size: 13px; color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5;"></p>
       <div style="display: flex; justify-content: center; gap: 10px;">
-        <button class="btn-secondary" onclick="closeConfirmModal()">Later</button>
-        <button class="btn-primary" id="openSpreadsheetBtn">Open Spreadsheet</button>
+        <button class="btn-secondary" onclick="closeConfirmModal()" data-i18n="btn.later"></button>
+        <button class="btn-primary" id="openSpreadsheetBtn" data-i18n="btn.openSheet"></button>
       </div>
     </div>
   </div>
@@ -834,65 +899,536 @@
   <!-- スクリプト -->
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec';
-    const API_SECRET = 'open ss1 rand kz'; // 設定したシークレットキー
+    // ※ APIキーや社員一覧はここに置かない（ログインはGoogleアカウント、照合はGAS側で実施）
 
-    const STAFF_MASTER = {
-      '10008': { name: 'Tetsuya Goto', role: 'Director' },
-      '15003': { name: 'Nguyễn Tiến Thịnh', role: 'Deputy Director' }
+    /* =========================================================
+     * 多言語（日本語 / ベトナム語 / 英語）
+     * ========================================================= */
+    const I18N = {
+      ja: {
+        'login.prompt': '会社のGoogleアカウントでサインインしてください',
+        'login.checking': 'サインインしています...',
+        'login.notStaff': 'このGoogleアカウントは登録されていません。管理者にStaffシートへのメールアドレス登録を依頼してください。',
+        'login.failed': 'サインインに失敗しました。もう一度お試しください。',
+        'login.expired': 'ログインの有効期限が切れました。もう一度サインインしてください。',
+        'login.config': 'ログイン設定（GOOGLE_CLIENT_ID）が未完了です。管理者に連絡してください。',
+        'nav.dashboard': '🏠 ダッシュボード',
+        'nav.projects': '📂 案件',
+        'nav.schedules': '📅 スケジュール',
+        'lang.label': '言語',
+        'user.signout': 'サインアウト',
+        'user.signoutConfirm': 'Buddyからサインアウトしますか？',
+        'dash.title': 'ダッシュボード',
+        'search.ph': '見積No・客先・内容で検索...',
+        'btn.newProject': '+ 新規見積',
+        'kpi.draft': '作成中',
+        'kpi.submitted': '提出済',
+        'kpi.negotiating': '商談中',
+        'kpi.accepted': '受注',
+        'followup.title': '📮 要フォロー（提出後 {days} 日以上アクションなし）',
+        'followup.none': 'フォローが必要な案件はありません',
+        'deadline.title': '⚠️ 手配期限の迫る国内案件',
+        'deadline.none': '期限が迫っている未完了案件はありません',
+        'projects.title': '案件',
+        'filter.all': '全担当者',
+        'filter.only': '{name} のみ',
+        'edit.title': '案件: {no}（担当: {sales}）',
+        'edit.readonly': '🔒 閲覧専用：この案件の担当者のみ編集できます。',
+        'edit.openFile': '📄 見積書スプレッドシートを開く',
+        'f.client': '客先名',
+        'f.amount': '見積金額',
+        'f.status': 'ステータス',
+        'f.delivery': '納入希望日',
+        'f.nextFollowUp': '次回フォロー日（この日まで通知を保留）',
+        'f.tradeType': '取引形態',
+        'f.details': '見積内容',
+        'f.newMemo': 'メモ追記',
+        'f.newMemoPh': '進捗・変更理由などを入力',
+        'f.history': '変更履歴',
+        'f.noHistory': '履歴なし',
+        'btn.revision': '+ 改訂版を作成',
+        'btn.cancel': 'キャンセル',
+        'btn.save': '保存',
+        'btn.saving': '保存中...',
+        'btn.create': '作成',
+        'btn.later': 'あとで',
+        'btn.openSheet': 'スプレッドシートを開く',
+        'fu.popupTitle': 'フォローが必要な案件があります',
+        'fu.popupDesc': '提出後アクションのない担当案件が <b>{n}件</b> あります。<br>対応したらメモを残して保存するか、次回フォロー日を設定してください。',
+        'fu.enableNotify': '🔔 デスクトップ通知を有効にする（アプリを開いている間、新しい案件をPCに通知）',
+        'fu.viewList': '一覧を見る',
+        'fu.ack': '確認しました',
+        'fu.idle': '📮 {d}日 アクションなし',
+        'fu.due': '⏰ フォロー予定日({date})超過',
+        'fu.snooze': '💤 {date}まで保留',
+        'fu.notifyUnsupported': 'このブラウザはデスクトップ通知に対応していません',
+        'fu.notifyEnabled': 'デスクトップ通知を有効にしました。フォローが必要な案件が出たらお知らせします。',
+        'fu.notifyTitle': '📮 フォローが必要な案件 {n}件',
+        'fu.more': 'ほか {n} 件',
+        'row.owner': '担当',
+        'row.lastUpdate': '最終更新',
+        'row.delivery': '納入希望',
+        'row.orderDeadline': '⚠️ 手配期限',
+        'card.amountTbd': '金額未定',
+        'card.deadline': '⚠️ 期限',
+        'common.notEntered': '（未入力）',
+        'common.noDetails': '内容未設定',
+        'common.tbd': '未定',
+        'common.unknown': '不明',
+        'common.unset': '未設定',
+        'create.title': '新規見積の作成',
+        'create.format': '見積先',
+        'create.formatVN': '国内顧客',
+        'create.formatJP': '親会社（管理№ JP〜）',
+        'create.category': '区分',
+        'create.delivery': '納入希望日（国内は手配期限を自動計算）',
+        'cat.domestic': '国内',
+        'cat.overseas': '輸出',
+        'cat.hq': '親会社',
+        'trade.direct': '直接取引',
+        'trade.forwarder': '通関業者経由',
+        'loading.default': '処理中...',
+        'loading.creating': '見積を作成しています...',
+        'loading.revision': '改訂版を作成しています...',
+        'confirm.created': '見積を作成しました',
+        'confirm.revCreated': '改訂版を作成しました',
+        'confirm.desc': '見積 <b>{no}</b> を作成しました。<br>スプレッドシートを開きますか？',
+        'confirm.revision': '{no} から改訂版を作成しますか？',
+        'err.update': '更新エラー: ',
+        'err.create': '作成エラー: ',
+        'err.revision': '改訂版エラー: ',
+        'err.network': '通信エラーが発生しました',
+        'status.1. Draft': '1. 作成中',
+        'status.2. Submitted': '2. 提出済',
+        'status.3. Negotiating': '3. 商談中',
+        'status.4. Accepted': '4. 受注',
+        'status.9. Lost / Cancelled': '9. 失注・中止'
+      },
+      vi: {
+        'login.prompt': 'Vui lòng đăng nhập bằng tài khoản Google của công ty',
+        'login.checking': 'Đang đăng nhập...',
+        'login.notStaff': 'Tài khoản Google này chưa được đăng ký. Vui lòng nhờ quản trị viên thêm email của bạn vào bảng Staff.',
+        'login.failed': 'Đăng nhập thất bại. Vui lòng thử lại.',
+        'login.expired': 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+        'login.config': 'Chưa hoàn tất cài đặt đăng nhập (GOOGLE_CLIENT_ID). Vui lòng liên hệ quản trị viên.',
+        'nav.dashboard': '🏠 Tổng quan',
+        'nav.projects': '📂 Dự án',
+        'nav.schedules': '📅 Lịch trình',
+        'lang.label': 'Ngôn ngữ',
+        'user.signout': 'Đăng xuất',
+        'user.signoutConfirm': 'Đăng xuất khỏi Buddy?',
+        'dash.title': 'Tổng quan',
+        'search.ph': 'Tìm theo số báo giá, khách hàng, nội dung...',
+        'btn.newProject': '+ Báo giá mới',
+        'kpi.draft': 'Bản nháp',
+        'kpi.submitted': 'Đã gửi',
+        'kpi.negotiating': 'Đang đàm phán',
+        'kpi.accepted': 'Đã nhận đơn',
+        'followup.title': '📮 Cần theo dõi (không có hoạt động từ {days} ngày trở lên sau khi gửi)',
+        'followup.none': 'Không có báo giá cần theo dõi',
+        'deadline.title': '⚠️ Báo giá trong nước sắp đến hạn đặt hàng',
+        'deadline.none': 'Không có báo giá nào sắp đến hạn',
+        'projects.title': 'Dự án',
+        'filter.all': 'Tất cả nhân viên',
+        'filter.only': 'Chỉ {name}',
+        'edit.title': 'Dự án: {no} (Phụ trách: {sales})',
+        'edit.readonly': '🔒 Chỉ xem: chỉ người phụ trách mới có thể chỉnh sửa báo giá này.',
+        'edit.openFile': '📄 Mở bảng tính báo giá',
+        'f.client': 'Khách hàng',
+        'f.amount': 'Số tiền báo giá',
+        'f.status': 'Trạng thái',
+        'f.delivery': 'Ngày giao hàng mong muốn',
+        'f.nextFollowUp': 'Ngày theo dõi tiếp theo (tạm dừng thông báo đến ngày này)',
+        'f.tradeType': 'Hình thức giao dịch',
+        'f.details': 'Nội dung báo giá',
+        'f.newMemo': 'Thêm ghi chú',
+        'f.newMemoPh': 'Nhập tiến độ, lý do thay đổi...',
+        'f.history': 'Lịch sử thay đổi',
+        'f.noHistory': 'Chưa có lịch sử',
+        'btn.revision': '+ Tạo bản sửa đổi',
+        'btn.cancel': 'Hủy',
+        'btn.save': 'Lưu',
+        'btn.saving': 'Đang lưu...',
+        'btn.create': 'Tạo',
+        'btn.later': 'Để sau',
+        'btn.openSheet': 'Mở bảng tính',
+        'fu.popupTitle': 'Có báo giá cần theo dõi',
+        'fu.popupDesc': 'Bạn có <b>{n}</b> báo giá đã gửi nhưng chưa có hoạt động.<br>Sau khi liên hệ khách hàng, hãy thêm ghi chú và lưu, hoặc đặt ngày theo dõi tiếp theo.',
+        'fu.enableNotify': '🔔 Bật thông báo trên máy tính (khi ứng dụng đang mở)',
+        'fu.viewList': 'Xem danh sách',
+        'fu.ack': 'Đã xem',
+        'fu.idle': '📮 {d} ngày không hoạt động',
+        'fu.due': '⏰ Đã quá ngày theo dõi ({date})',
+        'fu.snooze': '💤 Tạm dừng đến {date}',
+        'fu.notifyUnsupported': 'Trình duyệt này không hỗ trợ thông báo trên máy tính',
+        'fu.notifyEnabled': 'Đã bật thông báo. Bạn sẽ được báo khi có báo giá cần theo dõi.',
+        'fu.notifyTitle': '📮 {n} báo giá cần theo dõi',
+        'fu.more': 'và {n} báo giá khác',
+        'row.owner': 'Phụ trách',
+        'row.lastUpdate': 'Cập nhật lần cuối',
+        'row.delivery': 'Giao hàng',
+        'row.orderDeadline': '⚠️ Hạn đặt hàng',
+        'card.amountTbd': 'Chưa có giá',
+        'card.deadline': '⚠️ Hạn',
+        'common.notEntered': '(Chưa nhập)',
+        'common.noDetails': 'Chưa có nội dung',
+        'common.tbd': 'Chưa xác định',
+        'common.unknown': 'Không rõ',
+        'common.unset': 'Chưa đặt',
+        'create.title': 'Tạo báo giá mới',
+        'create.format': 'Đối tượng báo giá',
+        'create.formatVN': 'Khách hàng trong nước',
+        'create.formatJP': 'Công ty mẹ Nhật Bản (Số JP〜)',
+        'create.category': 'Phân loại',
+        'create.delivery': 'Ngày giao hàng mong muốn (trong nước tự tính hạn đặt hàng)',
+        'cat.domestic': 'Trong nước',
+        'cat.overseas': 'Xuất khẩu',
+        'cat.hq': 'Công ty mẹ',
+        'trade.direct': 'Giao dịch trực tiếp',
+        'trade.forwarder': 'Qua đại lý hải quan',
+        'loading.default': 'Đang xử lý...',
+        'loading.creating': 'Đang tạo báo giá...',
+        'loading.revision': 'Đang tạo bản sửa đổi...',
+        'confirm.created': 'Đã tạo báo giá',
+        'confirm.revCreated': 'Đã tạo bản sửa đổi',
+        'confirm.desc': 'Đã tạo báo giá <b>{no}</b>.<br>Bạn có muốn mở bảng tính không?',
+        'confirm.revision': 'Tạo bản sửa đổi từ {no}?',
+        'err.update': 'Lỗi cập nhật: ',
+        'err.create': 'Lỗi tạo báo giá: ',
+        'err.revision': 'Lỗi tạo bản sửa đổi: ',
+        'err.network': 'Đã xảy ra lỗi kết nối',
+        'status.1. Draft': '1. Bản nháp',
+        'status.2. Submitted': '2. Đã gửi',
+        'status.3. Negotiating': '3. Đang đàm phán',
+        'status.4. Accepted': '4. Đã nhận đơn',
+        'status.9. Lost / Cancelled': '9. Mất đơn / Hủy'
+      },
+      en: {
+        'login.prompt': 'Please sign in with your company Google account.',
+        'login.checking': 'Signing in...',
+        'login.notStaff': 'This Google account is not registered. Ask your administrator to add your email to the Staff sheet.',
+        'login.failed': 'Sign-in failed. Please try again.',
+        'login.expired': 'Your session has expired. Please sign in again.',
+        'login.config': 'Sign-in is not configured yet (GOOGLE_CLIENT_ID). Please contact your administrator.',
+        'nav.dashboard': '🏠 Dashboard',
+        'nav.projects': '📂 Projects',
+        'nav.schedules': '📅 Schedules',
+        'lang.label': 'Language',
+        'user.signout': 'Sign out',
+        'user.signoutConfirm': 'Sign out of Buddy?',
+        'dash.title': 'Dashboard Overview',
+        'search.ph': 'Search No, Client, Details...',
+        'btn.newProject': '+ New Project',
+        'kpi.draft': 'Draft',
+        'kpi.submitted': 'Submitted',
+        'kpi.negotiating': 'Negotiating',
+        'kpi.accepted': 'Accepted',
+        'followup.title': '📮 Follow-up Needed (no action for {days}+ days after submission)',
+        'followup.none': 'No quotes need follow-up',
+        'deadline.title': '⚠️ Upcoming Order Deadlines (Domestic)',
+        'deadline.none': 'No open quotes with upcoming deadlines',
+        'projects.title': 'Projects',
+        'filter.all': 'All Sales Persons',
+        'filter.only': '{name} only',
+        'edit.title': 'Project: {no} (Owner: {sales})',
+        'edit.readonly': '🔒 Read-only: only the owner of this quote can edit it.',
+        'edit.openFile': '📄 Open quotation spreadsheet',
+        'f.client': 'Client',
+        'f.amount': 'Amount',
+        'f.status': 'Status',
+        'f.delivery': 'Delivery Date',
+        'f.nextFollowUp': 'Next Follow-up (notifications paused until this date)',
+        'f.tradeType': 'Trade Type',
+        'f.details': 'Details',
+        'f.newMemo': 'New Memo',
+        'f.newMemoPh': 'Progress, reason for change, etc.',
+        'f.history': 'History',
+        'f.noHistory': 'No history',
+        'btn.revision': '+ Create Revision',
+        'btn.cancel': 'Cancel',
+        'btn.save': 'Save Changes',
+        'btn.saving': 'Saving...',
+        'btn.create': 'Create',
+        'btn.later': 'Later',
+        'btn.openSheet': 'Open Spreadsheet',
+        'fu.popupTitle': 'Some quotes need follow-up',
+        'fu.popupDesc': 'You have <b>{n}</b> submitted quote(s) with no recent action.<br>After following up, add a memo and save, or set the next follow-up date.',
+        'fu.enableNotify': '🔔 Enable desktop notifications (while the app is open)',
+        'fu.viewList': 'View list',
+        'fu.ack': 'Got it',
+        'fu.idle': '📮 No action for {d} days',
+        'fu.due': '⏰ Follow-up date passed ({date})',
+        'fu.snooze': '💤 Snoozed until {date}',
+        'fu.notifyUnsupported': 'This browser does not support desktop notifications',
+        'fu.notifyEnabled': 'Desktop notifications enabled. You will be notified when quotes need follow-up.',
+        'fu.notifyTitle': '📮 {n} quote(s) need follow-up',
+        'fu.more': 'and {n} more',
+        'row.owner': 'Owner',
+        'row.lastUpdate': 'Last update',
+        'row.delivery': 'Delivery',
+        'row.orderDeadline': '⚠️ Order deadline',
+        'card.amountTbd': 'Amount TBD',
+        'card.deadline': '⚠️ Deadline',
+        'common.notEntered': '(Not entered)',
+        'common.noDetails': 'No details',
+        'common.tbd': 'TBD',
+        'common.unknown': 'Unknown',
+        'common.unset': 'Not set',
+        'create.title': 'Create New Quote',
+        'create.format': 'Quote Format',
+        'create.formatVN': 'Vietnam Customer',
+        'create.formatJP': 'Japan HQ (No. JP〜)',
+        'create.category': 'Category',
+        'create.delivery': 'Delivery Date (order deadline auto-calculated for domestic)',
+        'cat.domestic': 'Domestic',
+        'cat.overseas': 'Overseas',
+        'cat.hq': 'Japan HQ',
+        'trade.direct': 'Direct Trade',
+        'trade.forwarder': 'Via Forwarder',
+        'loading.default': 'Processing... Please wait',
+        'loading.creating': 'Creating quotation... Please wait',
+        'loading.revision': 'Generating revision... Please wait',
+        'confirm.created': 'Quotation Created',
+        'confirm.revCreated': 'Revision Created',
+        'confirm.desc': 'Quotation <b>{no}</b> has been generated.<br>Would you like to open the spreadsheet now?',
+        'confirm.revision': 'Create a new revision from {no}?',
+        'err.update': 'Update error: ',
+        'err.create': 'Create error: ',
+        'err.revision': 'Revision error: ',
+        'err.network': 'A network error occurred.',
+        'status.1. Draft': '1. Draft',
+        'status.2. Submitted': '2. Submitted',
+        'status.3. Negotiating': '3. Negotiating',
+        'status.4. Accepted': '4. Accepted',
+        'status.9. Lost / Cancelled': '9. Lost / Cancelled'
+      }
     };
+    const LANGS = ['ja', 'vi', 'en'];
+    let currentLang = detectInitialLang();
 
+    function detectInitialLang() {
+      const saved = localStorage.getItem('buddy_lang');
+      if (LANGS.includes(saved)) return saved;
+      const nav = (navigator.language || '').toLowerCase();
+      if (nav.startsWith('ja')) return 'ja';
+      if (nav.startsWith('vi')) return 'vi';
+      return 'en';
+    }
+
+    // 翻訳: t('key', {var: value})
+    function t(key, vars) {
+      let s = (I18N[currentLang] && I18N[currentLang][key]) ?? I18N.en[key] ?? key;
+      if (vars) Object.keys(vars).forEach(k => { s = s.split('{' + k + '}').join(vars[k]); });
+      return s;
+    }
+
+    // ステータス表示（台帳に保存する値は変えず、表示だけ翻訳）
+    function statusLabel(status) {
+      const s = String(status || '');
+      const key = Object.keys(I18N.en).find(k => k.startsWith('status.') && s.startsWith(k.slice(7, 9)));
+      return key ? t(key) : s;
+    }
+
+    function categoryLabel(cat) {
+      const c = String(cat || '');
+      if (c.includes('親会社') || /japan hq/i.test(c)) return t('cat.hq');
+      if (c.includes('国内') || /domestic/i.test(c)) return t('cat.domestic');
+      if (c.includes('輸出') || /overseas/i.test(c)) return t('cat.overseas');
+      return c || t('common.unset');
+    }
+
+    function applyI18n() {
+      document.documentElement.lang = currentLang;
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+      document.querySelectorAll('[data-status]').forEach(el => { el.textContent = statusLabel(el.dataset.status); });
+      document.querySelectorAll('.lang-select').forEach(el => { el.value = currentLang; });
+      document.getElementById('followupTitle').textContent = t('followup.title', { days: followUpDays });
+      document.getElementById('loadingText').textContent = t('loading.default');
+    }
+
+    // 言語切り替え（ブラウザに記憶 + ログイン中ならStaffシートにも保存＝メールの言語にも反映）
+    function setLang(lang) {
+      if (!LANGS.includes(lang)) return;
+      currentLang = lang;
+      localStorage.setItem('buddy_lang', lang);
+      applyI18n();
+      renderGoogleButton();
+      if (currentUser) {
+        buildSalesFilter();
+        renderDashboard(rawProjects);
+        renderFollowUps();
+        onFilterChange();
+        api('setLanguage', { lang: lang }).catch(() => {});
+      }
+    }
+
+    // HTMLエスケープ（客先名などをそのまま画面に差し込まない）
+    function esc(v) {
+      return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    /* =========================================================
+     * 状態
+     * ========================================================= */
     let currentUser = null;
+    let staffNames = [];
     let rawProjects = [];
     let selectedQuoteNo = null;
+    let followUpProjects = [];        // 提出後一定期間アクションのない案件（台帳全体から取得）
+    let followUpDays = 14;
+    let followUpPopupShown = false;   // ポップアップはログイン後1回だけ
+    let followUpTimer = null;          // 開いている間の定期チェック
+    const FOLLOWUP_CHECK_INTERVAL = 60 * 60 * 1000; // 1時間ごと
+    const notifiedFollowUps = new Set(); // デスクトップ通知済み（同じ案件を何度も通知しない）
+    let googleClientId = '';
 
     document.addEventListener('DOMContentLoaded', () => {
-      checkLoginSession();
+      applyI18n();
+      initAuth();
     });
 
-    // 認証
-    function checkLoginSession() {
-      const savedId = localStorage.getItem('buddy_emp_id');
-      if (savedId && STAFF_MASTER[savedId]) {
-        currentUser = { empId: savedId, ...STAFF_MASTER[savedId] };
-        applyLoginSuccess();
-      } else {
-        document.getElementById('loginOverlay').style.display = 'flex';
+    /* =========================================================
+     * API 呼び出し（セッショントークンを付与。期限切れならログイン画面へ）
+     * ========================================================= */
+    async function api(action, params) {
+      const body = { action: action, token: localStorage.getItem('buddy_session') || '', ...(params || {}) };
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(body)
+      });
+      const res = await response.json();
+      if (res.status !== 'success' && res.code === 'AUTH') {
+        handleSessionExpired();
+        throw new Error('AUTH');
       }
+      return res;
     }
 
-    function executeLogin() {
-      const inputId = document.getElementById('loginEmpId').value.trim();
+    /* =========================================================
+     * 認証（Googleアカウント）
+     * ========================================================= */
+    async function initAuth() {
+      // 保存済みセッションがあれば確認
+      if (localStorage.getItem('buddy_session')) {
+        try {
+          const res = await api('whoami');
+          if (res.status === 'success' && res.user) { onLoggedIn(res.user, res.staffNames); return; }
+        } catch (e) { /* 期限切れ → ログイン画面 */ }
+      }
+      showLoginScreen();
+    }
+
+    async function showLoginScreen(messageKey) {
+      document.getElementById('loginOverlay').style.display = 'flex';
       const errEl = document.getElementById('loginError');
+      errEl.style.display = messageKey ? 'block' : 'none';
+      if (messageKey) errEl.textContent = t(messageKey);
 
-      if (STAFF_MASTER[inputId]) {
-        errEl.style.display = 'none';
-        localStorage.setItem('buddy_emp_id', inputId);
-        currentUser = { empId: inputId, ...STAFF_MASTER[inputId] };
-        applyLoginSuccess();
-      } else {
+      if (!googleClientId) {
+        try {
+          const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ action: 'getConfig' }) });
+          googleClientId = (await res.json()).clientId || '';
+        } catch (e) { /* 通信エラー */ }
+      }
+      if (!googleClientId) {
         errEl.style.display = 'block';
+        errEl.textContent = t('login.config');
+        return;
+      }
+      waitForGoogle(() => {
+        google.accounts.id.initialize({ client_id: googleClientId, callback: onGoogleCredential, auto_select: true });
+        renderGoogleButton();
+      });
+    }
+
+    function waitForGoogle(cb, tries) {
+      if (window.google && google.accounts && google.accounts.id) return cb();
+      if ((tries || 0) > 100) return;
+      setTimeout(() => waitForGoogle(cb, (tries || 0) + 1), 100);
+    }
+
+    function renderGoogleButton() {
+      const box = document.getElementById('googleBtn');
+      if (!box || !googleClientId || !window.google || !google.accounts || currentUser) return;
+      box.innerHTML = '';
+      google.accounts.id.renderButton(box, { theme: 'outline', size: 'large', text: 'signin_with', locale: currentLang, width: 260 });
+    }
+
+    async function onGoogleCredential(resp) {
+      const statusEl = document.getElementById('loginStatus');
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+      statusEl.style.display = 'block';
+      statusEl.textContent = t('login.checking');
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'login', idToken: resp.credential })
+        });
+        const res = await response.json();
+        statusEl.style.display = 'none';
+        if (res.status === 'success') {
+          localStorage.setItem('buddy_session', res.token);
+          onLoggedIn(res.user, res.staffNames);
+        } else {
+          errEl.style.display = 'block';
+          errEl.textContent = t(res.code === 'NOT_STAFF' ? 'login.notStaff' : res.code === 'CONFIG' ? 'login.config' : 'login.failed');
+          if (res.code === 'NOT_STAFF') google.accounts.id.disableAutoSelect();
+        }
+      } catch (e) {
+        statusEl.style.display = 'none';
+        errEl.style.display = 'block';
+        errEl.textContent = t('err.network');
       }
     }
 
-    function applyLoginSuccess() {
+    function onLoggedIn(user, names) {
+      currentUser = user;
+      staffNames = names || [];
+      // この端末で言語を選んだことがなければ、Staffシートの言語設定を使う
+      if (!localStorage.getItem('buddy_lang') && LANGS.includes(user.lang)) {
+        currentLang = user.lang;
+        applyI18n();
+      }
       document.getElementById('loginOverlay').style.display = 'none';
-      document.getElementById('currentUserName').textContent = currentUser.name;
-      document.getElementById('currentUserRole').textContent = currentUser.role;
+      document.getElementById('currentUserName').textContent = user.name;
+      document.getElementById('currentUserRole').textContent = user.position;
+      buildSalesFilter();
       fetchLatestProjects();
+      if (!followUpTimer) followUpTimer = setInterval(fetchFollowUps, FOLLOWUP_CHECK_INTERVAL);
     }
 
-    function executeLogout() {
-      if (confirm('Sign out of Buddy?')) {
-        localStorage.removeItem('buddy_emp_id');
-        location.reload();
-      }
+    function handleSessionExpired() {
+      if (!currentUser) return;
+      localStorage.removeItem('buddy_session');
+      location.reload();
     }
 
-    // 画面切り替え
+    async function executeLogout() {
+      if (!confirm(t('user.signoutConfirm'))) return;
+      try { await api('logout'); } catch (e) { /* 既に無効でもOK */ }
+      localStorage.removeItem('buddy_session');
+      if (window.google && google.accounts) google.accounts.id.disableAutoSelect();
+      location.reload();
+    }
+
+    function buildSalesFilter() {
+      const sel = document.getElementById('salesFilter');
+      const prev = sel.value || 'ALL';
+      sel.innerHTML = `<option value="ALL">${esc(t('filter.all'))}</option>`
+        + staffNames.map(n => `<option value="${esc(n)}">${esc(t('filter.only', { name: n }))}</option>`).join('');
+      sel.value = [...sel.options].some(o => o.value === prev) ? prev : 'ALL';
+    }
+
+    /* =========================================================
+     * 画面切り替え・検索
+     * ========================================================= */
     function switchView(viewName) {
       document.getElementById('nav-dashboard').classList.toggle('active', viewName === 'dashboard');
       document.getElementById('nav-projects').classList.toggle('active', viewName === 'projects');
-
       document.getElementById('view-dashboard').classList.toggle('active', viewName === 'dashboard');
       document.getElementById('view-projects').classList.toggle('active', viewName === 'projects');
     }
@@ -906,25 +1442,17 @@
       onFilterChange();
     }
 
-    // 案件取得
+    /* =========================================================
+     * 案件取得・ダッシュボード
+     * ========================================================= */
     async function fetchLatestProjects() {
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            action: 'searchProjects',
-            query: '',
-            apiKey: API_SECRET,
-            empId: currentUser.empId
-          })
-        });
-
-        const result = await response.json();
+        const result = await api('searchProjects', { query: '' });
         if (result.status === 'success') {
           rawProjects = result.data;
           renderDashboard(rawProjects);
           onFilterChange();
+          fetchFollowUps();
         } else {
           console.error('API Error:', result.message);
         }
@@ -933,7 +1461,10 @@
       }
     }
 
-    // Dashboard 描画（KPIと手配期限のみ）
+    function emptyRow(text) {
+      return `<div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">${esc(text)}</div>`;
+    }
+
     function renderDashboard(projects) {
       const counts = { draft: 0, submitted: 0, negotiating: 0, accepted: 0 };
       projects.forEach(p => {
@@ -957,36 +1488,154 @@
         .sort((a, b) => new Date(a.orderDeadline) - new Date(b.orderDeadline));
 
       if (pendingWithDeadlines.length === 0) {
-        deadlineContainer.innerHTML = `<div style="padding: 16px; font-size: 13px; color: var(--text-muted); text-align: center;">期限が迫っている未完了案件はありません</div>`;
-      } else {
-        pendingWithDeadlines.slice(0, 5).forEach(p => {
-          const row = document.createElement('div');
-          row.className = 'dash-row';
-          row.onclick = () => openEditModal(p.quoteNo);
-          row.innerHTML = `
-            <div class="dash-col-main">
-              <span class="dash-item-title">${p.quoteNo} - ${p.client || '（未入力）'}</span>
-              <span class="dash-item-sub">${p.details || '内容未設定'} / 納入希望: ${p.deliveryDate || '未定'}</span>
-            </div>
-            <div class="dash-col-side">
-              <span class="tag tag-danger">⚠️ 手配期限: ${p.orderDeadline}</span>
-              <span class="tag tag-draft">${p.status}</span>
-            </div>
-          `;
-          deadlineContainer.appendChild(row);
-        });
+        deadlineContainer.innerHTML = emptyRow(t('deadline.none'));
+        return;
+      }
+      pendingWithDeadlines.slice(0, 5).forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'dash-row';
+        row.onclick = () => openEditModal(p.quoteNo);
+        row.innerHTML = `
+          <div class="dash-col-main">
+            <span class="dash-item-title">${esc(p.quoteNo)} - ${esc(p.client || t('common.notEntered'))}</span>
+            <span class="dash-item-sub">${esc(p.details || t('common.noDetails'))} / ${esc(t('row.delivery'))}: ${esc(p.deliveryDate || t('common.tbd'))}</span>
+          </div>
+          <div class="dash-col-side">
+            <span class="tag tag-danger">${esc(t('row.orderDeadline'))}: ${esc(p.orderDeadline)}</span>
+            <span class="tag tag-draft">${esc(statusLabel(p.status))}</span>
+          </div>
+        `;
+        deadlineContainer.appendChild(row);
+      });
+    }
+
+    /* =========================================================
+     * 提出後フォロー通知
+     * ========================================================= */
+    async function fetchFollowUps() {
+      if (!currentUser) return;
+      try {
+        const result = await api('getFollowUps');
+        if (result.status !== 'success') { console.error('FollowUp API Error:', result.message); return; }
+        followUpProjects = result.data || [];
+        if (result.days) followUpDays = result.days;
+        document.getElementById('followupTitle').textContent = t('followup.title', { days: followUpDays });
+        renderFollowUps();
+        onFilterChange(); // カンバンにもタグを反映
+
+        const mine = followUpProjects.filter(p => isProjectOwner(p));
+        if (!followUpPopupShown) {
+          // ログイン直後：画面中央のポップアップ（既に通知済みとして記録）
+          followUpPopupShown = true;
+          mine.forEach(p => notifiedFollowUps.add(followUpKey(p)));
+          if (mine.length > 0) {
+            showFollowupModal(mine);
+            if (document.hidden) sendDesktopNotify(mine);
+          }
+        } else {
+          // 定期チェック：新しく該当した自分の案件だけをデスクトップ通知
+          const fresh = mine.filter(p => !notifiedFollowUps.has(followUpKey(p)));
+          fresh.forEach(p => notifiedFollowUps.add(followUpKey(p)));
+          if (fresh.length > 0) sendDesktopNotify(fresh);
+        }
+      } catch (error) {
+        console.error('FollowUp Fetch Error:', error);
       }
     }
 
-    // Projects フィルター＆描画
+    function todayStr() {
+      // ベトナム時間の今日（GAS側の判定と合わせる）
+      return new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
+    }
+
+    function followUpKey(p) { return p.quoteNo + '|' + p.reason; }
+
+    function followUpLabel(p) {
+      return p.reason === 'due'
+        ? t('fu.due', { date: (p.nextFollowUp || '').substring(5) })
+        : t('fu.idle', { d: p.daysSinceAction });
+    }
+
+    function renderFollowUps() {
+      const container = document.getElementById('dash-followup-list');
+      container.innerHTML = '';
+      if (followUpProjects.length === 0) {
+        container.innerHTML = emptyRow(t('followup.none'));
+        return;
+      }
+      // 自分の案件を先に表示
+      const sorted = [...followUpProjects].sort((a, b) => (isProjectOwner(b) - isProjectOwner(a)) || (b.daysSinceAction - a.daysSinceAction));
+      sorted.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'dash-row';
+        row.onclick = () => openEditModal(p.quoteNo);
+        row.innerHTML = `
+          <div class="dash-col-main">
+            <span class="dash-item-title">${esc(p.quoteNo)} - ${esc(p.client || t('common.notEntered'))}</span>
+            <span class="dash-item-sub">${esc(p.details || t('common.noDetails'))} / ${esc(t('row.owner'))}: ${esc(p.salesPerson || t('common.unset'))} / ${esc(t('row.lastUpdate'))}: ${esc(p.lastActionDate || t('common.unknown'))}</span>
+          </div>
+          <div class="dash-col-side">
+            <span class="tag tag-followup">${esc(followUpLabel(p))}</span>
+            <span class="tag tag-draft">${esc(statusLabel(p.status))}</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    // ポップアップ（画面中央・確認ボタンを押すまで表示）
+    function showFollowupModal(mine) {
+      document.getElementById('followupModalDesc').innerHTML = t('fu.popupDesc', { n: mine.length });
+      const list = document.getElementById('followupModalList');
+      list.innerHTML = '';
+      mine.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'followup-item';
+        item.onclick = () => { closeFollowupModal(); openEditModal(p.quoteNo); };
+        item.innerHTML = `<b>${esc(p.quoteNo)}</b> - ${esc(p.client || t('common.notEntered'))} <span class="tag tag-followup" style="margin-left: 6px;">${esc(followUpLabel(p))}</span>
+          <div class="followup-item-sub">${esc(p.details || t('common.noDetails'))} / ${esc(t('row.lastUpdate'))}: ${esc(p.lastActionDate || t('common.unknown'))}</div>`;
+        list.appendChild(item);
+      });
+      const canAsk = ('Notification' in window) && Notification.permission === 'default';
+      document.getElementById('enableDesktopNotifyBtn').style.display = canAsk ? 'inline-block' : 'none';
+      document.getElementById('followupModalOverlay').classList.add('active');
+    }
+
+    function closeFollowupModal() {
+      document.getElementById('followupModalOverlay').classList.remove('active');
+    }
+
+    function openFollowupDashboard() {
+      closeFollowupModal();
+      switchView('dashboard');
+      document.getElementById('dash-followup-list').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // デスクトップ通知（ブラウザの許可が必要。アプリを開いている間のみ）
+    async function enableDesktopNotify() {
+      if (!('Notification' in window)) { alert(t('fu.notifyUnsupported')); return; }
+      const perm = await Notification.requestPermission();
+      document.getElementById('enableDesktopNotifyBtn').style.display = 'none';
+      if (perm === 'granted') new Notification('Buddy', { body: t('fu.notifyEnabled') });
+    }
+
+    function sendDesktopNotify(items) {
+      if (!('Notification' in window) || Notification.permission !== 'granted' || items.length === 0) return;
+      const body = items.slice(0, 3).map(p => `${p.quoteNo}（${p.client || t('common.notEntered')}）${followUpLabel(p)}`).join('\n')
+        + (items.length > 3 ? '\n' + t('fu.more', { n: items.length - 3 }) : '');
+      const n = new Notification(t('fu.notifyTitle', { n: items.length }), { body: body, tag: 'buddy-followup' });
+      n.onclick = () => { window.focus(); openFollowupDashboard(); n.close(); };
+    }
+
+    /* =========================================================
+     * Projects（カンバン）
+     * ========================================================= */
     function onFilterChange() {
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const salesFilter = document.getElementById('salesFilter').value;
+      const salesFilter = document.getElementById('salesFilter').value || 'ALL';
 
       const filtered = rawProjects.filter(p => {
-        if (salesFilter !== 'ALL' && (!p.salesPerson || !p.salesPerson.includes(salesFilter))) {
-          return false;
-        }
+        if (salesFilter !== 'ALL' && !salesMatches(p.salesPerson, salesFilter)) return false;
         if (q) {
           const matchNo = (p.quoteNo || '').toLowerCase().includes(q);
           const matchClient = (p.client || '').toLowerCase().includes(q);
@@ -999,112 +1648,105 @@
       renderKanbanBoard(filtered);
     }
 
-    function renderKanbanBoard(projects) {
-      const colDraft = document.getElementById('col-draft');
-      const colSubmitted = document.getElementById('col-submitted');
-      const colNegotiating = document.getElementById('col-negotiating');
-      const colAccepted = document.getElementById('col-accepted');
-      
-      [colDraft, colSubmitted, colNegotiating, colAccepted].forEach(col => col.innerHTML = '');
+    // 台帳の担当者名（例: 'Thịnh'）と社員名（例: 'Nguyễn Tiến Thịnh'）の照合
+    function salesMatches(salesPerson, staffName) {
+      const sales = String(salesPerson || '').toLowerCase();
+      const name = String(staffName || '').toLowerCase();
+      if (!sales || !name) return false;
+      return sales.includes(name) || name.split(' ').some(part => part.length > 2 && sales.includes(part));
+    }
 
+    function renderKanbanBoard(projects) {
+      const cols = {
+        draft: document.getElementById('col-draft'),
+        submitted: document.getElementById('col-submitted'),
+        negotiating: document.getElementById('col-negotiating'),
+        accepted: document.getElementById('col-accepted')
+      };
+      Object.values(cols).forEach(col => col.innerHTML = '');
       const counts = { draft: 0, submitted: 0, negotiating: 0, accepted: 0 };
 
       projects.forEach(proj => {
-        const amountDisplay = (proj.amount && proj.amount !== '0') ? proj.amount : '金額未定';
-        
-        let tagsHtml = `<span class="tag tag-draft">${proj.category || '未設定'}</span>`;
+        const amountDisplay = (proj.amount && proj.amount !== '0') ? proj.amount : t('card.amountTbd');
+
+        let tagsHtml = `<span class="tag tag-draft">${esc(categoryLabel(proj.category))}</span>`;
         if (proj.salesPerson) {
-          tagsHtml += `<span class="tag tag-sub">${proj.salesPerson.split(' ')[0]}</span>`;
+          tagsHtml += `<span class="tag tag-sub">${esc(proj.salesPerson.split(' ')[0])}</span>`;
         }
         if (proj.orderDeadline) {
-          const formattedDate = proj.orderDeadline.substring(5);
-          tagsHtml += `<span class="tag tag-alert">⚠️ Deadline: ${formattedDate}</span>`;
+          tagsHtml += `<span class="tag tag-alert">${esc(t('card.deadline'))}: ${esc(proj.orderDeadline.substring(5))}</span>`;
+        }
+        const fu = followUpProjects.find(f => f.quoteNo === proj.quoteNo);
+        if (fu) {
+          tagsHtml += `<span class="tag tag-followup">${esc(followUpLabel(fu))}</span>`;
+        } else if ((proj.status || '').startsWith('2.') && proj.nextFollowUp && proj.nextFollowUp > todayStr()) {
+          tagsHtml += `<span class="tag tag-snooze">${esc(t('fu.snooze', { date: proj.nextFollowUp.substring(5) }))}</span>`;
         }
 
-        const cardHtml = `
-          <div class="card" onclick="openEditModal('${proj.quoteNo}')">
-            <div class="c-id">${proj.quoteNo}</div>
-            <div class="c-title">${proj.client} / ${amountDisplay}</div>
-            <div class="c-tags">${tagsHtml}</div>
-          </div>
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.onclick = () => openEditModal(proj.quoteNo);
+        card.innerHTML = `
+          <div class="c-id">${esc(proj.quoteNo)}</div>
+          <div class="c-title">${esc(proj.client)} / ${esc(amountDisplay)}</div>
+          <div class="c-tags">${tagsHtml}</div>
         `;
 
         const status = proj.status || '';
-        if (status.includes('1. Draft')) {
-          colDraft.insertAdjacentHTML('beforeend', cardHtml);
-          counts.draft++;
-        } else if (status.includes('2. Submitted')) {
-          colSubmitted.insertAdjacentHTML('beforeend', cardHtml);
-          counts.submitted++;
-        } else if (status.includes('3. Negotiating')) {
-          colNegotiating.insertAdjacentHTML('beforeend', cardHtml);
-          counts.negotiating++;
-        } else if (status.includes('4. Accepted')) {
-          colAccepted.insertAdjacentHTML('beforeend', cardHtml);
-          counts.accepted++;
-        }
+        const key = status.includes('1. Draft') ? 'draft'
+          : status.includes('2. Submitted') ? 'submitted'
+          : status.includes('3. Negotiating') ? 'negotiating'
+          : status.includes('4. Accepted') ? 'accepted' : null;
+        if (key) { cols[key].appendChild(card); counts[key]++; }
       });
 
-      document.getElementById('badge-draft').textContent = counts.draft;
-      document.getElementById('badge-submitted').textContent = counts.submitted;
-      document.getElementById('badge-negotiating').textContent = counts.negotiating;
-      document.getElementById('badge-accepted').textContent = counts.accepted;
+      Object.keys(counts).forEach(k => { document.getElementById('badge-' + k).textContent = counts[k]; });
     }
 
-    // 作成者判定 & 編集モーダル制御
+    /* =========================================================
+     * 編集モーダル
+     * ========================================================= */
     function isProjectOwner(proj) {
       if (!proj || !currentUser) return false;
-      const sales = (proj.salesPerson || '').toLowerCase();
-      const myName = currentUser.name.toLowerCase();
-      const nameParts = myName.split(' ');
-      return sales.includes(myName) || nameParts.some(part => part.length > 2 && sales.includes(part));
+      return salesMatches(proj.salesPerson, currentUser.name);
     }
 
     function openEditModal(quoteNo) {
-      const proj = rawProjects.find(p => p.quoteNo === quoteNo);
+      // 直近10件に含まれない古い案件（フォロー通知から開いた場合）も開けるようにする
+      const proj = rawProjects.find(p => p.quoteNo === quoteNo) || followUpProjects.find(p => p.quoteNo === quoteNo);
       if (!proj) return;
 
       selectedQuoteNo = quoteNo;
-      document.getElementById('editModalTitle').textContent = `Project: ${proj.quoteNo} (担当: ${proj.salesPerson || '未設定'})`;
+      document.getElementById('editModalTitle').textContent = t('edit.title', { no: proj.quoteNo, sales: proj.salesPerson || t('common.unset') });
       document.getElementById('editFileUrl').href = proj.fileUrl || '#';
       document.getElementById('editClient').value = proj.client || '';
       document.getElementById('editAmount').value = proj.amount || '0';
       document.getElementById('editStatus').value = proj.status || '1. Draft';
       document.getElementById('editDeliveryDate').value = proj.deliveryDate || '';
+      document.getElementById('editNextFollowUp').value = proj.nextFollowUp || '';
+      toggleNextFollowUp();
       document.getElementById('editTradeType').value = proj.tradeType || '直接取引(Direct)';
       document.getElementById('editDetails').value = proj.details || '';
       document.getElementById('editNewMemo').value = '';
-      document.getElementById('editMemoHistory').textContent = proj.memo || '履歴なし';
+      document.getElementById('editMemoHistory').textContent = proj.memo || t('f.noHistory');
 
       const isOwner = isProjectOwner(proj);
-      const readOnlyBanner = document.getElementById('readOnlyBanner');
-      const saveBtn = document.getElementById('saveEditBtn');
-      const revBtn = document.getElementById('createRevisionBtn');
-      const memoGroup = document.getElementById('memoGroup');
+      const inputs = ['editStatus', 'editDeliveryDate', 'editNextFollowUp', 'editTradeType', 'editDetails', 'editNewMemo']
+        .map(id => document.getElementById(id));
 
-      const inputs = [
-        document.getElementById('editStatus'),
-        document.getElementById('editDeliveryDate'),
-        document.getElementById('editTradeType'),
-        document.getElementById('editDetails'),
-        document.getElementById('editNewMemo')
-      ];
-
-      if (isOwner) {
-        readOnlyBanner.style.display = 'none';
-        saveBtn.style.display = 'block';
-        revBtn.style.display = 'block';
-        memoGroup.style.display = 'flex';
-        inputs.forEach(el => el.disabled = false);
-      } else {
-        readOnlyBanner.style.display = 'block';
-        saveBtn.style.display = 'none';
-        revBtn.style.display = 'none';
-        memoGroup.style.display = 'none';
-        inputs.forEach(el => el.disabled = true);
-      }
+      document.getElementById('readOnlyBanner').style.display = isOwner ? 'none' : 'block';
+      document.getElementById('saveEditBtn').style.display = isOwner ? 'block' : 'none';
+      document.getElementById('createRevisionBtn').style.display = isOwner ? 'block' : 'none';
+      document.getElementById('memoGroup').style.display = isOwner ? 'flex' : 'none';
+      inputs.forEach(el => el.disabled = !isOwner);
 
       document.getElementById('editModalOverlay').classList.add('active');
+    }
+
+    // 次回フォロー日は「2. Submitted」のときだけ表示
+    function toggleNextFollowUp() {
+      const isSubmitted = document.getElementById('editStatus').value.startsWith('2.');
+      document.getElementById('nextFollowUpGroup').style.display = isSubmitted ? 'flex' : 'none';
     }
 
     function closeEditModal() {
@@ -1116,77 +1758,62 @@
       if (!selectedQuoteNo) return;
       const saveBtn = document.getElementById('saveEditBtn');
       saveBtn.disabled = true;
-      saveBtn.textContent = 'Saving...';
+      saveBtn.textContent = t('btn.saving');
 
+      const status = document.getElementById('editStatus').value;
       const payload = {
-        action: 'updateProject',
-        apiKey: API_SECRET,
-        empId: currentUser.empId,
         quoteNo: selectedQuoteNo,
-        status: document.getElementById('editStatus').value,
+        status: status,
         deliveryDate: document.getElementById('editDeliveryDate').value,
+        // 提出済以外に変えた場合はフォロー日をクリア
+        nextFollowUp: status.startsWith('2.') ? document.getElementById('editNextFollowUp').value : '',
         tradeType: document.getElementById('editTradeType').value,
         details: document.getElementById('editDetails').value,
         memo: document.getElementById('editNewMemo').value
       };
 
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload)
-        });
-        const res = await response.json();
+        const res = await api('updateProject', payload);
         if (res.status === 'success') {
           closeEditModal();
           await fetchLatestProjects();
         } else {
-          alert('更新エラー: ' + res.message);
+          alert(t('err.update') + res.message);
         }
       } catch (err) {
-        alert('通信エラーが発生しました');
+        if (err.message !== 'AUTH') alert(t('err.network'));
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = 'Save Changes';
+        saveBtn.textContent = t('btn.save');
       }
     }
 
     async function submitCreateRevision() {
       if (!selectedQuoteNo) return;
-      if (!confirm(`Create a new revision from ${selectedQuoteNo}?`)) return;
+      if (!confirm(t('confirm.revision', { no: selectedQuoteNo }))) return;
 
       const baseNo = selectedQuoteNo;
       closeEditModal();
-      document.getElementById('loadingText').textContent = 'Generating revision... Please wait';
-      document.getElementById('loadingOverlay').classList.add('active');
+      showLoading('loading.revision');
 
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            action: 'createRevision',
-            apiKey: API_SECRET,
-            empId: currentUser.empId,
-            quoteNo: baseNo
-          })
-        });
-
-        const res = await response.json();
+        const res = await api('createRevision', { quoteNo: baseNo });
         if (res.status === 'success') {
           await fetchLatestProjects();
-          showConfirmModal('Revision Created', res.quoteNo, res.fileUrl);
+          showConfirmModal('confirm.revCreated', res.quoteNo, res.fileUrl);
         } else {
-          alert('Revision Error: ' + res.message);
+          alert(t('err.revision') + res.message);
         }
       } catch (err) {
-        alert('A network error occurred.');
+        if (err.message !== 'AUTH') alert(t('err.network'));
       } finally {
-        document.getElementById('loadingOverlay').classList.remove('active');
+        hideLoading();
       }
     }
 
-    // 新規作成
+    /* =========================================================
+     * 新規作成
+     * ========================================================= */
     function openCreateModal() {
       document.getElementById('createQuoteFormat').value = 'VN';
       onQuoteFormatChange();
@@ -1208,9 +1835,6 @@
 
     async function submitCreateQuotation() {
       const payload = {
-        action: 'createQuotation',
-        apiKey: API_SECRET,
-        empId: currentUser.empId,
         quoteFormat: document.getElementById('createQuoteFormat').value,
         isDomestic: document.getElementById('createCategory').value,
         tradeType: document.getElementById('createTradeType').value,
@@ -1218,39 +1842,40 @@
       };
 
       closeCreateModal();
-      document.getElementById('loadingText').textContent = 'Creating quotation... Please wait';
-      document.getElementById('loadingOverlay').classList.add('active');
+      showLoading('loading.creating');
 
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify(payload)
-        });
-        const res = await response.json();
+        const res = await api('createQuotation', payload);
         if (res.status === 'success') {
           await fetchLatestProjects();
-          showConfirmModal('Quotation Created', res.quoteNo, res.fileUrl);
+          showConfirmModal('confirm.created', res.quoteNo, res.fileUrl);
         } else {
-          alert('Create Error: ' + res.message);
+          alert(t('err.create') + res.message);
         }
       } catch (err) {
-        alert('A network error occurred.');
+        if (err.message !== 'AUTH') alert(t('err.network'));
       } finally {
-        document.getElementById('loadingOverlay').classList.remove('active');
+        hideLoading();
       }
     }
 
-    function showConfirmModal(headerTitle, quoteNo, fileUrl) {
-      document.getElementById('confirmModalHeader').textContent = headerTitle;
-      document.getElementById('confirmModalDesc').innerHTML = `Quotation <b>${quoteNo}</b> has been generated.<br>Would you like to open the spreadsheet now?`;
-      
-      const openBtn = document.getElementById('openSpreadsheetBtn');
-      openBtn.onclick = () => {
-        if (fileUrl) window.open(fileUrl, '_blank');
+    function showLoading(key) {
+      document.getElementById('loadingText').textContent = t(key);
+      document.getElementById('loadingOverlay').classList.add('active');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('active');
+    }
+
+    function showConfirmModal(headerKey, quoteNo, fileUrl) {
+      document.getElementById('confirmModalHeader').textContent = t(headerKey);
+      document.getElementById('confirmModalDesc').innerHTML = t('confirm.desc', { no: esc(quoteNo) });
+
+      document.getElementById('openSpreadsheetBtn').onclick = () => {
+        if (fileUrl) window.open(fileUrl, '_blank', 'noopener');
         closeConfirmModal();
       };
-
       document.getElementById('confirmModalOverlay').classList.add('active');
     }
 
