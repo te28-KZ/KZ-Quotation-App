@@ -581,6 +581,10 @@
     .pj-table tbody tr.clickable:hover { background: var(--bg-sidebar); }
     .pj-table .num { text-align: right; white-space: nowrap; }
     .pj-table .tag, .pj-table .stage-tag { white-space: nowrap; display: inline-block; }
+    .pj-table .pj-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .pj-table tr.pj-branch td:first-child { padding-left: 22px; }
+    .pj-table tr.pj-branch td:first-child::before { content: '└ '; color: var(--text-muted); }
+    .pj-add-branch { display: flex; justify-content: flex-end; margin-top: 8px; }
     .pj-empty { padding: 32px; text-align: center; color: var(--text-muted); font-size: 13px; }
     .stage-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 12px; white-space: nowrap; }
     .stage-1 { background: #E3E2E0; color: #32302C; }
@@ -894,12 +898,16 @@
         <div class="form-row-2">
           <div class="form-group">
             <label class="form-label" data-i18n="f.client"></label>
-            <input type="text" id="pjClient" class="form-input" list="clientList">
+            <input type="text" id="pjClient" class="form-input" list="clientList" oninput="updateContactList(this.value)">
           </div>
           <div class="form-group">
-            <label class="form-label" data-i18n="pj.stage"></label>
-            <select id="pjStage" class="form-select"></select>
+            <label class="form-label" data-i18n="pj.contact"></label>
+            <input type="text" id="pjContact" class="form-input" list="contactList" data-i18n-ph="pj.contactPh">
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="pj.stage"></label>
+          <select id="pjStage" class="form-select"></select>
         </div>
         <div class="form-row-2">
           <div class="form-group">
@@ -931,6 +939,9 @@
             </select>
             <button class="btn-outline-primary" onclick="submitAddQuote()" data-i18n="pj.addQuote"></button>
           </div>
+          <div class="pj-add-branch" id="pjAddBranchBox">
+            <button class="btn-outline-primary" onclick="openBranchModal()" data-i18n="pj.addBranch"></button>
+          </div>
         </div>
         <div class="form-group" id="pjMemoGroup">
           <label class="form-label" data-i18n="f.newMemo"></label>
@@ -950,6 +961,53 @@
     </div>
   </div>
   <datalist id="clientList"></datalist>
+  <datalist id="contactList"></datalist>
+
+  <!-- 枝番を追加（メンテナンス・追加工事など） -->
+  <div class="modal-overlay" id="branchModalOverlay" style="z-index: 1200;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" id="branchModalTitle"></span>
+        <button class="close-btn" onclick="closeBranchModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-muted); margin: 0;" id="branchModalDesc"></p>
+        <div class="form-group">
+          <label class="form-label" data-i18n="pj.name"></label>
+          <input type="text" id="branchName" class="form-input">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-i18n="f.client"></label>
+            <input type="text" id="branchClient" class="form-input form-readonly" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="pj.contact"></label>
+            <input type="text" id="branchContact" class="form-input" list="contactList" data-i18n-ph="pj.contactPh">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-i18n="create.delivery"></label>
+            <input type="date" id="branchDelivery" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="f.tradeType"></label>
+            <select id="branchTradeType" class="form-select">
+              <option value="Direct" data-i18n="trade.direct"></option>
+              <option value="Via Forwarder" data-i18n="trade.forwarder"></option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-footer-right" style="width: 100%; justify-content: flex-end;">
+          <button class="btn-secondary" onclick="closeBranchModal()" data-i18n="btn.cancel"></button>
+          <button class="btn-primary" onclick="submitAddBranch()" data-i18n="pj.createBranch"></button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 提出後フォロー通知ポップアップ -->
   <div class="modal-overlay" id="followupModalOverlay" style="z-index: 1400;">
@@ -980,7 +1038,11 @@
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="f.client"></label>
-          <input type="text" id="createClient" class="form-input" list="clientList" data-i18n-ph="pj.clientPh">
+          <input type="text" id="createClient" class="form-input" list="clientList" data-i18n-ph="pj.clientPh" oninput="onCreateClientInput()">
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="pj.contact"></label>
+          <input type="text" id="createContact" class="form-input" list="contactList" data-i18n-ph="pj.contactPh">
         </div>
         <div class="form-row-2">
           <div class="form-group">
@@ -996,7 +1058,6 @@
             <input type="date" id="createDeliveryDate" class="form-input">
           </div>
         </div>
-        <label class="form-check"><input type="checkbox" id="createWithQuote" checked onchange="onCreateCategoryChange()"> <span data-i18n="pj.withQuote"></span></label>
         <div class="form-group" id="createTradeGroup">
           <label class="form-label" data-i18n="f.tradeType"></label>
           <select id="createTradeType" class="form-select">
@@ -1031,6 +1092,7 @@
       <p id="confirmModalDesc" style="font-size: 13px; color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.5;"></p>
       <div style="display: flex; justify-content: center; gap: 10px;">
         <button class="btn-secondary" onclick="closeConfirmModal()" data-i18n="btn.later"></button>
+        <button class="btn-outline-primary" id="openFolderBtn" style="display: none;" data-i18n="btn.openFolder"></button>
         <button class="btn-primary" id="openSpreadsheetBtn" data-i18n="btn.openSheet"></button>
       </div>
     </div>
@@ -1068,7 +1130,14 @@
         'pj.noQuotes': 'まだ見積がありません',
         'pj.addQuote': '+ 見積を追加',
         'pj.addQuoteConfirm': '物件 {no} に新しい見積を追加しますか？',
-        'pj.withQuote': '最初の見積も作成する',
+        'pj.contact': '客先担当者',
+        'pj.contactPh': '例：Ms. Mai（見積には載りません）',
+        'pj.addBranch': '+ 枝番を追加（メンテナンス・追加工事）',
+        'pj.createBranch': '枝番と見積を作成',
+        'pj.branchTitle': '{no} に枝番を追加',
+        'pj.branchDesc': '物件の完了後に発生したメンテナンス・追加工事などを、新しい枝番 {next} として登録します。フォルダは元の物件フォルダの中に作成し、最初の見積も同時に作成します。',
+        'pj.branchSuffix': '（メンテナンス）',
+        'pj.jpClientOnly': '{c} は区分「親会社」の物件でのみ選べます。',
         'pj.nameRequired': '物件名を入力してください',
         'pj.none': '該当する物件はありません',
         'pj.colNo': '物件No',
@@ -1090,7 +1159,7 @@
         'cs.noClient': '（客先未設定）',
         'pj.created': '物件を作成しました',
         'pj.createdDesc': '物件 <b>{no}</b> を作成しました。<br>物件フォルダを開きますか？',
-        'pj.createdWithQuoteDesc': '物件 <b>{no}</b> と見積 <b>{q}</b> を作成しました。<br>見積のスプレッドシートを開きますか？',
+        'pj.createdWithQuoteDesc': '物件 <b>{no}</b> と見積 <b>{q}</b> を作成しました。',
         'btn.openFolder': 'フォルダを開く',
         'loading.project': '物件を作成しています...',
         'stage.1. Inquiry': '1. 引合',
@@ -1221,7 +1290,14 @@
         'pj.noQuotes': 'Chưa có báo giá',
         'pj.addQuote': '+ Thêm báo giá',
         'pj.addQuoteConfirm': 'Thêm báo giá mới vào dự án {no}?',
-        'pj.withQuote': 'Tạo luôn báo giá đầu tiên',
+        'pj.contact': 'Người phụ trách (khách hàng)',
+        'pj.contactPh': 'Ví dụ: Ms. Mai (không in trên báo giá)',
+        'pj.addBranch': '+ Thêm nhánh (bảo trì / phát sinh)',
+        'pj.createBranch': 'Tạo nhánh và báo giá',
+        'pj.branchTitle': 'Thêm nhánh cho {no}',
+        'pj.branchDesc': 'Đăng ký công việc bảo trì / phát sinh sau khi dự án hoàn thành với số nhánh mới {next}. Thư mục được tạo bên trong thư mục dự án gốc và báo giá đầu tiên cũng được tạo cùng lúc.',
+        'pj.branchSuffix': ' (Bảo trì)',
+        'pj.jpClientOnly': 'Chỉ có thể chọn {c} cho dự án thuộc loại "Công ty mẹ".',
         'pj.nameRequired': 'Vui lòng nhập tên dự án',
         'pj.none': 'Không có dự án phù hợp',
         'pj.colNo': 'Số dự án',
@@ -1243,7 +1319,7 @@
         'cs.noClient': '(Chưa có khách hàng)',
         'pj.created': 'Đã tạo dự án',
         'pj.createdDesc': 'Đã tạo dự án <b>{no}</b>.<br>Bạn có muốn mở thư mục dự án không?',
-        'pj.createdWithQuoteDesc': 'Đã tạo dự án <b>{no}</b> và báo giá <b>{q}</b>.<br>Bạn có muốn mở bảng tính báo giá không?',
+        'pj.createdWithQuoteDesc': 'Đã tạo dự án <b>{no}</b> và báo giá <b>{q}</b>.',
         'btn.openFolder': 'Mở thư mục',
         'loading.project': 'Đang tạo dự án...',
         'stage.1. Inquiry': '1. Yêu cầu',
@@ -1374,7 +1450,14 @@
         'pj.noQuotes': 'No quotes yet',
         'pj.addQuote': '+ Add quote',
         'pj.addQuoteConfirm': 'Add a new quote to project {no}?',
-        'pj.withQuote': 'Also create the first quote',
+        'pj.contact': 'Client contact',
+        'pj.contactPh': 'e.g. Ms. Mai (not shown on the quote)',
+        'pj.addBranch': '+ Add branch (maintenance / extra work)',
+        'pj.createBranch': 'Create branch & quote',
+        'pj.branchTitle': 'Add a branch to {no}',
+        'pj.branchDesc': 'Registers maintenance or extra work that came up after the project was completed as new branch {next}. The folder is created inside the original project folder, and the first quote is created at the same time.',
+        'pj.branchSuffix': ' (Maintenance)',
+        'pj.jpClientOnly': '{c} can only be chosen for Japan HQ projects.',
         'pj.nameRequired': 'Please enter a project name',
         'pj.none': 'No matching projects',
         'pj.colNo': 'No.',
@@ -1396,7 +1479,7 @@
         'cs.noClient': '(No client)',
         'pj.created': 'Project Created',
         'pj.createdDesc': 'Project <b>{no}</b> has been created.<br>Open the project folder now?',
-        'pj.createdWithQuoteDesc': 'Project <b>{no}</b> and quote <b>{q}</b> have been created.<br>Open the quotation spreadsheet now?',
+        'pj.createdWithQuoteDesc': 'Project <b>{no}</b> and quote <b>{q}</b> have been created.',
         'btn.openFolder': 'Open Folder',
         'loading.project': 'Creating project... Please wait',
         'stage.1. Inquiry': '1. Inquiry',
@@ -1588,6 +1671,9 @@
     let googleClientId = '';
     let projectsData = [];             // 物件一覧（見積を含む）
     let clientsList = [];              // 客先一覧
+    let clientContacts = {};           // 客先ごとの担当者 { 客先: [名前…] }
+    let jpClient = 'KATZ JP';          // 親会社の客先名（区分「親会社」と連動）
+    let jpAliases = [];
     let projectStages = ['1. Inquiry', '2. Quoting', '3. Ordered', '4. In Production', '5. Delivered', '6. Completed', '9. Lost'];
     let pjTab = 'list';
     let selectedProjectNo = null;
@@ -2140,6 +2226,9 @@
         if (res.status !== 'success') { console.error('Projects API Error:', res.message); return; }
         projectsData = res.projects || [];
         clientsList = res.clients || [];
+        clientContacts = res.clientContacts || {};
+        if (res.jpClient) jpClient = res.jpClient;
+        jpAliases = res.jpAliases || [];
         if (res.stages) projectStages = res.stages;
         document.getElementById('clientList').innerHTML = clientsList.map(c => `<option value="${esc(c)}"></option>`).join('');
         buildStageOptions();
@@ -2201,7 +2290,7 @@
           if (stage !== 'ACTIVE' && stage !== 'ALL' && p.stage !== stage) return false;
         }
         if (q) {
-          const hay = [p.projectNo, p.name, p.client, ...(p.quotes || []).map(x => x.quoteNo)].join(' ').toLowerCase();
+          const hay = [p.projectNo, p.name, p.client, p.contact, ...(p.quotes || []).map(x => x.quoteNo)].join(' ').toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -2215,13 +2304,13 @@
       document.getElementById('pjStageFilter').style.display = pjTab === 'clients' ? 'none' : '';
       if (pjTab === 'clients') { box.innerHTML = renderClientSummary(filteredProjects(true)); return; }
 
-      const list = filteredProjects(false);
+      const list = groupBranches(filteredProjects(false));
       if (list.length === 0) { box.innerHTML = `<div class="pj-empty">${esc(t('pj.none'))}</div>`; return; }
       const rows = list.map(p => `
-        <tr class="clickable" onclick="openProjectModal('${esc(p.projectNo)}')">
+        <tr class="clickable${isBranch(p.projectNo) ? ' pj-branch' : ''}" onclick="openProjectModal('${esc(p.projectNo)}')">
           <td style="white-space: nowrap;">${esc(p.projectNo)}</td>
           <td>${esc(p.name)}</td>
-          <td>${esc(p.client || '-')}</td>
+          <td>${esc(p.client || '-')}${p.contact ? `<div class="pj-sub">${esc(p.contact)}</div>` : ''}</td>
           <td><span class="tag tag-draft">${esc(categoryLabel(p.category))}</span></td>
           <td>${stageTag(p.stage)}</td>
           <td>${esc((p.salesPerson || '').split(' ')[0])}</td>
@@ -2234,6 +2323,32 @@
           <th>${esc(t('pj.colCategory'))}</th><th>${esc(t('pj.colStage'))}</th><th>${esc(t('pj.colOwner'))}</th>
           <th class="num">${esc(t('pj.colAmount'))}</th><th>${esc(t('pj.colDelivery'))}</th><th class="num">${esc(t('pj.colQuotes'))}</th>
         </tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    // 物件No（10桁）= 元の番号 + 枝番2桁。枝番02以降は元の物件のすぐ下にまとめて表示
+    function projectBase(no) { return String(no || '').slice(0, -2); }
+    function isBranch(no) { return /^(?:JP)?\d{10}$/.test(no) && String(no).slice(-2) !== '01'; }
+    function groupBranches(list) {
+      const order = [], groups = {};
+      list.forEach(p => {
+        const b = projectBase(p.projectNo);
+        if (!groups[b]) { groups[b] = []; order.push(b); }
+        groups[b].push(p);
+      });
+      return order.flatMap(b => groups[b].sort((x, y) => x.projectNo.localeCompare(y.projectNo)));
+    }
+
+    // 客先担当者の候補（選んだ客先で過去に入力した名前）
+    function updateContactList(client) {
+      const names = clientContacts[String(client || '').trim()] || [];
+      document.getElementById('contactList').innerHTML = names.map(n => `<option value="${esc(n)}"></option>`).join('');
+    }
+
+    // 入力された客先が KATZ JP（または別名）か
+    function isJpClientName(name) {
+      const k = s => String(s || '').toLowerCase().replace(/[\s.,，。・\-_()（）]/g, '');
+      const v = k(name);
+      return !!v && [jpClient, ...jpAliases].some(a => k(a) === v);
     }
 
     // 金額文字列 → { cur, val }（$ / ₫ / ¥ を判定。通貨ごとに合計するため）
@@ -2306,6 +2421,7 @@
       if (!keepInputs) {
         document.getElementById('pjName').value = p.name || '';
         document.getElementById('pjClient').value = p.client || '';
+        document.getElementById('pjContact').value = p.contact || '';
         document.getElementById('pjStage').value = p.stage || '1. Inquiry';
         document.getElementById('pjDelivery').value = p.deliveryDate || '';
         document.getElementById('pjNewMemo').value = '';
@@ -2333,7 +2449,14 @@
       document.getElementById('pjSaveBtn').style.display = isOwner ? 'block' : 'none';
       document.getElementById('pjAddQuoteBox').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('pjMemoGroup').style.display = isOwner ? 'flex' : 'none';
-      ['pjName', 'pjClient', 'pjStage', 'pjDelivery'].forEach(id => document.getElementById(id).disabled = !isOwner);
+      document.getElementById('pjAddBranchBox').style.display = isOwner ? 'flex' : 'none';
+      ['pjName', 'pjClient', 'pjContact', 'pjStage', 'pjDelivery'].forEach(id => document.getElementById(id).disabled = !isOwner);
+      // 親会社の物件は客先を KATZ JP に固定
+      const isJp = String(p.projectNo).startsWith('JP');
+      const pjClient = document.getElementById('pjClient');
+      pjClient.readOnly = isJp;
+      pjClient.classList.toggle('form-readonly', isJp);
+      updateContactList(document.getElementById('pjClient').value);
       document.getElementById('projectModalOverlay').classList.add('active');
     }
 
@@ -2344,6 +2467,11 @@
 
     async function saveProjectInfo() {
       if (!selectedProjectNo) return;
+      const client = document.getElementById('pjClient').value;
+      if (!String(selectedProjectNo).startsWith('JP') && isJpClientName(client)) {
+        alert(t('pj.jpClientOnly', { c: jpClient }));
+        return;
+      }
       const btn = document.getElementById('pjSaveBtn');
       btn.disabled = true;
       btn.textContent = t('btn.saving');
@@ -2351,7 +2479,8 @@
         const res = await api('updateProjectInfo', {
           projectNo: selectedProjectNo,
           name: document.getElementById('pjName').value,
-          client: document.getElementById('pjClient').value,
+          client: client,
+          contact: document.getElementById('pjContact').value,
           stage: document.getElementById('pjStage').value,
           deliveryDate: document.getElementById('pjDelivery').value,
           memo: document.getElementById('pjNewMemo').value
@@ -2394,9 +2523,10 @@
     function openCreateModal() {
       document.getElementById('createName').value = '';
       document.getElementById('createClient').value = '';
+      document.getElementById('createContact').value = '';
       document.getElementById('createCategory').value = 'domestic';
       document.getElementById('createDeliveryDate').value = '';
-      document.getElementById('createWithQuote').checked = true;
+      updateContactList('');
       document.getElementById('createTradeType').value = 'Direct';
       document.getElementById('createError').style.display = 'none';
       onCreateCategoryChange();
@@ -2404,8 +2534,32 @@
       setTimeout(() => document.getElementById('createName').focus(), 50);
     }
 
+    // 区分「親会社」⇔ 客先「KATZ JP」を連動させる
+    function setCreateClientLocked(locked) {
+      const el = document.getElementById('createClient');
+      el.readOnly = locked;
+      el.classList.toggle('form-readonly', locked);
+    }
     function onCreateCategoryChange() {
-      document.getElementById('createTradeGroup').style.display = document.getElementById('createWithQuote').checked ? '' : 'none';
+      const cat = document.getElementById('createCategory');
+      const client = document.getElementById('createClient');
+      if (cat.value === 'hq') {
+        client.value = jpClient;
+        setCreateClientLocked(true);
+      } else {
+        if (isJpClientName(client.value)) client.value = '';
+        setCreateClientLocked(false);
+      }
+      updateContactList(client.value);
+    }
+    function onCreateClientInput() {
+      const client = document.getElementById('createClient');
+      if (isJpClientName(client.value)) {
+        client.value = jpClient;
+        document.getElementById('createCategory').value = 'hq';
+        setCreateClientLocked(true);
+      }
+      updateContactList(client.value);
     }
 
     function closeCreateModal() {
@@ -2421,33 +2575,82 @@
         return;
       }
       const cat = document.getElementById('createCategory').value;
-      const withQuote = document.getElementById('createWithQuote').checked;
       const payload = {
         name: name,
         client: document.getElementById('createClient').value.trim(),
+        contact: document.getElementById('createContact').value.trim(),
         quoteFormat: cat === 'hq' ? 'JP' : 'VN',
         isDomestic: cat === 'domestic' ? '国内(Domestic)' : '輸出(Overseas)',
         tradeType: document.getElementById('createTradeType').value,
-        deliveryDate: document.getElementById('createDeliveryDate').value,
-        withQuote: withQuote
+        deliveryDate: document.getElementById('createDeliveryDate').value
       };
 
       closeCreateModal();
-      showLoading(withQuote ? 'loading.creating' : 'loading.project');
+      showLoading('loading.creating');
       try {
         const res = await api('createProject', payload);
         if (res.status === 'success') {
           await Promise.all([fetchProjects(), fetchLatestProjects()]);
-          if (res.quoteNo) {
-            showConfirmModal('pj.created', t('pj.createdWithQuoteDesc', { no: esc(res.projectNo), q: esc(res.quoteNo) }), res.fileUrl);
-          } else {
-            showConfirmModal('pj.created', t('pj.createdDesc', { no: esc(res.projectNo) }), res.folderUrl, 'btn.openFolder');
-          }
+          showConfirmModal('pj.created', t('pj.createdWithQuoteDesc', { no: esc(res.projectNo), q: esc(res.quoteNo) }), res.fileUrl, null, res.folderUrl);
         } else {
           alert(t('err.create') + res.message);
         }
       } catch (err) {
         if (err.message !== 'AUTH') alert(t('err.network'));
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 枝番を追加
+    function nextBranchNo(projectNo) {
+      const base = projectBase(projectNo);
+      let max = 0;
+      projectsData.forEach(p => {
+        if (p.projectNo.length === base.length + 2 && p.projectNo.startsWith(base)) max = Math.max(max, parseInt(p.projectNo.slice(-2), 10) || 0);
+      });
+      return base + String(max + 1).padStart(2, '0');
+    }
+    function openBranchModal() {
+      const p = projectsData.find(x => x.projectNo === selectedProjectNo);
+      if (!p) return;
+      const root = projectsData.find(x => x.projectNo === projectBase(p.projectNo) + '01') || p;
+      document.getElementById('branchModalTitle').textContent = t('pj.branchTitle', { no: p.projectNo });
+      document.getElementById('branchModalDesc').textContent = t('pj.branchDesc', { next: nextBranchNo(p.projectNo) });
+      document.getElementById('branchName').value = (root.name || '') + t('pj.branchSuffix');
+      document.getElementById('branchClient').value = p.client || '';
+      document.getElementById('branchContact').value = p.contact || '';
+      document.getElementById('branchDelivery').value = '';
+      document.getElementById('branchTradeType').value = 'Direct';
+      updateContactList(p.client);
+      document.getElementById('branchModalOverlay').classList.add('active');
+    }
+    function closeBranchModal() {
+      document.getElementById('branchModalOverlay').classList.remove('active');
+    }
+    async function submitAddBranch() {
+      const projectNo = selectedProjectNo;
+      if (!projectNo) return;
+      const payload = {
+        projectNo: projectNo,
+        name: document.getElementById('branchName').value.trim(),
+        contact: document.getElementById('branchContact').value.trim(),
+        deliveryDate: document.getElementById('branchDelivery').value,
+        tradeType: document.getElementById('branchTradeType').value
+      };
+      closeBranchModal();
+      closeProjectModal();
+      showLoading('loading.creating');
+      try {
+        const res = await api('addBranch', payload);
+        if (res.status === 'success') {
+          await Promise.all([fetchProjects(), fetchLatestProjects()]);
+          showConfirmModal('pj.created', t('pj.createdWithQuoteDesc', { no: esc(res.projectNo), q: esc(res.quoteNo) }), res.fileUrl, null, res.folderUrl);
+        } else {
+          alert(t('err.create') + res.message);
+        }
+      } catch (e) {
+        if (e.message !== 'AUTH') alert(t('err.network'));
       } finally {
         hideLoading();
       }
@@ -2462,11 +2665,17 @@
       document.getElementById('loadingOverlay').classList.remove('active');
     }
 
-    function showConfirmModal(headerKey, descHtml, url, openBtnKey) {
+    function showConfirmModal(headerKey, descHtml, url, openBtnKey, folderUrl) {
       document.getElementById('confirmModalHeader').textContent = t(headerKey);
       document.getElementById('confirmModalDesc').innerHTML = descHtml;
       document.getElementById('openSpreadsheetBtn').textContent = t(openBtnKey || 'btn.openSheet');
       const fileUrl = url;
+      const folderBtn = document.getElementById('openFolderBtn');
+      folderBtn.style.display = folderUrl ? '' : 'none';
+      folderBtn.onclick = () => {
+        if (folderUrl) window.open(folderUrl, '_blank', 'noopener');
+        closeConfirmModal();
+      };
 
       document.getElementById('openSpreadsheetBtn').onclick = () => {
         if (fileUrl) window.open(fileUrl, '_blank', 'noopener');
