@@ -16,7 +16,9 @@ KATZ VN（ベトナム）の見積と物件を管理する社内アプリ。親�
 | --- | --- |
 | `Code.gs` | Google Apps Script（GAS）のWeb API。`doPost` で JSON を受け取る |
 | `index.html` | 画面（1ファイル）。`API_URL` に GAS の `/exec` URL を指定 |
+| `template/UnitPriceFormat.gs` | 単価の通貨表示を切り替える onEdit。Buddy と同じ Apps Script プロジェクトに別ファイルとして入っている |
 
+- Buddy の Apps Script は**見積マスター（テンプレート）にくっついたプロジェクト**。見積を作るとテンプレートをコピーするので、各見積ファイルにもコードが一緒にコピーされる（Webアプリとして動くのはテンプレート側のデプロイだけ）。Code.gs を更新するときは Code.gs のファイルだけを差し替え、UnitPriceFormat のファイルは残す。
 - ログイン：Google Identity Services の IDトークン → `login` でセッション発行（30日）。OAuth クライアントIDはスクリプトプロパティ `GOOGLE_CLIENT_ID`。
 - 同時書き込みは `LockService` で守る。
 - 主なAPI（`doPost` の action）：`whoami` `logout` `setLanguage` `createQuotation`（旧互換） `getProjects` `createProject` `addBranch` `addQuoteToProject` `updateProjectInfo` `addClient` `getFollowUps` `searchProjects` `updateProject` `createRevision`
@@ -47,6 +49,10 @@ KATZ VN（ベトナム）の見積と物件を管理する社内アプリ。親�
   - 旧名 `02見積り` も見積フォルダとして扱う。
 - 見積は回ごとに分ける：`02見積り_Báo giá/01 1回目_Lần 1/`、`02 2回目_Lần 2/` …
 - 見積テンプレート `1QiFOlOhv_1fvM-pX_EB4-GgbWjYUrmZ0XTvdXMTRX1U`（国内用 `TH` / 親会社用 `TH_JP` シート）
+  - Quotation：J6 通貨（USD / VND）、J7 担当、J8 役職（数式）、明細は14〜31行（G 数量 / I 単価 / J 金額）、J34 合計。
+  - 単価 I14:I31 は手入力。表示形式は他のセルの値で切り替えられないため、見積マスターに入れた `template/UnitPriceFormat.gs`（onEdit のシンプルトリガー）が、J6 の変更時と単価の入力時に I列の表示形式を `"$"#,##0.0` / `#,##0" VND"` に切り替える。明細の最後は I列の「TOTAL」の行の手前で判定。
+  - 金額 J列と合計 J34 は、単価が文字（$16.4 など）でも数値に直して計算する。
+  - 親会社とはUSDで取引する（TH_JPの円は参考表示）。
 
 ## 権限
 
