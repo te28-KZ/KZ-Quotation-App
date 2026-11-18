@@ -2111,7 +2111,7 @@
      * ========================================================= */
     function isProjectOwner(proj) {
       if (!proj || !currentUser) return false;
-      return salesMatches(proj.salesPerson, currentUser.name);
+      return !!currentUser.isAdmin || salesMatches(proj.salesPerson, currentUser.name);
     }
 
     function openEditModal(quoteNo) {
@@ -2444,7 +2444,7 @@
         ql.appendChild(row);
       });
 
-      const isOwner = salesMatches(p.salesPerson, currentUser.name);
+      const isOwner = !!currentUser.isAdmin || salesMatches(p.salesPerson, currentUser.name);
       document.getElementById('pjReadOnlyBanner').style.display = isOwner ? 'none' : 'block';
       document.getElementById('pjSaveBtn').style.display = isOwner ? 'block' : 'none';
       document.getElementById('pjAddQuoteBox').style.display = isOwner ? 'flex' : 'none';
