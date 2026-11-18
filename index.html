@@ -582,6 +582,7 @@
     .pj-table .num { text-align: right; white-space: nowrap; }
     .pj-table .tag, .pj-table .stage-tag { white-space: nowrap; display: inline-block; }
     .pj-table .pj-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .pj-table .pj-reason { font-size: 11px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; }
     .pj-table tr.pj-branch td:first-child { padding-left: 22px; }
     .pj-table tr.pj-branch td:first-child::before { content: '└ '; color: var(--text-muted); }
     .pj-add-branch { display: flex; justify-content: flex-end; margin-top: 8px; }
@@ -905,9 +906,15 @@
             <input type="text" id="pjContact" class="form-input" list="contactList" data-i18n-ph="pj.contactPh">
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="pj.stage"></label>
-          <select id="pjStage" class="form-select"></select>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" data-i18n="pj.stage"></label>
+            <select id="pjStage" class="form-select" onchange="toggleLostReason()"></select>
+          </div>
+          <div class="form-group" id="pjLostReasonGroup" style="display: none;">
+            <label class="form-label" data-i18n="pj.lostReason"></label>
+            <select id="pjLostReason" class="form-select"></select>
+          </div>
         </div>
         <div class="form-row-2">
           <div class="form-group">
@@ -1153,10 +1160,10 @@
         'cs.projects': '物件数',
         'cs.active': '進行中',
         'cs.won': '受注',
-        'cs.lost': '失注',
+        'cs.lost': '不成立',
         'cs.winRate': '受注率',
         'cs.amount': '受注金額合計',
-        'cs.note': '受注率 ＝ 受注 ÷（受注＋失注）。受注金額は通貨ごとに合計しています。',
+        'cs.note': '受注率 ＝ 受注 ÷（受注＋不成立）。不成立のうち「案件の中止・延期」は除きます。受注金額は通貨ごとに合計しています。',
         'cs.noClient': '（客先未設定）',
         'pj.created': '物件を作成しました',
         'pj.createdDesc': '物件 <b>{no}</b> を作成しました。<br>物件フォルダを開きますか？',
@@ -1169,7 +1176,16 @@
         'stage.4. In Production': '4. 製作中',
         'stage.5. Delivered': '5. 納品済',
         'stage.6. Completed': '6. 完了',
-        'stage.9. Lost': '9. 失注',
+        'stage.9. Lost': '9. 不成立',
+        'pj.lostReason': '不成立の理由',
+        'pj.reasonPick': '選んでください',
+        'pj.reasonRequired': '段階を「9. 不成立」にするときは、理由を選んでください。',
+        'lr.price': '価格が合わない',
+        'lr.competitor': '他社に決定',
+        'lr.spec': '仕様・納期が合わない',
+        'lr.cancelled': '案件の中止・延期',
+        'lr.no_response': '連絡が途絶えた',
+        'lr.other': 'その他',
         'login.prompt': '会社のGoogleアカウントでサインインしてください',
         'login.checking': 'サインインしています...',
         'login.notStaff': 'このGoogleアカウントは登録されていません。管理者にStaffシートへのメールアドレス登録を依頼してください。',
@@ -1266,7 +1282,7 @@
         'status.2. Submitted': '2. 提出済',
         'status.3. Negotiating': '3. 商談中',
         'status.4. Accepted': '4. 受注',
-        'status.9. Lost / Cancelled': '9. 失注・中止'
+        'status.9. Lost / Cancelled': '9. 不成立・中止'
       },
       vi: {
         'nav.properties': '🏗 Dự án',
@@ -1314,10 +1330,10 @@
         'cs.projects': 'Số dự án',
         'cs.active': 'Đang thực hiện',
         'cs.won': 'Đã nhận đơn',
-        'cs.lost': 'Mất đơn',
+        'cs.lost': 'Không thành công',
         'cs.winRate': 'Tỷ lệ thắng',
         'cs.amount': 'Tổng giá trị đơn hàng',
-        'cs.note': 'Tỷ lệ thắng = Đã nhận đơn ÷ (Đã nhận đơn + Mất đơn). Giá trị đơn hàng được cộng theo từng loại tiền tệ.',
+        'cs.note': 'Tỷ lệ thắng = Đã nhận đơn ÷ (Đã nhận đơn + Không thành công). Không tính các dự án “Dự án bị hủy / hoãn”. Giá trị đơn hàng được cộng theo từng loại tiền tệ.',
         'cs.noClient': '(Chưa có khách hàng)',
         'pj.created': 'Đã tạo dự án',
         'pj.createdDesc': 'Đã tạo dự án <b>{no}</b>.<br>Bạn có muốn mở thư mục dự án không?',
@@ -1330,7 +1346,16 @@
         'stage.4. In Production': '4. Đang sản xuất',
         'stage.5. Delivered': '5. Đã giao hàng',
         'stage.6. Completed': '6. Hoàn thành',
-        'stage.9. Lost': '9. Mất đơn',
+        'stage.9. Lost': '9. Không thành công',
+        'pj.lostReason': 'Lý do không thành công',
+        'pj.reasonPick': 'Vui lòng chọn',
+        'pj.reasonRequired': 'Khi chuyển sang “9. Không thành công”, vui lòng chọn lý do.',
+        'lr.price': 'Giá không phù hợp',
+        'lr.competitor': 'Khách chọn công ty khác',
+        'lr.spec': 'Không phù hợp thông số / thời hạn',
+        'lr.cancelled': 'Dự án bị hủy / hoãn',
+        'lr.no_response': 'Mất liên lạc',
+        'lr.other': 'Khác',
         'login.prompt': 'Vui lòng đăng nhập bằng tài khoản Google của công ty',
         'login.checking': 'Đang đăng nhập...',
         'login.notStaff': 'Tài khoản Google này chưa được đăng ký. Vui lòng nhờ quản trị viên thêm email của bạn vào bảng Staff.',
@@ -1427,7 +1452,7 @@
         'status.2. Submitted': '2. Đã gửi',
         'status.3. Negotiating': '3. Đang đàm phán',
         'status.4. Accepted': '4. Đã nhận đơn',
-        'status.9. Lost / Cancelled': '9. Mất đơn / Hủy'
+        'status.9. Lost / Cancelled': '9. Không thành công / Hủy'
       },
       en: {
         'nav.properties': '🏗 Projects',
@@ -1475,10 +1500,10 @@
         'cs.projects': 'Projects',
         'cs.active': 'Active',
         'cs.won': 'Won',
-        'cs.lost': 'Lost',
+        'cs.lost': 'Not won',
         'cs.winRate': 'Win rate',
         'cs.amount': 'Total order amount',
-        'cs.note': 'Win rate = won ÷ (won + lost). Order amounts are totaled per currency.',
+        'cs.note': 'Win rate = won ÷ (won + not won), excluding projects cancelled or postponed. Order amounts are totaled per currency.',
         'cs.noClient': '(No client)',
         'pj.created': 'Project Created',
         'pj.createdDesc': 'Project <b>{no}</b> has been created.<br>Open the project folder now?',
@@ -1491,7 +1516,16 @@
         'stage.4. In Production': '4. In Production',
         'stage.5. Delivered': '5. Delivered',
         'stage.6. Completed': '6. Completed',
-        'stage.9. Lost': '9. Lost',
+        'stage.9. Lost': '9. Not won',
+        'pj.lostReason': 'Reason',
+        'pj.reasonPick': 'Choose…',
+        'pj.reasonRequired': 'Please choose a reason when setting the stage to “9. Not won”.',
+        'lr.price': 'Price did not fit',
+        'lr.competitor': 'Went with a competitor',
+        'lr.spec': 'Spec or lead time did not fit',
+        'lr.cancelled': 'Project cancelled / postponed',
+        'lr.no_response': 'No response',
+        'lr.other': 'Other',
         'login.prompt': 'Please sign in with your company Google account.',
         'login.checking': 'Signing in...',
         'login.notStaff': 'This Google account is not registered. Ask your administrator to add your email to the Staff sheet.',
@@ -1678,6 +1712,7 @@
     let jpClient = 'KATZ JP';          // 親会社の客先名（区分「親会社」と連動）
     let jpAliases = [];
     let projectStages = ['1. Inquiry', '2. Quoting', '3. Ordered', '4. In Production', '5. Delivered', '6. Completed', '9. Lost'];
+    let lostReasons = ['price', 'competitor', 'spec', 'cancelled', 'no_response', 'other'];
     let pjTab = 'list';
     let selectedProjectNo = null;
 
@@ -2233,6 +2268,7 @@
         if (res.jpClient) jpClient = res.jpClient;
         jpAliases = res.jpAliases || [];
         if (res.stages) projectStages = res.stages;
+        if (res.lostReasons) lostReasons = res.lostReasons;
         document.getElementById('clientList').innerHTML = clientsList.map(c => `<option value="${esc(c)}"></option>`).join('');
         buildStageOptions();
         renderProjectsView();
@@ -2315,7 +2351,7 @@
           <td>${esc(p.name)}</td>
           <td>${esc(p.client || '-')}${p.contact ? `<div class="pj-sub">${esc(p.contact)}</div>` : ''}</td>
           <td><span class="tag tag-draft">${esc(categoryLabel(p.category))}</span></td>
-          <td>${stageTag(p.stage)}</td>
+          <td>${stageTag(p.stage)}${parseInt(p.stage, 10) === 9 && p.lostReason ? `<div class="pj-reason">${esc(t('lr.' + p.lostReason))}</div>` : ''}</td>
           <td>${esc((p.salesPerson || '').split(' ')[0])}</td>
           <td class="num">${esc(p.orderAmount || '-')}</td>
           <td style="white-space: nowrap;">${esc(p.deliveryDate || '-')}</td>
@@ -2381,11 +2417,15 @@
       const map = {};
       list.forEach(p => {
         const key = p.client || t('cs.noClient');
-        const m = map[key] || (map[key] = { client: key, projects: 0, active: 0, won: 0, lost: 0, totals: {} });
+        const m = map[key] || (map[key] = { client: key, projects: 0, active: 0, won: 0, lost: 0, cancelled: 0, reasons: {}, totals: {} });
         const n = parseInt(p.stage, 10);
         m.projects++;
         if (n >= 3 && n <= 6) m.won++;
-        else if (n === 9) m.lost++;
+        else if (n === 9) {
+          m.lost++;
+          if (p.lostReason === 'cancelled') m.cancelled++;   // 中止・延期は受注率から除く
+          if (p.lostReason) m.reasons[p.lostReason] = (m.reasons[p.lostReason] || 0) + 1;
+        }
         if (n <= 5) m.active++;
         const a = parseAmount(p.orderAmount);
         if (a && n >= 3 && n <= 6) m.totals[a.cur] = (m.totals[a.cur] || 0) + a.val;
@@ -2393,11 +2433,12 @@
       const rows = Object.values(map).sort((a, b) => (b.won - a.won) || (b.projects - a.projects) || a.client.localeCompare(b.client));
       if (rows.length === 0) return `<div class="pj-empty">${esc(t('pj.none'))}</div>`;
       const body = rows.map(r => {
-        const closed = r.won + r.lost;
+        const closed = r.won + r.lost - r.cancelled;
+        const breakdown = lostReasons.filter(k => r.reasons[k]).map(k => `${t('lr.' + k)} ${r.reasons[k]}`).join(' / ');
         const rate = closed ? Math.round(r.won / closed * 100) + '%' : '-';
         return `<tr class="clickable" onclick="filterByClient(${esc(JSON.stringify(r.client))})">
           <td>${esc(r.client)}</td><td class="num">${r.projects}</td><td class="num">${r.active}</td>
-          <td class="num">${r.won}</td><td class="num">${r.lost}</td><td class="num">${rate}</td>
+          <td class="num">${r.won}</td><td class="num">${r.lost}${breakdown ? `<div class="pj-reason">${esc(breakdown)}</div>` : ''}</td><td class="num">${rate}</td>
           <td class="num">${formatTotals(r.totals)}</td></tr>`;
       }).join('');
       return `<table class="pj-table"><thead><tr>
@@ -2406,6 +2447,19 @@
           <th class="num">${esc(t('cs.amount'))}</th>
         </tr></thead><tbody>${body}</tbody></table>
         <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px;">${esc(t('cs.note'))}</div>`;
+    }
+
+    // 段階「9. 不成立」のときだけ理由を選ぶ欄を出す
+    function toggleLostReason() {
+      const sel = document.getElementById('pjLostReason');
+      if (!sel.options.length || sel.dataset.lang !== currentLang) {
+        const keep = sel.value;
+        sel.innerHTML = `<option value="">${esc(t('pj.reasonPick'))}</option>` +
+          lostReasons.map(r => `<option value="${esc(r)}">${esc(t('lr.' + r))}</option>`).join('');
+        sel.value = keep;
+        sel.dataset.lang = currentLang;
+      }
+      document.getElementById('pjLostReasonGroup').style.display = parseInt(document.getElementById('pjStage').value, 10) === 9 ? '' : 'none';
     }
 
     // 客先別集計の行をクリック → その客先の物件一覧へ
@@ -2434,6 +2488,8 @@
       const amountEl = document.getElementById('pjAmount'), stageEl = document.getElementById('pjStage');
       if (!keepInputs || amountEl.value === pjLoaded.amount) amountEl.value = p.orderAmount || '';
       if (keepInputs && stageEl.value === pjLoaded.stage) stageEl.value = p.stage || '1. Inquiry';
+      if (!keepInputs) document.getElementById('pjLostReason').value = p.lostReason || '';
+      toggleLostReason();
       pjLoaded = { amount: p.orderAmount || '', stage: p.stage || '1. Inquiry' };
       document.getElementById('pjCategory').value = categoryLabel(p.category);
       document.getElementById('pjSales').value = p.salesPerson || '';
@@ -2458,7 +2514,7 @@
       document.getElementById('pjAddQuoteBox').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('pjMemoGroup').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('pjAddBranchBox').style.display = isOwner ? 'flex' : 'none';
-      ['pjName', 'pjClient', 'pjContact', 'pjStage', 'pjDelivery', 'pjAmount'].forEach(id => document.getElementById(id).disabled = !isOwner);
+      ['pjName', 'pjClient', 'pjContact', 'pjStage', 'pjLostReason', 'pjDelivery', 'pjAmount'].forEach(id => document.getElementById(id).disabled = !isOwner);
       // 親会社の物件は客先を KATZ JP に固定
       const isJp = String(p.projectNo).startsWith('JP');
       const pjClient = document.getElementById('pjClient');
@@ -2476,6 +2532,10 @@
     async function saveProjectInfo() {
       if (!selectedProjectNo) return;
       const client = document.getElementById('pjClient').value;
+      if (parseInt(document.getElementById('pjStage').value, 10) === 9 && !document.getElementById('pjLostReason').value) {
+        alert(t('pj.reasonRequired'));
+        return;
+      }
       if (!String(selectedProjectNo).startsWith('JP') && isJpClientName(client)) {
         alert(t('pj.jpClientOnly', { c: jpClient }));
         return;
@@ -2492,6 +2552,7 @@
           stage: document.getElementById('pjStage').value,
           deliveryDate: document.getElementById('pjDelivery').value,
           orderAmount: document.getElementById('pjAmount').value,
+          lostReason: document.getElementById('pjLostReason').value,
           memo: document.getElementById('pjNewMemo').value
         });
         if (res.status === 'success') {
