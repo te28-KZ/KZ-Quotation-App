@@ -916,7 +916,7 @@
           </div>
           <div class="form-group">
             <label class="form-label" data-i18n="pj.orderAmount"></label>
-            <input type="text" id="pjAmount" class="form-input form-readonly" readonly>
+            <input type="text" id="pjAmount" class="form-input" data-i18n-ph="pj.amountPh">
           </div>
         </div>
         <div class="form-row-2">
@@ -1126,6 +1126,7 @@
         'pj.clientPh': '一覧から選択、または新しい客先名を入力',
         'pj.stage': '段階',
         'pj.orderAmount': '受注金額',
+        'pj.amountPh': '例：25,840,000 ₫ / $3,250 / ¥820,000',
         'pj.quotes': '見積',
         'pj.noQuotes': 'まだ見積がありません',
         'pj.addQuote': '+ 見積を追加',
@@ -1286,6 +1287,7 @@
         'pj.clientPh': 'Chọn từ danh sách hoặc nhập khách hàng mới',
         'pj.stage': 'Giai đoạn',
         'pj.orderAmount': 'Giá trị đơn hàng',
+        'pj.amountPh': 'Ví dụ: 25,840,000 ₫ / $3,250 / ¥820,000',
         'pj.quotes': 'Báo giá',
         'pj.noQuotes': 'Chưa có báo giá',
         'pj.addQuote': '+ Thêm báo giá',
@@ -1446,6 +1448,7 @@
         'pj.clientPh': 'Pick from the list or type a new client',
         'pj.stage': 'Stage',
         'pj.orderAmount': 'Order amount',
+        'pj.amountPh': 'e.g. 25,840,000 ₫ / $3,250 / ¥820,000',
         'pj.quotes': 'Quotes',
         'pj.noQuotes': 'No quotes yet',
         'pj.addQuote': '+ Add quote',
@@ -2412,6 +2415,7 @@
       setProjectsTab('list');
     }
 
+    let pjLoaded = { amount: '', stage: '' };   // 物件の画面を開いたときの値（手で変えたかの判定用）
     function openProjectModal(projectNo, keepInputs) {
       const p = projectsData.find(x => x.projectNo === projectNo);
       if (!p) return;
@@ -2426,7 +2430,11 @@
         document.getElementById('pjDelivery').value = p.deliveryDate || '';
         document.getElementById('pjNewMemo').value = '';
       }
-      document.getElementById('pjAmount').value = p.orderAmount || '-';
+      // 再読み込み時（見積の受注などで段階・受注金額が自動で変わったとき）は、手で触っていない欄だけ新しい値にする
+      const amountEl = document.getElementById('pjAmount'), stageEl = document.getElementById('pjStage');
+      if (!keepInputs || amountEl.value === pjLoaded.amount) amountEl.value = p.orderAmount || '';
+      if (keepInputs && stageEl.value === pjLoaded.stage) stageEl.value = p.stage || '1. Inquiry';
+      pjLoaded = { amount: p.orderAmount || '', stage: p.stage || '1. Inquiry' };
       document.getElementById('pjCategory').value = categoryLabel(p.category);
       document.getElementById('pjSales').value = p.salesPerson || '';
       document.getElementById('pjMemoHistory').textContent = p.memo || t('f.noHistory');
@@ -2450,7 +2458,7 @@
       document.getElementById('pjAddQuoteBox').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('pjMemoGroup').style.display = isOwner ? 'flex' : 'none';
       document.getElementById('pjAddBranchBox').style.display = isOwner ? 'flex' : 'none';
-      ['pjName', 'pjClient', 'pjContact', 'pjStage', 'pjDelivery'].forEach(id => document.getElementById(id).disabled = !isOwner);
+      ['pjName', 'pjClient', 'pjContact', 'pjStage', 'pjDelivery', 'pjAmount'].forEach(id => document.getElementById(id).disabled = !isOwner);
       // 親会社の物件は客先を KATZ JP に固定
       const isJp = String(p.projectNo).startsWith('JP');
       const pjClient = document.getElementById('pjClient');
@@ -2483,6 +2491,7 @@
           contact: document.getElementById('pjContact').value,
           stage: document.getElementById('pjStage').value,
           deliveryDate: document.getElementById('pjDelivery').value,
+          orderAmount: document.getElementById('pjAmount').value,
           memo: document.getElementById('pjNewMemo').value
         });
         if (res.status === 'success') {
