@@ -16,8 +16,9 @@ KATZ VN（ベトナム）の見積と物件を管理する社内アプリ。親�
 | --- | --- |
 | `Code.gs` | Google Apps Script（GAS）のWeb API。`doPost` で JSON を受け取る |
 | `index.html` | 画面（1ファイル）。`API_URL` に GAS の `/exec` URL を指定 |
-| `template/UnitPriceFormat.gs` | 見積マスター（スプレッドシート）に入れるスクリプト。Buddy本体とは別 |
+| `template/UnitPriceFormat.gs` | 単価の通貨表示を切り替える onEdit。Buddy と同じ Apps Script プロジェクトに別ファイルとして入っている |
 
+- Buddy の Apps Script は**見積マスター（テンプレート）にくっついたプロジェクト**。見積を作るとテンプレートをコピーするので、各見積ファイルにもコードが一緒にコピーされる（Webアプリとして動くのはテンプレート側のデプロイだけ）。Code.gs を更新するときは Code.gs のファイルだけを差し替え、UnitPriceFormat のファイルは残す。
 - ログイン：Google Identity Services の IDトークン → `login` でセッション発行（30日）。OAuth クライアントIDはスクリプトプロパティ `GOOGLE_CLIENT_ID`。
 - 同時書き込みは `LockService` で守る。
 - 主なAPI（`doPost` の action）：`whoami` `logout` `setLanguage` `createQuotation`（旧互換） `getProjects` `createProject` `addBranch` `addQuoteToProject` `updateProjectInfo` `addClient` `getFollowUps` `searchProjects` `updateProject` `createRevision`
