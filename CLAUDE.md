@@ -16,9 +16,13 @@ KATZ VN（ベトナム）の見積と物件を管理する社内アプリ。親�
 | --- | --- |
 | `Code.gs` | Google Apps Script（GAS）のWeb API。`doPost` で JSON を受け取る |
 | `index.html` | 画面（1ファイル）。`API_URL` に GAS の `/exec` URL を指定 |
-| `template/UnitPriceFormat.gs` | 単価の通貨表示を切り替える onEdit。Buddy と同じ Apps Script プロジェクトに別ファイルとして入っている |
+| `template/UnitPriceFormat.gs` | 単価の通貨表示を切り替える onEdit。見積マスターにくっついた Apps Script に入れる（Buddy API とは別） |
 
-- Buddy の Apps Script は**見積マスター（テンプレート）にくっついたプロジェクト**。見積を作るとテンプレートをコピーするので、各見積ファイルにもコードが一緒にコピーされる（Webアプリとして動くのはテンプレート側のデプロイだけ）。Code.gs を更新するときは Code.gs のファイルだけを差し替え、UnitPriceFormat のファイルは残す。
+- Buddy の Apps Script は単独のプロジェクト「Buddy API」（どのシートにもくっついていない。2026-11-19 に見積マスターから移行）。シートはすべて ID で開く。
+  - 見積マスターに残るスクリプトは `UnitPriceFormat` だけ（シートの操作に反応する onEdit のため、シートにくっついている必要がある）。
+  - 移行前の旧URL（見積マスターにくっついていた版。手順5でアーカイブするまで戻し先）：`https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec`
+  - 移行前に作った見積ファイルには旧コードのコピーが入っているが、デプロイされていないので動かない。
+- フォロー通知のトリガー（`sendFollowUpEmails`）は「Buddy API」側にだけ置く（2つあるとメールが2通届く）。
 - ログイン：Google Identity Services の IDトークン → `login` でセッション発行（30日）。OAuth クライアントIDはスクリプトプロパティ `GOOGLE_CLIENT_ID`。
 - 同時書き込みは `LockService` で守る。
 - 主なAPI（`doPost` の action）：`whoami` `logout` `setLanguage` `createQuotation`（旧互換） `getProjects` `createProject` `addBranch` `addQuoteToProject` `updateProjectInfo` `addClient` `getFollowUps` `searchProjects` `updateProject` `createRevision`
