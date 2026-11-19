@@ -20,7 +20,7 @@ KATZ VN（ベトナム）の見積と物件を管理する社内アプリ。親�
 
 - Buddy の Apps Script は単独のプロジェクト「Buddy API」（どのシートにもくっついていない。2026-11-19 に見積マスターから移行）。シートはすべて ID で開く。
   - 見積マスターに残るスクリプトは `UnitPriceFormat` だけ（シートの操作に反応する onEdit のため、シートにくっついている必要がある）。
-  - 移行前の旧URL（見積マスターにくっついていた版。手順5でアーカイブするまで戻し先）：`https://script.google.com/macros/s/AKfycbwP09q3UMN0Z5_x44kuSpTAiH3yiTPL49nNATYnVBp0SDP0ddbhfk82KlC4IZJ-CKlO/exec`
+  - 旧デプロイ（見積マスターにくっついていた版）は 2026-11-19 にアーカイブ済みで、見積マスターからも Buddy のコードは削除済み。
   - 移行前に作った見積ファイルには旧コードのコピーが入っているが、デプロイされていないので動かない。
 - フォロー通知のトリガー（`sendFollowUpEmails`）は「Buddy API」側にだけ置く（2つあるとメールが2通届く）。
 - ログイン：Google Identity Services の IDトークン → `login` でセッション発行（30日）。OAuth クライアントIDはスクリプトプロパティ `GOOGLE_CLIENT_ID`。

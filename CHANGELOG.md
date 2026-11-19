@@ -4,6 +4,7 @@
 
 ## 2026-11-19
 - Buddy の Apps Script を見積マスターから単独のプロジェクト「Buddy API」に移行。index.html の接続先（API_URL）を新しいURLに変更。
+- 旧デプロイをアーカイブし、見積マスターから Buddy のコードを削除（UnitPriceFormat だけ残す）。
 
 ## 2026-11-18
 - 見積マスター：単価（I列）の表示形式を J6 の通貨に合わせて自動で切り替えるスクリプト（template/UnitPriceFormat.gs）を追加。単価は今までどおり手入力。
